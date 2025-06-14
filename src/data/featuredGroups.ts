@@ -86,7 +86,7 @@ export const featuredGroups = [
     category: "Lifestyle",
     isLocal: true,
     trending: false,
-    image: "https://images.unsplash.com/photo-1465146344425-f00d5f5c8f07?w=400&h=300&fit=crop",
+    image: "/lovable-uploads/b364e6f1-f02e-471d-8504-151285937585.png",
     tags: ["gardening", "sustainability", "plants"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
