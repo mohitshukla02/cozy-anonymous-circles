@@ -73,7 +73,6 @@ const TagOnboarding = () => {
           {TAG_CATEGORIES.map((category) => (
             <div key={category.id} className="bg-white rounded-2xl shadow-sm p-6">
               <div className="flex items-center space-x-3 mb-4">
-                <span className="text-2xl">{category.icon}</span>
                 <h2 className="text-xl font-semibold text-gray-900">{category.name}</h2>
               </div>
               <div className="flex flex-wrap gap-2">
@@ -88,7 +87,6 @@ const TagOnboarding = () => {
                     }`}
                     onClick={() => handleTagToggle(tag.id)}
                   >
-                    <span className="mr-1">{tag.icon}</span>
                     {tag.name}
                   </Badge>
                 ))}
