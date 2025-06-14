@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-react';
@@ -92,10 +91,6 @@ const Header = () => {
           </div>
 
           <div className="flex items-center space-x-2">
-            <span className="text-xs text-gray-500 hidden sm:block mr-3">
-              <span className="font-medium text-gray-700">{username}</span>
-            </span>
-            
             {/* Notifications */}
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
