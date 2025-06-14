@@ -13,6 +13,7 @@ import TagOnboarding from "./pages/TagOnboarding";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
+import GroupDetail from "./pages/GroupDetail";
 import Feed from "./pages/Feed";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
@@ -71,6 +72,11 @@ const AppContent = () => {
           <Route path="/groups" element={
             <ProtectedRoute>
               <Groups />
+            </ProtectedRoute>
+          } />
+          <Route path="/groups/:groupId" element={
+            <ProtectedRoute>
+              <GroupDetail />
             </ProtectedRoute>
           } />
           <Route path="/feed" element={
