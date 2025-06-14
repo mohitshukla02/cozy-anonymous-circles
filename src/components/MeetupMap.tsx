@@ -1,9 +1,8 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
-import { MapPin, Calendar, Users, ExternalLink } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
+import { MapPin, Calendar, Users } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUser } from '@/contexts/UserContext';
 
@@ -120,13 +119,13 @@ const MeetupMap = () => {
       const markerElement = document.createElement('div');
       markerElement.className = 'meetup-marker';
       markerElement.style.cssText = `
-        width: 30px;
-        height: 30px;
-        background: linear-gradient(135deg, #f59e0b, #d97706);
+        width: 32px;
+        height: 32px;
+        background: #000;
         border: 2px solid white;
         border-radius: 50%;
         cursor: pointer;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -134,7 +133,7 @@ const MeetupMap = () => {
       
       const icon = document.createElement('div');
       icon.innerHTML = '📍';
-      icon.style.fontSize = '12px';
+      icon.style.fontSize = '14px';
       markerElement.appendChild(icon);
 
       const marker = new mapboxgl.Marker(markerElement)
@@ -164,80 +163,80 @@ const MeetupMap = () => {
 
   if (!mapboxToken) {
     return (
-      <Card className="p-6">
-        <div className="text-center">
-          <MapPin className="mx-auto text-amber-600 mb-4" size={48} />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">
-            Explore Meetups in {userLocation.city}
+      <div className="border border-gray-200 rounded-2xl p-8">
+        <div className="text-center max-w-md mx-auto">
+          <MapPin className="mx-auto text-gray-400 mb-4" size={32} />
+          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+            Explore meetups in {userLocation.city}
           </h3>
-          <p className="text-gray-600 mb-4">
-            Enter your Mapbox token to see upcoming meetups in your city
+          <p className="text-gray-600 mb-6">
+            Enter your Mapbox token to see upcoming events on the map
           </p>
           <form onSubmit={handleTokenSubmit} className="space-y-4">
             <input
               type="text"
               name="token"
-              placeholder="Enter your Mapbox public token"
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+              placeholder="Mapbox public token"
+              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-sm"
               required
             />
-            <Button type="submit" className="bg-amber-600 hover:bg-amber-700">
-              Load Map
-            </Button>
+            <button 
+              type="submit" 
+              className="w-full bg-black text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+            >
+              Load map
+            </button>
           </form>
-          <p className="text-xs text-gray-500 mt-2">
+          <p className="text-xs text-gray-500 mt-3">
             Get your token at{' '}
-            <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-amber-600 hover:underline">
+            <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-black hover:underline">
               mapbox.com
             </a>
           </p>
         </div>
-      </Card>
+      </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center space-x-2">
-          <MapPin className="text-amber-600" size={24} />
-          <h3 className="text-xl font-semibold text-gray-800">
-            Upcoming Meetups in {userLocation.city}, {userLocation.region}
-          </h3>
-        </div>
-        <span className="text-sm text-gray-500">{upcomingMeetups.length} events this week</span>
+    <div>
+      <div className="mb-6">
+        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+          Meetups in {userLocation.city}
+        </h2>
+        <p className="text-gray-600">{upcomingMeetups.length} events happening this week</p>
       </div>
       
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Map */}
         <div className="lg:col-span-2">
-          <div className="relative h-80 rounded-xl overflow-hidden border border-gray-200">
+          <div className="relative h-96 rounded-xl overflow-hidden border border-gray-200">
             <div ref={mapContainer} className="absolute inset-0" />
           </div>
         </div>
         
         {/* Meetup List */}
-        <div className="space-y-3">
-          <h4 className="font-medium text-gray-800">This Week's Events</h4>
-          <div className="space-y-2 max-h-72 overflow-y-auto">
+        <div>
+          <h3 className="font-medium text-gray-900 mb-4">This week's events</h3>
+          <div className="space-y-3 max-h-80 overflow-y-auto">
             {upcomingMeetups.map((meetup) => (
               <div
                 key={meetup.id}
-                className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                className={`p-4 rounded-lg border cursor-pointer transition-all ${
                   selectedMeetup?.id === meetup.id
-                    ? 'border-amber-300 bg-amber-50'
-                    : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                    ? 'border-black bg-gray-50'
+                    : 'border-gray-200 hover:border-gray-300'
                 }`}
                 onClick={() => setSelectedMeetup(meetup)}
               >
-                <h5 className="font-medium text-sm text-gray-800 mb-1">{meetup.title}</h5>
-                <p className="text-xs text-gray-600 mb-2">{meetup.groupName}</p>
+                <h4 className="font-medium text-gray-900 mb-1">{meetup.title}</h4>
+                <p className="text-sm text-gray-600 mb-3">{meetup.groupName}</p>
                 <div className="flex items-center justify-between text-xs text-gray-500">
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center gap-1">
                     <Calendar size={12} />
                     <span>{new Date(meetup.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
                   </div>
-                  <div className="flex items-center space-x-1">
+                  <div className="flex items-center gap-1">
                     <Users size={12} />
                     <span>{meetup.attendees}</span>
                   </div>
@@ -250,32 +249,31 @@ const MeetupMap = () => {
 
       {/* Selected Meetup Details */}
       {selectedMeetup && (
-        <Card className="p-4 border-amber-200 bg-amber-50">
+        <div className="mt-6 p-6 border border-gray-200 rounded-xl bg-gray-50">
           <div className="flex items-start justify-between">
-            <div>
-              <h4 className="font-semibold text-gray-800 mb-1">{selectedMeetup.title}</h4>
-              <p className="text-sm text-gray-600 mb-2">{selectedMeetup.groupName}</p>
-              <div className="flex items-center space-x-4 text-sm text-gray-600">
-                <div className="flex items-center space-x-1">
-                  <Calendar size={14} />
+            <div className="flex-1">
+              <h4 className="text-lg font-semibold text-gray-900 mb-1">{selectedMeetup.title}</h4>
+              <p className="text-gray-600 mb-4">{selectedMeetup.groupName}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+                <div className="flex items-center gap-2">
+                  <Calendar size={16} />
                   <span>{new Date(selectedMeetup.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <MapPin size={14} />
+                <div className="flex items-center gap-2">
+                  <MapPin size={16} />
                   <span>{selectedMeetup.location}</span>
                 </div>
-                <div className="flex items-center space-x-1">
-                  <Users size={14} />
+                <div className="flex items-center gap-2">
+                  <Users size={16} />
                   <span>{selectedMeetup.attendees} attending</span>
                 </div>
               </div>
             </div>
-            <Button size="sm" className="bg-amber-600 hover:bg-amber-700">
-              <ExternalLink size={14} className="mr-1" />
-              View Details
-            </Button>
+            <button className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+              Join event
+            </button>
           </div>
-        </Card>
+        </div>
       )}
     </div>
   );
