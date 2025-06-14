@@ -17,6 +17,7 @@ import GroupDetail from "./pages/GroupDetail";
 import Feed from "./pages/Feed";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
+import TagOnboarding from "./pages/TagOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -95,6 +96,11 @@ const AppContent = () => {
             <Route path="/messages" element={
               <ProtectedRoute>
                 <Messages />
+              </ProtectedRoute>
+            } />
+            <Route path="/tag-onboarding" element={
+              <ProtectedRoute>
+                <TagOnboarding />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

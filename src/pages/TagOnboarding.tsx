@@ -51,7 +51,7 @@ const TagOnboarding = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center">
         <div className="animate-pulse">
           <div className="bg-gray-200 h-32 w-96 rounded-lg"></div>
         </div>
@@ -60,7 +60,7 @@ const TagOnboarding = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 py-12 px-4">
+    <div className="min-h-screen py-12 px-4">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Interests</h1>
@@ -82,7 +82,7 @@ const TagOnboarding = () => {
                     variant={selectedTags.includes(tag.id) ? "default" : "secondary"}
                     className={`cursor-pointer transition-all hover:scale-105 ${
                       selectedTags.includes(tag.id)
-                        ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                        ? 'bg-blue-600 hover:bg-blue-700 text-white'
                         : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
                     }`}
                     onClick={() => handleTagToggle(tag.id)}
@@ -106,7 +106,7 @@ const TagOnboarding = () => {
           <Button
             onClick={handleSubmit}
             disabled={selectedTags.length === 0}
-            className="px-8 py-2 bg-amber-600 hover:bg-amber-700"
+            className="px-8 py-2 bg-blue-600 hover:bg-blue-700"
           >
             Continue with {selectedTags.length} interest{selectedTags.length !== 1 ? 's' : ''}
           </Button>

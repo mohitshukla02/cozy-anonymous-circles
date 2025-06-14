@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -48,7 +47,7 @@ const Profile = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="min-h-screen">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="animate-pulse space-y-4">
             <div className="bg-gray-200 h-32 rounded-lg"></div>
@@ -60,12 +59,12 @@ const Profile = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Profile Header */}
         <div className="bg-white rounded-2xl shadow-soft p-6 mb-6">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+            <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
               <User className="text-white" size={20} />
             </div>
             <div>
@@ -84,12 +83,12 @@ const Profile = () => {
         <div className="bg-white rounded-2xl shadow-soft p-6 mb-6">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center space-x-2">
-              <Tag className="text-amber-600" size={18} />
+              <Tag className="text-blue-600" size={18} />
               <h2 className="text-lg font-heading font-bold text-gray-800">Your Interests</h2>
             </div>
             <button
               onClick={handleEditTags}
-              className="flex items-center space-x-2 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-full hover:bg-amber-100 transition-colors text-xs"
+              className="flex items-center space-x-2 px-3 py-1.5 bg-gray-100 text-gray-800 rounded-lg hover:bg-gray-200 transition-colors text-xs"
             >
               <Edit3 size={14} />
               <span>Edit</span>
@@ -112,7 +111,7 @@ const Profile = () => {
               <p className="text-gray-500 mb-3 text-xs">No interests selected yet</p>
               <button
                 onClick={handleEditTags}
-                className="px-4 py-2 bg-amber-600 text-white rounded-full hover:bg-amber-700 transition-colors text-xs"
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-xs"
               >
                 Choose Your Interests
               </button>
@@ -139,7 +138,7 @@ const Profile = () => {
         {/* Settings */}
         <div className="bg-white rounded-2xl shadow-soft p-6 mb-6">
           <div className="flex items-center space-x-2 mb-4">
-            <Settings className="text-amber-600" size={18} />
+            <Settings className="text-blue-600" size={18} />
             <h2 className="text-lg font-heading font-bold text-gray-800">Account Settings</h2>
           </div>
 
@@ -151,7 +150,7 @@ const Profile = () => {
               </div>
               <select
                 value="light"
-                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-xs"
+                className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-xs"
               >
                 <option value="light">Light</option>
                 <option value="dark">Dark</option>
@@ -163,7 +162,7 @@ const Profile = () => {
                 <h3 className="font-semibold text-gray-800 text-sm">Notifications</h3>
                 <p className="text-xs text-gray-500">Manage your notification preferences</p>
               </div>
-              <button className="px-3 py-1.5 text-amber-600 hover:text-amber-700 transition-colors text-xs">
+              <button className="px-3 py-1.5 text-blue-600 hover:text-blue-700 transition-colors text-xs">
                 Configure
               </button>
             </div>
@@ -188,11 +187,11 @@ const Profile = () => {
               </ul>
             </div>
 
-            <div className="p-3 bg-amber-50 rounded-xl">
-              <h3 className="font-semibold text-amber-800 mb-1 text-sm">
+            <div className="p-3 bg-yellow-50 rounded-xl">
+              <h3 className="font-semibold text-yellow-800 mb-1 text-sm">
                 Username: {profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous'}
               </h3>
-              <p className="text-xs text-amber-700">
+              <p className="text-xs text-yellow-700">
                 Your username is your only identifier. Keep it safe!
               </p>
             </div>
