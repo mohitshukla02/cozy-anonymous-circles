@@ -7,6 +7,7 @@ import { getGroups, createGroup } from '@/utils/supabaseStorage';
 import { formatDistanceToNow } from 'date-fns';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupCard from '@/components/GroupCard';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -16,6 +17,11 @@ const Groups = () => {
   const [selectedTag, setSelectedTag] = useState('');
   const [groupType, setGroupType] = useState<'all' | 'interest' | 'local-meetup'>('all');
   const [cityFilter, setCityFilter] = useState('');
+  
+  const { profile, loading: profileLoading } = useUserProfile();
+
+  console.log('User profile in Groups:', profile);
+  console.log('User tags:', profile?.selected_tags);
 
   useEffect(() => {
     loadGroups();
@@ -88,7 +94,7 @@ const Groups = () => {
   const interestGroups = filteredGroups.filter(group => group.type === 'interest');
   const localGroups = filteredGroups.filter(group => group.type === 'local-meetup');
 
-  if (loading) {
+  if (loading || profileLoading) {
     return (
       <div className="max-w-6xl mx-auto px-4 py-8">
         <div className="animate-pulse space-y-4">
@@ -218,8 +224,12 @@ const Groups = () => {
           isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
           onCreate={handleGroupCreated}
-          userTags={[]} // You would pass user's selected tags here
-          userLocation={undefined} // You would pass user's location here
+          userTags={profile?.selected_tags || []}
+          userLocation={profile?.location_city && profile?.location_region ? {
+            city: profile.location_city,
+            region: profile.location_region,
+            coordinates: profile.location_coordinates
+          } : undefined}
         />
       )}
     </div>

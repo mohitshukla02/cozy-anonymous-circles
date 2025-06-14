@@ -5,28 +5,21 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { TAG_CATEGORIES } from '../types/tags';
 import { Badge } from '../components/ui/badge';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
+  const { profile, loading } = useUserProfile();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const navigate = useNavigate();
 
   if (!user) return null;
 
-  // For now, we'll use placeholder data since we don't have user profile storage yet
-  const userData = {
-    username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
-    selectedTags: [], // This will need to be implemented with a profile system
-    joinDate: user.created_at,
-    preferences: {
-      theme: 'light' as const
-    }
-  };
-
   console.log('User data in Profile:', user);
-  console.log('Selected tags:', userData.selectedTags);
+  console.log('Profile data:', profile);
+  console.log('Selected tags:', profile?.selected_tags);
 
-  const joinDate = new Date(userData.joinDate).toLocaleDateString('en-US', {
+  const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
@@ -53,6 +46,19 @@ const Profile = () => {
     return tagId;
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div className="animate-pulse space-y-4">
+            <div className="bg-gray-200 h-32 rounded-lg"></div>
+            <div className="bg-gray-200 h-64 rounded-lg"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
@@ -63,7 +69,9 @@ const Profile = () => {
               <User className="text-white" size={20} />
             </div>
             <div>
-              <h1 className="text-xl font-heading font-bold text-gray-800 mb-1">{userData.username}</h1>
+              <h1 className="text-xl font-heading font-bold text-gray-800 mb-1">
+                {profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous'}
+              </h1>
               <div className="flex items-center space-x-2 text-gray-500">
                 <Calendar size={14} />
                 <span className="text-xs">Joined {joinDate}</span>
@@ -88,9 +96,9 @@ const Profile = () => {
             </button>
           </div>
 
-          {userData.selectedTags && userData.selectedTags.length > 0 ? (
+          {profile?.selected_tags && profile.selected_tags.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {userData.selectedTags.map((tagId) => {
+              {profile.selected_tags.map((tagId) => {
                 const tagName = getTagName(tagId);
                 return (
                   <Badge key={tagId} variant="secondary" className="px-2 py-1 text-xs">
@@ -142,7 +150,7 @@ const Profile = () => {
                 <p className="text-xs text-gray-500">Choose your preferred theme</p>
               </div>
               <select
-                value={userData.preferences.theme}
+                value="light"
                 className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-xs"
               >
                 <option value="light">Light</option>
@@ -181,7 +189,9 @@ const Profile = () => {
             </div>
 
             <div className="p-3 bg-amber-50 rounded-xl">
-              <h3 className="font-semibold text-amber-800 mb-1 text-sm">Username: {userData.username}</h3>
+              <h3 className="font-semibold text-amber-800 mb-1 text-sm">
+                Username: {profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous'}
+              </h3>
               <p className="text-xs text-amber-700">
                 Your username is your only identifier. Keep it safe!
               </p>

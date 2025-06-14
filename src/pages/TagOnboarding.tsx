@@ -1,181 +1,187 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { ArrowRight, Check } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, ArrowLeft } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
 import { TAG_CATEGORIES } from '../types/tags';
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '../components/ui/accordion';
 import TagSelector from '../components/TagSelector';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { updateUserTags } from '@/utils/userProfileStorage';
+import { useAuth } from '@/contexts/AuthContext';
 
 const TagOnboarding = () => {
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const { user, updateTags, completeOnboarding } = useUser();
   const navigate = useNavigate();
+  const { user } = useAuth();
+  const { profile, loading, refreshProfile } = useUserProfile();
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
 
-  const handleTagToggle = (tagId: string) => {
+  // Load existing tags when profile is available
+  useEffect(() => {
+    if (profile?.selected_tags) {
+      console.log('Loading existing tags:', profile.selected_tags);
+      setSelectedTags(profile.selected_tags);
+    }
+  }, [profile]);
+
+  const toggleTag = (tagId: string) => {
+    console.log('Toggling tag:', tagId);
     if (selectedTags.includes(tagId)) {
       setSelectedTags(selectedTags.filter(id => id !== tagId));
-    } else if (selectedTags.length < 15) {
+    } else if (selectedTags.length < 10) {
       setSelectedTags([...selectedTags, tagId]);
     }
   };
 
-  const handleContinue = () => {
-    if (selectedTags.length >= 5) {
-      updateTags(selectedTags);
-      completeOnboarding();
-      navigate('/dashboard');
+  const handleContinue = async () => {
+    if (!user || selectedTags.length < 3) return;
+    
+    setIsLoading(true);
+    console.log('Saving tags:', selectedTags);
+    
+    try {
+      const success = await updateUserTags(user.id, selectedTags);
+      
+      if (success) {
+        console.log('Tags saved successfully');
+        await refreshProfile(); // Refresh the profile to get updated data
+        navigate('/dashboard');
+      } else {
+        console.error('Failed to save tags');
+        alert('Failed to save your interests. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error saving tags:', error);
+      alert('An error occurred while saving your interests. Please try again.');
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getSelectedTagNames = () => {
-    const tagMap = new Map();
-    TAG_CATEGORIES.forEach(category => {
-      category.tags.forEach(tag => {
-        tagMap.set(tag.id, tag.name);
-      });
-    });
-    return selectedTags.map(id => tagMap.get(id));
-  };
-
-  if (!user) {
-    navigate('/');
-    return null;
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
+        <div className="animate-pulse">
+          <div className="bg-gray-200 h-8 w-64 rounded mb-4"></div>
+          <div className="bg-gray-200 h-4 w-96 rounded"></div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         {/* Header */}
-        <div className="text-center mb-8">
-          <h1 className="text-4xl font-heading font-bold text-gray-800 mb-4">
-            Let's Find Your Tribe
+        <div className="text-center mb-12">
+          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-gray-900 mb-4">
+            What interests you?
           </h1>
-          <p className="text-gray-600 text-base max-w-2xl mx-auto">
-            Choose 5-15 interests that truly resonate with you. This helps us connect you with like-minded people 
-            and suggest relevant groups for meaningful conversations.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Choose topics you're passionate about to find your perfect communities. 
+            Select at least 3 interests to get started.
           </p>
         </div>
 
-        {/* Progress Indicator */}
-        <div className="mb-8">
-          <div className="flex justify-between items-center mb-2">
-            <span className="text-sm text-gray-600">Progress</span>
-            <span className="text-sm text-gray-600">
-              {selectedTags.length}/15 selected {selectedTags.length < 5 ? `(${5 - selectedTags.length} more needed)` : ''}
-            </span>
-          </div>
-          <div className="w-full bg-gray-200 rounded-full h-2">
-            <div 
-              className="bg-amber-500 h-2 rounded-full transition-all duration-300"
-              style={{ width: `${Math.min((selectedTags.length / 15) * 100, 100)}%` }}
-            />
+        {/* Progress indicator */}
+        <div className="flex justify-center mb-8">
+          <div className="flex items-center space-x-2">
+            <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
+            <div className="w-8 h-1 bg-amber-500 rounded"></div>
+            <div className="w-3 h-3 bg-amber-200 rounded-full"></div>
           </div>
         </div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
-          {/* Tag Categories */}
-          <div className="lg:col-span-2">
-            <div className="bg-white rounded-3xl shadow-soft p-6">
-              <h2 className="text-xl font-heading font-semibold text-gray-800 mb-6">
-                Choose Your Interests
+        {/* Tag Categories */}
+        <div className="space-y-8 mb-12">
+          {TAG_CATEGORIES.map((category) => (
+            <div key={category.id} className="bg-white rounded-2xl p-6 shadow-soft">
+              <h2 className="text-xl font-heading font-semibold text-gray-800 mb-4 flex items-center">
+                <span className="text-2xl mr-3">{category.emoji}</span>
+                {category.name}
               </h2>
-              
-              <Accordion type="multiple" className="space-y-4">
-                {TAG_CATEGORIES.map((category) => (
-                  <AccordionItem 
-                    key={category.id} 
-                    value={category.id}
-                    className="border border-gray-200 rounded-2xl px-6"
-                  >
-                    <AccordionTrigger className="text-left">
-                      <div className="flex items-center gap-3">
-                        <div className={`w-4 h-4 rounded-full ${category.color}`} />
-                        <span className="font-medium text-gray-800">{category.name}</span>
-                        <span className="text-xs text-gray-500">
-                          ({category.tags.filter(tag => selectedTags.includes(tag.id)).length} selected)
-                        </span>
-                      </div>
-                    </AccordionTrigger>
-                    <AccordionContent className="pt-4">
-                      <div className="flex flex-wrap gap-3">
-                        {category.tags.map((tag) => (
-                          <TagSelector
-                            key={tag.id}
-                            tag={tag}
-                            isSelected={selectedTags.includes(tag.id)}
-                            onToggle={handleTagToggle}
-                          />
-                        ))}
-                      </div>
-                    </AccordionContent>
-                  </AccordionItem>
+              <div className="flex flex-wrap gap-3">
+                {category.tags.map((tag) => (
+                  <TagSelector
+                    key={tag.id}
+                    tag={tag}
+                    isSelected={selectedTags.includes(tag.id)}
+                    onToggle={toggleTag}
+                  />
                 ))}
-              </Accordion>
+              </div>
             </div>
-          </div>
+          ))}
+        </div>
 
-          {/* Selected Tags Summary */}
-          <div className="lg:col-span-1">
-            <div className="bg-white rounded-3xl shadow-soft p-6 sticky top-8">
-              <h3 className="text-lg font-heading font-semibold text-gray-800 mb-4">
-                Your Selected Interests
+        {/* Selection summary and continue button */}
+        <div className="bg-white rounded-2xl p-6 shadow-soft">
+          <div className="flex items-center justify-between">
+            <div>
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
+                Your Interests ({selectedTags.length}/10)
               </h3>
-              
-              {selectedTags.length === 0 ? (
-                <p className="text-gray-500 text-sm italic">
-                  No interests selected yet. Choose at least 5 to continue.
-                </p>
-              ) : (
-                <div className="space-y-3">
-                  <div className="flex flex-wrap gap-2">
-                    {getSelectedTagNames().map((tagName, index) => (
-                      <span
-                        key={index}
-                        className="inline-block bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-medium"
-                      >
-                        {tagName}
-                      </span>
-                    ))}
-                  </div>
-                  
-                  <div className="text-xs text-gray-600 border-t pt-3">
-                    <p>✓ {selectedTags.length} interests selected</p>
-                    {selectedTags.length < 5 && (
-                      <p className="text-amber-600">Choose {5 - selectedTags.length} more to continue</p>
-                    )}
-                    {selectedTags.length >= 15 && (
-                      <p className="text-amber-600">Maximum reached (15)</p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {/* Continue Button */}
-              <button
-                onClick={handleContinue}
-                disabled={selectedTags.length < 5}
-                className={`
-                  w-full mt-6 py-3 rounded-full font-semibold flex items-center justify-center gap-2 transition-all
-                  ${selectedTags.length >= 5
-                    ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-md hover:shadow-lg'
-                    : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                  }
-                `}
-              >
-                <span>Continue to Dashboard</span>
-                <ArrowRight size={20} />
-              </button>
-
-              <button
-                onClick={() => navigate('/signup')}
-                className="w-full mt-3 text-gray-500 hover:text-gray-700 transition-colors flex items-center justify-center gap-2 text-sm"
-              >
-                <ArrowLeft size={16} />
-                <span>Back to Signup</span>
-              </button>
+              <p className="text-gray-600 text-sm">
+                {selectedTags.length < 3 
+                  ? `Select ${3 - selectedTags.length} more to continue`
+                  : 'Great! You can add more or continue to your dashboard.'
+                }
+              </p>
             </div>
+            <button
+              onClick={handleContinue}
+              disabled={selectedTags.length < 3 || isLoading}
+              className={`
+                flex items-center space-x-2 px-6 py-3 rounded-full font-medium transition-all
+                ${selectedTags.length >= 3 && !isLoading
+                  ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-lg hover:shadow-xl'
+                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                }
+              `}
+            >
+              {isLoading ? (
+                <>
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                  <span>Saving...</span>
+                </>
+              ) : (
+                <>
+                  <span>{profile?.selected_tags?.length ? 'Update' : 'Continue'}</span>
+                  <ArrowRight size={18} />
+                </>
+              )}
+            </button>
           </div>
+
+          {selectedTags.length > 0 && (
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <div className="flex flex-wrap gap-2">
+                {selectedTags.map((tagId) => {
+                  const tag = TAG_CATEGORIES
+                    .flatMap(cat => cat.tags)
+                    .find(t => t.id === tagId);
+                  return tag ? (
+                    <span
+                      key={tagId}
+                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-amber-100 text-amber-800"
+                    >
+                      <Check size={14} className="mr-1" />
+                      {tag.name}
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {/* Skip option */}
+        <div className="text-center mt-8">
+          <button
+            onClick={() => navigate('/dashboard')}
+            className="text-gray-500 hover:text-gray-700 transition-colors text-sm"
+          >
+            Skip for now
+          </button>
         </div>
       </div>
     </div>
