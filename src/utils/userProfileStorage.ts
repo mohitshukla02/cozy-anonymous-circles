@@ -9,6 +9,7 @@ export interface UserProfile {
   location_city?: string;
   location_region?: string;
   location_coordinates?: { lat: number; lng: number };
+  reddit_karma?: number;
   created_at: string;
   updated_at: string;
 }
