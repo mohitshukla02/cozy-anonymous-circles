@@ -39,6 +39,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
   const [privacy, setPrivacy] = useState<'open' | 'invitation'>('open');
   const [groupType, setGroupType] = useState<'interest' | 'local-meetup'>('interest');
   const [groupLocation, setGroupLocation] = useState(userLocation);
+  const [locationError, setLocationError] = useState('');
 
   // If userTags is empty, use all available tags, otherwise use userTags
   const availableTags = userTags.length > 0 ? userTags : TAG_CATEGORIES.flatMap(category => category.tags.map(tag => tag.id));
@@ -52,31 +53,50 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (name.trim() && description.trim() && selectedTags.length >= 3) {
-      if (groupType === 'local-meetup' && !groupLocation) {
-        return; // Location required for local meetup groups
-      }
+    setLocationError('');
 
-      onCreate({
-        name: name.trim(),
-        description: description.trim(),
-        tags: selectedTags,
-        memberLimit: groupType === 'local-meetup' ? Math.min(memberLimit, 20) : memberLimit,
-        privacy,
-        type: groupType,
-        location: groupType === 'local-meetup' ? groupLocation : undefined
-      });
-      
-      // Reset form
-      setName('');
-      setDescription('');
-      setSelectedTags([]);
-      setMemberLimit(30);
-      setPrivacy('open');
-      setGroupType('interest');
-      setGroupLocation(userLocation);
-      onClose();
+    // Basic validation
+    if (!name.trim() || !description.trim() || selectedTags.length < 3) {
+      return;
     }
+
+    // Location validation for local meetup groups
+    if (groupType === 'local-meetup') {
+      if (!groupLocation || !groupLocation.city || !groupLocation.region) {
+        setLocationError('Location is required for local meetup groups');
+        return;
+      }
+    }
+
+    console.log('Creating group with data:', {
+      name: name.trim(),
+      description: description.trim(),
+      tags: selectedTags,
+      memberLimit: groupType === 'local-meetup' ? Math.min(memberLimit, 20) : memberLimit,
+      privacy,
+      type: groupType,
+      location: groupType === 'local-meetup' ? groupLocation : undefined
+    });
+
+    onCreate({
+      name: name.trim(),
+      description: description.trim(),
+      tags: selectedTags,
+      memberLimit: groupType === 'local-meetup' ? Math.min(memberLimit, 20) : memberLimit,
+      privacy,
+      type: groupType,
+      location: groupType === 'local-meetup' ? groupLocation : undefined
+    });
+    
+    // Reset form
+    setName('');
+    setDescription('');
+    setSelectedTags([]);
+    setMemberLimit(30);
+    setPrivacy('open');
+    setGroupType('interest');
+    setGroupLocation(userLocation);
+    setLocationError('');
   };
 
   const toggleTag = (tagId: string) => {
@@ -87,7 +107,30 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
     }
   };
 
+  const handleLocationSelect = (location: { city: string; region: string; coordinates?: { lat: number; lng: number } }) => {
+    console.log('Location selected:', location);
+    setGroupLocation(location);
+    setLocationError('');
+  };
+
+  const handleGroupTypeChange = (type: 'interest' | 'local-meetup') => {
+    setGroupType(type);
+    setLocationError('');
+    // Reset location when switching to interest group
+    if (type === 'interest') {
+      setGroupLocation(undefined);
+    } else {
+      // Set to user location if available when switching to local meetup
+      setGroupLocation(userLocation);
+    }
+  };
+
   if (!isOpen) return null;
+
+  const isFormValid = name.trim() && 
+                     description.trim() && 
+                     selectedTags.length >= 3 &&
+                     (groupType === 'interest' || (groupType === 'local-meetup' && groupLocation?.city && groupLocation?.region));
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
@@ -112,7 +155,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
-                onClick={() => setGroupType('interest')}
+                onClick={() => handleGroupTypeChange('interest')}
                 className={`p-3 rounded-lg border text-sm transition-all ${
                   groupType === 'interest'
                     ? 'bg-blue-50 border-blue-300 text-blue-800'
@@ -124,7 +167,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
               </button>
               <button
                 type="button"
-                onClick={() => setGroupType('local-meetup')}
+                onClick={() => handleGroupTypeChange('local-meetup')}
                 className={`p-3 rounded-lg border text-sm transition-all ${
                   groupType === 'local-meetup'
                     ? 'bg-green-50 border-green-300 text-green-800'
@@ -143,9 +186,12 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
                 Location <span className="text-red-500">*</span>
               </label>
               <LocationSelector
-                onLocationSelect={setGroupLocation}
+                onLocationSelect={handleLocationSelect}
                 selectedLocation={groupLocation}
               />
+              {locationError && (
+                <p className="text-sm text-red-600 mt-1">{locationError}</p>
+              )}
             </div>
           )}
 
@@ -280,12 +326,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
             </Button>
             <Button
               type="submit"
-              disabled={
-                !name.trim() || 
-                !description.trim() || 
-                selectedTags.length < 3 ||
-                (groupType === 'local-meetup' && !groupLocation)
-              }
+              disabled={!isFormValid}
               className="flex-1 bg-amber-600 hover:bg-amber-700"
             >
               Create Group
