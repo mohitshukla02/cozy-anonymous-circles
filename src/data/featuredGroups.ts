@@ -1,10 +1,13 @@
 
+
 export const featuredGroups = [
   {
     id: 'featured-1',
     name: "Local Photographers",
     description: "Capture Hyderabad's iconic heritage sites, bustling markets, and modern skyline. Weekly photo walks through Old City, Banjara Hills, and HITEC City.",
     members: 127,
+    memberIds: [], // Will be populated with actual member IDs
+    memberLimit: 50,
     category: "Creative Arts",
     isLocal: true,
     trending: true,
@@ -12,13 +15,16 @@ export const featuredGroups = [
     tags: ["photography", "creative", "arts"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-01-15').toISOString()
   },
   {
     id: 'featured-2',
     name: "Weekend Hikers",
     description: "Explore the rocky terrain around Hyderabad. Trek to Ananthagiri Hills, Bhongir Fort, and hidden gems in the Deccan plateau every Saturday morning.",
     members: 89,
+    memberIds: [],
+    memberLimit: 50,
     category: "Sports & Outdoors",
     isLocal: true,
     trending: false,
@@ -26,25 +32,31 @@ export const featuredGroups = [
     tags: ["hiking", "outdoor", "fitness"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-01-20').toISOString()
   },
   {
     id: 'featured-3',
     name: "Book Club Enthusiasts",
     description: "Monthly deep dives into contemporary fiction, classic literature, and regional authors. Virtual discussions with members worldwide sharing diverse perspectives.",
     members: 156,
+    memberIds: [],
+    memberLimit: 50,
     category: "Intellectual",
     isLocal: false,
     trending: true,
     image: "/lovable-uploads/d9cd9dda-8dd7-4348-adce-1fd23806b825.png",
     tags: ["books", "reading", "discussion"],
-    type: "interest" as const
+    type: "interest" as const,
+    createdDate: new Date('2024-01-10').toISOString()
   },
   {
     id: 'featured-4',
     name: "Chai & Conversations",
     description: "Connect over steaming cups of Irani chai at iconic spots like Nimrah Cafe and Shadab Hotel. Weekly meetups for meaningful conversations and networking.",
     members: 203,
+    memberIds: [],
+    memberLimit: 50,
     category: "Lifestyle",
     isLocal: true,
     trending: false,
@@ -52,37 +64,46 @@ export const featuredGroups = [
     tags: ["social", "lifestyle", "networking"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-01-25').toISOString()
   },
   {
     id: 'featured-5',
     name: "Startup Founders",
     description: "Global community of entrepreneurs building the next big thing. Share insights, find co-founders, and navigate the startup journey together through virtual meetups.",
     members: 84,
+    memberIds: [],
+    memberLimit: 50,
     category: "Business",
     isLocal: false,
     trending: true,
     image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop",
     tags: ["startup", "business", "entrepreneurship"],
-    type: "interest" as const
+    type: "interest" as const,
+    createdDate: new Date('2024-01-30').toISOString()
   },
   {
     id: 'featured-6',
     name: "Robotics Enthusiasts",
     description: "Build, program, and tinker with robots. Share projects, learn new techniques, and collaborate on innovative automation solutions with fellow makers worldwide.",
     members: 67,
+    memberIds: [],
+    memberLimit: 50,
     category: "Technology",
     isLocal: false,
     trending: false,
     image: "https://images.unsplash.com/photo-1518770660439-4636190af475?w=400&h=300&fit=crop",
     tags: ["robotics", "technology", "programming"],
-    type: "interest" as const
+    type: "interest" as const,
+    createdDate: new Date('2024-02-01').toISOString()
   },
   {
     id: 'featured-7',
     name: "Urban Gardeners",
     description: "Transform Hyderabad's concrete jungle into green oases. Learn terrace gardening, organic farming techniques, and sustainable living practices in our city's climate.",
     members: 142,
+    memberIds: [],
+    memberLimit: 50,
     category: "Lifestyle",
     isLocal: true,
     trending: false,
@@ -90,13 +111,16 @@ export const featuredGroups = [
     tags: ["gardening", "sustainability", "plants"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-02-05').toISOString()
   },
   {
     id: 'featured-8',
     name: "Golden Years Circle",
     description: "Vibrant community of seniors celebrating life through laughter yoga, group activities, and cultural events. Weekly gatherings at Lumbini Park and NTR Gardens for wellness and joy.",
     members: 95,
+    memberIds: [],
+    memberLimit: 50,
     category: "Community",
     isLocal: true,
     trending: false,
@@ -104,32 +128,40 @@ export const featuredGroups = [
     tags: ["seniors", "community", "activities"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-02-10').toISOString()
   },
   {
     id: 'featured-9',
     name: "Literary Society",
     description: "Writers, poets, and literature lovers unite across borders. Share original works, provide feedback, and explore diverse literary traditions through virtual workshops.",
     members: 118,
+    memberIds: [],
+    memberLimit: 50,
     category: "Arts & Culture",
     isLocal: false,
     trending: true,
     image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=300&fit=crop",
     tags: ["writing", "literature", "poetry"],
-    type: "interest" as const
+    type: "interest" as const,
+    createdDate: new Date('2024-02-12').toISOString()
   },
   {
     id: 'featured-10',
     name: "Jam Session Collective",
     description: "Musicians jamming across genres in Hyderabad's vibrant music scene. Meet at local studios, cafes in Jubilee Hills, and outdoor venues for collaborative sessions.",
     members: 76,
+    memberIds: [],
+    memberLimit: 50,
     category: "Music",
     isLocal: true,
     trending: false,
-    image: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=300&fit=crop",
+    image: "/lovable-uploads/607699cd-7553-4f8d-ad9e-469b40624b13.png",
     tags: ["music", "jamming", "instruments"],
     type: "local-meetup" as const,
     locationCity: "Hyderabad",
-    locationRegion: "Telangana"
+    locationRegion: "Telangana",
+    createdDate: new Date('2024-02-15').toISOString()
   }
 ];
+
