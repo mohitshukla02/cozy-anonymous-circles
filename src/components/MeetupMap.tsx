@@ -5,6 +5,8 @@ import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin, Calendar, Users, ExternalLink } from 'lucide-react';
 import { Button } from './ui/button';
 import { Card } from './ui/card';
+import { useUserProfile } from '@/hooks/useUserProfile';
+import { useUser } from '@/contexts/UserContext';
 
 interface Meetup {
   id: string;
@@ -21,46 +23,79 @@ const MeetupMap = () => {
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedMeetup, setSelectedMeetup] = useState<Meetup | null>(null);
+  const { profile } = useUserProfile();
+  const { user } = useUser();
 
-  // Mock upcoming meetups data - in a real app, this would come from your backend
-  const upcomingMeetups: Meetup[] = [
-    {
-      id: '1',
-      title: 'Weekend Photography Walk',
-      groupName: 'Local Photographers',
-      date: '2024-06-16',
-      location: 'Central Park',
-      coordinates: [-73.9665, 40.7829], // Central Park NYC coordinates
-      attendees: 12
-    },
-    {
-      id: '2',
-      title: 'Saturday Morning Hike',
-      groupName: 'Weekend Hikers',
-      date: '2024-06-17',
-      location: 'Prospect Park',
-      coordinates: [-73.9690, 40.6602], // Prospect Park coordinates
-      attendees: 8
-    },
-    {
-      id: '3',
-      title: 'Coffee & Book Discussion',
-      groupName: 'Book Club Enthusiasts',
-      date: '2024-06-18',
-      location: 'Brooklyn Heights',
-      coordinates: [-73.9969, 40.6955], // Brooklyn Heights coordinates
-      attendees: 15
-    },
-    {
-      id: '4',
-      title: 'Sunset Meetup',
-      groupName: 'Coffee & Conversations',
-      date: '2024-06-19',
-      location: 'Williamsburg',
-      coordinates: [-73.9442, 40.7081], // Williamsburg coordinates
-      attendees: 20
+  // Generate meetups based on user's location or default to NYC
+  const getUserLocation = () => {
+    if (profile?.location?.coordinates) {
+      return {
+        center: [profile.location.coordinates.lng, profile.location.coordinates.lat] as [number, number],
+        city: profile.location.city,
+        region: profile.location.region
+      };
+    } else if (user?.location?.coordinates) {
+      return {
+        center: [user.location.coordinates.lng, user.location.coordinates.lat] as [number, number],
+        city: user.location.city,
+        region: user.location.region
+      };
     }
-  ];
+    // Default to NYC if no location is set
+    return {
+      center: [-73.9665, 40.7829] as [number, number],
+      city: 'New York',
+      region: 'NY'
+    };
+  };
+
+  const userLocation = getUserLocation();
+
+  // Generate meetups around user's location
+  const generateLocalMeetups = (centerLng: number, centerLat: number, cityName: string): Meetup[] => {
+    const meetupTemplates = [
+      { title: 'Weekend Photography Walk', groupName: 'Local Photographers', category: 'photography' },
+      { title: 'Saturday Morning Hike', groupName: 'Weekend Hikers', category: 'hiking' },
+      { title: 'Coffee & Book Discussion', groupName: 'Book Club Enthusiasts', category: 'books' },
+      { title: 'Sunset Meetup', groupName: 'Coffee & Conversations', category: 'social' },
+      { title: 'Local Art Gallery Tour', groupName: 'Art Enthusiasts', category: 'art' },
+      { title: 'Tech Networking Event', groupName: 'Tech Professionals', category: 'tech' }
+    ];
+
+    const locations = [
+      'Downtown',
+      'City Center',
+      'Riverside Park',
+      'Main Street',
+      'Community Center',
+      'Local Library'
+    ];
+
+    return meetupTemplates.slice(0, 4).map((template, index) => {
+      // Generate coordinates within ~5km radius of user location
+      const offsetLng = (Math.random() - 0.5) * 0.1; // ~5km radius
+      const offsetLat = (Math.random() - 0.5) * 0.1;
+      
+      const date = new Date();
+      date.setDate(date.getDate() + index + 1); // Next few days
+
+      return {
+        id: (index + 1).toString(),
+        title: template.title,
+        groupName: template.groupName,
+        date: date.toISOString().split('T')[0],
+        location: `${locations[index]}, ${cityName}`,
+        coordinates: [centerLng + offsetLng, centerLat + offsetLat] as [number, number],
+        attendees: Math.floor(Math.random() * 20) + 5
+      };
+    });
+  };
+
+  const upcomingMeetups = generateLocalMeetups(
+    userLocation.center[0], 
+    userLocation.center[1], 
+    userLocation.city
+  );
 
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
@@ -71,8 +106,8 @@ const MeetupMap = () => {
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: 'mapbox://styles/mapbox/light-v11',
-      center: [-73.9665, 40.7829], // Centered on NYC
-      zoom: 11,
+      center: userLocation.center,
+      zoom: 12, // Closer zoom for city-level view
     });
 
     // Add navigation controls
@@ -117,7 +152,7 @@ const MeetupMap = () => {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken]);
+  }, [mapboxToken, userLocation.center[0], userLocation.center[1]]);
 
   const handleTokenSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -133,7 +168,9 @@ const MeetupMap = () => {
       <Card className="p-6">
         <div className="text-center">
           <MapPin className="mx-auto text-amber-600 mb-4" size={48} />
-          <h3 className="text-xl font-semibold text-gray-800 mb-2">Explore Local Meetups</h3>
+          <h3 className="text-xl font-semibold text-gray-800 mb-2">
+            Explore Meetups in {userLocation.city}
+          </h3>
           <p className="text-gray-600 mb-4">
             Enter your Mapbox token to see upcoming meetups in your city
           </p>
@@ -165,7 +202,9 @@ const MeetupMap = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center space-x-2">
           <MapPin className="text-amber-600" size={24} />
-          <h3 className="text-xl font-semibold text-gray-800">Upcoming Meetups Near You</h3>
+          <h3 className="text-xl font-semibold text-gray-800">
+            Upcoming Meetups in {userLocation.city}, {userLocation.region}
+          </h3>
         </div>
         <span className="text-sm text-gray-500">{upcomingMeetups.length} events this week</span>
       </div>
