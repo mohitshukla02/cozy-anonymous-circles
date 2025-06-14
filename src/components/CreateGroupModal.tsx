@@ -40,7 +40,9 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
   const [groupType, setGroupType] = useState<'interest' | 'local-meetup'>('interest');
   const [groupLocation, setGroupLocation] = useState(userLocation);
 
-  const availableTags = userTags;
+  // If userTags is empty, use all available tags, otherwise use userTags
+  const availableTags = userTags.length > 0 ? userTags : TAG_CATEGORIES.flatMap(category => category.tags.map(tag => tag.id));
+  
   const tagNames = new Map();
   TAG_CATEGORIES.forEach(category => {
     category.tags.forEach(tag => {
@@ -192,7 +194,7 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
                       : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
                   }`}
                 >
-                  {tagNames.get(tagId)}
+                  {tagNames.get(tagId) || tagId}
                 </button>
               ))}
             </div>
