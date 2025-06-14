@@ -2,8 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Users, Clock, AlertTriangle } from 'lucide-react';
+import { MessageCircle, Clock, AlertTriangle } from 'lucide-react';
 import MessagingInterface from '@/components/MessagingInterface';
+import MessagingGuidelinesModal from '@/components/MessagingGuidelinesModal';
 import { useAuth } from '@/contexts/AuthContext';
 import { getUserConversations, getGroupsNearDeadline } from '@/utils/supabaseHelpers';
 
@@ -11,11 +12,18 @@ const Messages = () => {
   const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const [warningGroups, setWarningGroups] = useState<any[]>([]);
+  const [showGuidelines, setShowGuidelines] = useState(false);
 
   useEffect(() => {
     if (user) {
       loadMessageStats();
       loadGroupWarnings();
+      
+      // Show guidelines modal on first visit
+      const hasSeenGuidelines = localStorage.getItem('messaging-guidelines-seen');
+      if (!hasSeenGuidelines) {
+        setShowGuidelines(true);
+      }
     }
   }, [user]);
 
@@ -40,8 +48,13 @@ const Messages = () => {
     }
   };
 
+  const handleGuidelinesClose = () => {
+    setShowGuidelines(false);
+    localStorage.setItem('messaging-guidelines-seen', 'true');
+  };
+
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl pt-20">
+    <div className="container mx-auto px-4 py-8 max-w-7xl pt-16">
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <MessageCircle className="w-8 h-8 text-blue-600" />
@@ -90,43 +103,14 @@ const Messages = () => {
         </Card>
       )}
 
-      {/* How Messaging Works */}
-      <Card className="mb-6 bg-blue-50 border-blue-200">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-blue-800">
-            <Users className="w-5 h-5" />
-            How Anonymous Messaging Works
-          </CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid md:grid-cols-3 gap-4 text-sm">
-            <div className="text-center">
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-2">
-                1
-              </div>
-              <h4 className="font-medium text-blue-800">Interact in Groups</h4>
-              <p className="text-blue-700">Like and comment on posts from others in shared groups</p>
-            </div>
-            <div className="text-center">
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-2">
-                2
-              </div>
-              <h4 className="font-medium text-blue-800">Build Trust</h4>
-              <p className="text-blue-700">After 3+ mutual interactions, messaging unlocks</p>
-            </div>
-            <div className="text-center">
-              <div className="w-8 h-8 bg-blue-200 rounded-full flex items-center justify-center mx-auto mb-2">
-                3
-              </div>
-              <h4 className="font-medium text-blue-800">Start Chatting</h4>
-              <p className="text-blue-700">Send direct messages with your anonymous group identity</p>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Messaging Interface */}
       <MessagingInterface />
+
+      {/* Guidelines Modal */}
+      <MessagingGuidelinesModal 
+        open={showGuidelines} 
+        onClose={handleGuidelinesClose} 
+      />
     </div>
   );
 };
