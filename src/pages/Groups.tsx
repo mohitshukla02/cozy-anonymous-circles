@@ -23,7 +23,7 @@ const Groups = () => {
   const { profile, loading: profileLoading } = useUserProfile();
   const { user } = useAuth();
 
-  // Featured groups from Dashboard
+  // Featured groups from Dashboard with images
   const featuredGroups = [
     {
       id: 'featured-1',
@@ -79,7 +79,7 @@ const Groups = () => {
       locationCity: "Hyderabad",
       locationRegion: "Telangana"
     },
-    // New groups
+    // New groups with images
     {
       id: 'featured-5',
       name: "Startup Founders",
@@ -140,7 +140,7 @@ const Groups = () => {
       category: "Arts & Culture",
       isLocal: false,
       trending: true,
-      image: "https://images.unsplash.com/photo-1498050108023-c5249f4df085?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1487058792275-0ad4aaf24ca7?w=400&h=300&fit=crop",
       tags: ["writing", "literature", "poetry"],
       type: "interest" as const
     },
@@ -152,7 +152,7 @@ const Groups = () => {
       category: "Music",
       isLocal: true,
       trending: false,
-      image: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?w=400&h=300&fit=crop",
+      image: "https://images.unsplash.com/photo-1500673922987-e212871fec22?w=400&h=300&fit=crop",
       tags: ["music", "jamming", "instruments"],
       type: "local-meetup" as const,
       locationCity: "Hyderabad",
@@ -160,7 +160,7 @@ const Groups = () => {
     }
   ];
 
-  // Convert featured groups to Group format
+  // Convert featured groups to Group format with images
   const convertedFeaturedGroups: Group[] = featuredGroups.map(group => ({
     id: group.id,
     name: group.name,
@@ -174,7 +174,8 @@ const Groups = () => {
     type: group.type,
     locationCity: group.locationCity,
     locationRegion: group.locationRegion,
-    isArchived: false
+    isArchived: false,
+    image: group.image
   }));
 
   useEffect(() => {
