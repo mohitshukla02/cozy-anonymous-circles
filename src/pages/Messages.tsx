@@ -4,11 +4,11 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { MessageCircle, Users, Clock, AlertTriangle } from 'lucide-react';
 import MessagingInterface from '@/components/MessagingInterface';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { getUserConversations, getGroupsNearDeadline } from '@/utils/supabaseHelpers';
 
 const Messages = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [unreadCount, setUnreadCount] = useState(0);
   const [warningGroups, setWarningGroups] = useState<any[]>([]);
 
@@ -20,10 +20,10 @@ const Messages = () => {
   }, [user]);
 
   const loadMessageStats = async () => {
-    if (!user?.username) return;
+    if (!user?.id) return;
     
     try {
-      const conversations = await getUserConversations(user.username);
+      const conversations = await getUserConversations(user.id);
       const totalUnread = conversations.reduce((sum, conv) => sum + conv.unreadCount, 0);
       setUnreadCount(totalUnread);
     } catch (error) {
@@ -41,7 +41,7 @@ const Messages = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-7xl">
+    <div className="container mx-auto px-4 py-8 max-w-7xl pt-20">
       <div className="mb-6">
         <div className="flex items-center gap-3 mb-2">
           <MessageCircle className="w-8 h-8 text-blue-600" />

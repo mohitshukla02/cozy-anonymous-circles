@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { Heart, MessageSquare, MoreHorizontal } from 'lucide-react';
 import { Post, Comment } from '../types/groups';
 import { formatDistanceToNow } from 'date-fns';
+import InteractionTracker from './InteractionTracker';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface PostCardProps {
   post: Post;
@@ -12,7 +14,6 @@ interface PostCardProps {
   onComment: (postId: string, content: string) => void;
   onLikeComment: (commentId: string) => void;
   onReply: (commentId: string, content: string) => void;
-  currentUserId: string;
   getUserName: (userId: string, groupId: string) => string;
   groupId: string;
   isLiked: boolean;
@@ -26,11 +27,11 @@ const PostCard = ({
   onComment, 
   onLikeComment,
   onReply,
-  currentUserId,
   getUserName,
   groupId,
   isLiked 
 }: PostCardProps) => {
+  const { user } = useAuth();
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
   const [replyingTo, setReplyingTo] = useState<string | null>(null);
@@ -57,6 +58,8 @@ const PostCard = ({
   const getReplies = (commentId: string) => 
     comments.filter(comment => comment.parentCommentId === commentId);
 
+  if (!user) return null;
+
   return (
     <div className="bg-white rounded-2xl p-4 shadow-soft border border-gray-100">
       <div className="flex justify-between items-start mb-3">
@@ -69,8 +72,8 @@ const PostCard = ({
           <div>
             <span className="font-medium text-gray-800 text-sm">{authorName}</span>
             <div className="text-xs text-gray-500">
-              {formatDistanceToNow(new Date(post.timestamp), { addSuffix: true })}
-              {post.editedAt && <span className="ml-1">(edited)</span>}
+              {formatDistanceToNow(new Date(post.timestamp || post.created_at), { addSuffix: true })}
+              {post.edited_at && <span className="ml-1">(edited)</span>}
             </div>
           </div>
         </div>
@@ -84,15 +87,21 @@ const PostCard = ({
       </p>
 
       <div className="flex items-center gap-4 mb-4">
-        <button
-          onClick={() => onLike(post.id)}
-          className={`flex items-center gap-1 text-sm transition-colors ${
-            isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-          }`}
+        <InteractionTracker
+          targetUserId={post.authorId || post.author_id}
+          groupId={groupId}
+          interactionType="like"
+          onInteraction={() => onLike(post.id)}
         >
-          <Heart size={16} className={isLiked ? 'fill-current' : ''} />
-          <span>{post.likes.length}</span>
-        </button>
+          <button
+            className={`flex items-center gap-1 text-sm transition-colors ${
+              isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+            }`}
+          >
+            <Heart size={16} className={isLiked ? 'fill-current' : ''} />
+            <span>{post.likes.length}</span>
+          </button>
+        </InteractionTracker>
         
         <button
           onClick={() => setShowComments(!showComments)}
@@ -125,8 +134,8 @@ const PostCard = ({
           <div className="space-y-3">
             {topLevelComments.map(comment => {
               const replies = getReplies(comment.id);
-              const commentAuthor = getUserName(comment.authorId, groupId);
-              const isCommentLiked = comment.likes.includes(currentUserId);
+              const commentAuthor = getUserName(comment.authorId || comment.author_id, groupId);
+              const isCommentLiked = comment.likes.includes(user.id);
               
               return (
                 <div key={comment.id} className="space-y-2">
@@ -140,21 +149,27 @@ const PostCard = ({
                         </div>
                         <span className="font-medium text-gray-800 text-xs">{commentAuthor}</span>
                         <span className="text-xs text-gray-500">
-                          {formatDistanceToNow(new Date(comment.timestamp), { addSuffix: true })}
+                          {formatDistanceToNow(new Date(comment.timestamp || comment.created_at), { addSuffix: true })}
                         </span>
                       </div>
                     </div>
                     <p className="text-gray-700 text-sm mb-2">{comment.content}</p>
                     <div className="flex items-center gap-3">
-                      <button
-                        onClick={() => onLikeComment(comment.id)}
-                        className={`flex items-center gap-1 text-xs transition-colors ${
-                          isCommentLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-                        }`}
+                      <InteractionTracker
+                        targetUserId={comment.authorId || comment.author_id}
+                        groupId={groupId}
+                        interactionType="like"
+                        onInteraction={() => onLikeComment(comment.id)}
                       >
-                        <Heart size={12} className={isCommentLiked ? 'fill-current' : ''} />
-                        <span>{comment.likes.length}</span>
-                      </button>
+                        <button
+                          className={`flex items-center gap-1 text-xs transition-colors ${
+                            isCommentLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                          }`}
+                        >
+                          <Heart size={12} className={isCommentLiked ? 'fill-current' : ''} />
+                          <span>{comment.likes.length}</span>
+                        </button>
+                      </InteractionTracker>
                       <button
                         onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
                         className="text-xs text-gray-500 hover:text-blue-500 transition-colors"
@@ -189,8 +204,8 @@ const PostCard = ({
                   {replies.length > 0 && (
                     <div className="ml-6 space-y-2">
                       {replies.map(reply => {
-                        const replyAuthor = getUserName(reply.authorId, groupId);
-                        const isReplyLiked = reply.likes.includes(currentUserId);
+                        const replyAuthor = getUserName(reply.authorId || reply.author_id, groupId);
+                        const isReplyLiked = reply.likes.includes(user.id);
                         
                         return (
                           <div key={reply.id} className="bg-gray-50 rounded-lg p-3">
@@ -202,19 +217,25 @@ const PostCard = ({
                               </div>
                               <span className="font-medium text-gray-800 text-xs">{replyAuthor}</span>
                               <span className="text-xs text-gray-500">
-                                {formatDistanceToNow(new Date(reply.timestamp), { addSuffix: true })}
+                                {formatDistanceToNow(new Date(reply.timestamp || reply.created_at), { addSuffix: true })}
                               </span>
                             </div>
                             <p className="text-gray-700 text-sm mb-2">{reply.content}</p>
-                            <button
-                              onClick={() => onLikeComment(reply.id)}
-                              className={`flex items-center gap-1 text-xs transition-colors ${
-                                isReplyLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-                              }`}
+                            <InteractionTracker
+                              targetUserId={reply.authorId || reply.author_id}
+                              groupId={groupId}
+                              interactionType="like"
+                              onInteraction={() => onLikeComment(reply.id)}
                             >
-                              <Heart size={12} className={isReplyLiked ? 'fill-current' : ''} />
-                              <span>{reply.likes.length}</span>
-                            </button>
+                              <button
+                                className={`flex items-center gap-1 text-xs transition-colors ${
+                                  isReplyLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                                }`}
+                              >
+                                <Heart size={12} className={isReplyLiked ? 'fill-current' : ''} />
+                                <span>{reply.likes.length}</span>
+                              </button>
+                            </InteractionTracker>
                           </div>
                         );
                       })}

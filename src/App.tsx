@@ -4,12 +4,11 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { UserProvider, useUser } from "./contexts/UserContext";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Landing from "./pages/Landing";
-import Signup from "./pages/Signup";
-import TagOnboarding from "./pages/TagOnboarding";
+import Auth from "./pages/Auth";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
@@ -21,27 +20,39 @@ import NotFound from "./pages/NotFound";
 const queryClient = new QueryClient();
 
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useUser();
-  return user ? <>{children}</> : <Navigate to="/" replace />;
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
+      </div>
+    );
+  }
+  
+  return user ? <>{children}</> : <Navigate to="/auth" replace />;
 };
 
 const PublicRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useUser();
+  const { user, loading } = useAuth();
+  
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-amber-600"></div>
+      </div>
+    );
+  }
+  
   return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
-const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
-  const { user } = useUser();
-  if (!user) return <Navigate to="/" replace />;
-  return <>{children}</>;
-};
-
 const AppContent = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
 
   return (
     <div className="min-h-screen flex flex-col">
-      {user && user.hasCompletedOnboarding && <Header />}
+      {user && <Header />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={
@@ -49,15 +60,10 @@ const AppContent = () => {
               <Landing />
             </PublicRoute>
           } />
-          <Route path="/signup" element={
+          <Route path="/auth" element={
             <PublicRoute>
-              <Signup />
+              <Auth />
             </PublicRoute>
-          } />
-          <Route path="/tag-onboarding" element={
-            <OnboardingRoute>
-              <TagOnboarding />
-            </OnboardingRoute>
           } />
           <Route path="/dashboard" element={
             <ProtectedRoute>
@@ -92,7 +98,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {user && user.hasCompletedOnboarding && <Footer />}
+      {user && <Footer />}
     </div>
   );
 };
@@ -103,9 +109,9 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <UserProvider>
+        <AuthProvider>
           <AppContent />
-        </UserProvider>
+        </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

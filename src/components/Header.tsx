@@ -2,15 +2,22 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LogOut, User, Home, Users, MessageCircle, Rss } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 const Header = () => {
-  const { user, logout } = useUser();
+  const { user, signOut } = useAuth();
   const location = useLocation();
 
   const isActive = (path: string) => location.pathname === path;
 
   if (!user) return null;
+
+  const handleLogout = async () => {
+    await signOut();
+  };
+
+  // Get username from user metadata or email
+  const username = user.user_metadata?.username || user.email?.split('@')[0] || 'User';
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md border-b border-gray-200/50">
@@ -77,7 +84,7 @@ const Header = () => {
 
           <div className="flex items-center space-x-3">
             <span className="text-xs text-gray-500 hidden sm:block">
-              <span className="font-medium text-gray-700">{user.username}</span>
+              <span className="font-medium text-gray-700">{username}</span>
             </span>
             
             <Link 
@@ -88,7 +95,7 @@ const Header = () => {
             </Link>
             
             <button
-              onClick={logout}
+              onClick={handleLogout}
               className="p-1.5 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50/50 transition-colors"
               title="Logout"
             >

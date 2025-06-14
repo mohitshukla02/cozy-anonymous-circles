@@ -1,7 +1,7 @@
 
 import React from 'react';
 import { Heart, MessageSquare } from 'lucide-react';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { trackUserInteraction } from '@/utils/supabaseHelpers';
 import { useToast } from '@/hooks/use-toast';
 
@@ -20,18 +20,18 @@ const InteractionTracker: React.FC<InteractionTrackerProps> = ({
   children,
   interactionType
 }) => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
 
   const handleInteraction = async (e: React.MouseEvent) => {
-    if (!user?.username || user.username === targetUserId) {
+    if (!user?.id || user.id === targetUserId) {
       onInteraction?.();
       return;
     }
 
     try {
       // Track the interaction for messaging eligibility
-      await trackUserInteraction(user.username, targetUserId, groupId, interactionType);
+      await trackUserInteraction(user.id, targetUserId, groupId, interactionType);
       
       // Check if this creates messaging eligibility
       // This is a simplified check - in a real app you'd query the total interactions

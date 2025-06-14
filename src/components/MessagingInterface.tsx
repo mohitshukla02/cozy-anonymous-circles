@@ -7,7 +7,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { MessageCircle, Send, Clock, Check, CheckCheck } from 'lucide-react';
-import { useUser } from '@/contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { getUserConversations, sendMessage, markMessageAsRead } from '@/utils/supabaseHelpers';
 import { generateAnonymousName } from '@/utils/groupStorage';
 import { useToast } from '@/hooks/use-toast';
@@ -31,7 +31,7 @@ interface Message {
 }
 
 const MessagingInterface = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const { toast } = useToast();
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [selectedConversation, setSelectedConversation] = useState<Conversation | null>(null);
@@ -45,10 +45,10 @@ const MessagingInterface = () => {
   }, [user]);
 
   const loadConversations = async () => {
-    if (!user?.username) return;
+    if (!user?.id) return;
     
     try {
-      const convs = await getUserConversations(user.username);
+      const convs = await getUserConversations(user.id);
       setConversations(convs);
     } catch (error) {
       console.error('Error loading conversations:', error);
@@ -63,7 +63,7 @@ const MessagingInterface = () => {
   };
 
   const handleSendMessage = async () => {
-    if (!newMessage.trim() || !selectedConversation || !user?.username) return;
+    if (!newMessage.trim() || !selectedConversation || !user?.id) return;
 
     if (newMessage.length > 500) {
       toast({
@@ -76,7 +76,7 @@ const MessagingInterface = () => {
 
     try {
       const success = await sendMessage(
-        user.username,
+        user.id,
         selectedConversation.partnerId,
         newMessage,
         selectedConversation.groupId
@@ -86,7 +86,7 @@ const MessagingInterface = () => {
         setNewMessage('');
         await loadConversations();
         // Update selected conversation with new message
-        const updatedConvs = await getUserConversations(user.username);
+        const updatedConvs = await getUserConversations(user.id);
         const updatedConv = updatedConvs.find(c => 
           c.partnerId === selectedConversation.partnerId && 
           c.groupId === selectedConversation.groupId
@@ -111,9 +111,9 @@ const MessagingInterface = () => {
     setSelectedConversation(conversation);
     
     // Mark unread messages as read
-    if (conversation.unreadCount > 0 && user?.username) {
+    if (conversation.unreadCount > 0 && user?.id) {
       const unreadMessages = conversation.messages.filter(
-        msg => msg.recipient_id === user.username && !msg.read_at
+        msg => msg.recipient_id === user.id && !msg.read_at
       );
       
       for (const msg of unreadMessages) {
@@ -139,7 +139,7 @@ const MessagingInterface = () => {
   };
 
   const getMessageStatus = (message: Message) => {
-    if (message.sender_id !== user?.username) return null;
+    if (message.sender_id !== user?.id) return null;
     
     if (message.read_at) {
       return <CheckCheck className="w-3 h-3 text-blue-500" />;
@@ -236,12 +236,12 @@ const MessagingInterface = () => {
                       <div
                         key={message.id}
                         className={`flex ${
-                          message.sender_id === user?.username ? 'justify-end' : 'justify-start'
+                          message.sender_id === user?.id ? 'justify-end' : 'justify-start'
                         }`}
                       >
                         <div
                           className={`max-w-[70%] px-3 py-2 rounded-lg ${
-                            message.sender_id === user?.username
+                            message.sender_id === user?.id
                               ? 'bg-blue-500 text-white'
                               : 'bg-gray-100 text-gray-900'
                           }`}
