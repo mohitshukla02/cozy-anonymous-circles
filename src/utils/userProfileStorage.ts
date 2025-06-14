@@ -5,6 +5,7 @@ export interface UserProfile {
   id: string;
   user_id: string;
   username: string;
+  bio?: string;
   selected_tags: string[];
   location_city?: string;
   location_region?: string;

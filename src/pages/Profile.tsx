@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3, Users, MessageCircle, UserPlus, Key, Bell, Globe, Moon } from 'lucide-react';
+import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3, Users, MessageCircle, UserPlus, Key, Bell, Globe, Moon, Eye, EyeOff, Lock, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { TAG_CATEGORIES } from '../types/tags';
@@ -8,16 +8,22 @@ import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Separator } from '../components/ui/separator';
 import { Switch } from '../components/ui/switch';
+import { Textarea } from '../components/ui/textarea';
 import UserAvatar from '../components/UserAvatar';
 import { useUserProfile } from '@/hooks/useUserProfile';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
-  const { profile, loading } = useUserProfile();
+  const { profile, loading, updateProfile } = useUserProfile();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioText, setBioText] = useState('');
   const [notifications, setNotifications] = useState(true);
   const [publicProfile, setPublicProfile] = useState(false);
+  const [showOnlineStatus, setShowOnlineStatus] = useState(true);
+  const [locationVisible, setLocationVisible] = useState(false);
+  const [activityVisible, setActivityVisible] = useState(true);
   const navigate = useNavigate();
 
   if (!user) return null;
@@ -34,6 +40,13 @@ const Profile = () => {
 
   const handleEditTags = () => {
     navigate('/tag-onboarding', { state: { from: 'profile' } });
+  };
+
+  const handleSaveBio = async () => {
+    if (updateProfile) {
+      await updateProfile({ bio: bioText });
+      setEditingBio(false);
+    }
   };
 
   const getTagName = (tagId: string) => {
@@ -58,36 +71,89 @@ const Profile = () => {
   }
 
   const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous';
+  const userBio = profile?.bio || '';
+
+  React.useEffect(() => {
+    setBioText(userBio);
+  }, [userBio]);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Profile Header */}
-        <div className="flex items-center space-x-4 mb-8">
-          <UserAvatar size="xl" />
-          <div>
-            <h1 className="text-2xl font-semibold text-gray-900">{username}</h1>
-            <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
-              <Calendar size={14} />
-              <span>Joined {joinDate}</span>
+        <div className="flex items-start justify-between mb-6">
+          <div className="flex items-center space-x-6">
+            <UserAvatar size="xl" />
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">{username}</h1>
+              <div className="flex items-center space-x-2 text-sm text-gray-500 mt-1">
+                <Calendar size={14} />
+                <span>Joined {joinDate}</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Stats - Instagram style */}
+          <div className="flex space-x-8">
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">0</div>
+              <div className="text-sm text-gray-600">Groups</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">0</div>
+              <div className="text-sm text-gray-600">Connections</div>
+            </div>
+            <div className="text-center">
+              <div className="text-lg font-semibold text-gray-900">0</div>
+              <div className="text-sm text-gray-600">Messages</div>
             </div>
           </div>
         </div>
 
-        {/* Overview Stats */}
-        <div className="grid grid-cols-3 gap-6 mb-8">
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-gray-900">0</div>
-            <div className="text-sm text-gray-600">Groups</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-gray-900">0</div>
-            <div className="text-sm text-gray-600">Connections</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-semibold text-gray-900">0</div>
-            <div className="text-sm text-gray-600">Messages</div>
-          </div>
+        {/* Bio Section */}
+        <div className="mb-8">
+          {editingBio ? (
+            <div className="space-y-3">
+              <Textarea
+                value={bioText}
+                onChange={(e) => setBioText(e.target.value)}
+                placeholder="Write something about yourself..."
+                className="resize-none"
+                rows={3}
+              />
+              <div className="flex space-x-2">
+                <Button size="sm" onClick={handleSaveBio}>
+                  Save Bio
+                </Button>
+                <Button variant="outline" size="sm" onClick={() => setEditingBio(false)}>
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <div className="group">
+              {userBio ? (
+                <div className="flex items-start justify-between">
+                  <p className="text-gray-700 text-sm leading-relaxed">{userBio}</p>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setEditingBio(true)}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity ml-2"
+                  >
+                    <Edit3 className="w-4 h-4" />
+                  </Button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setEditingBio(true)}
+                  className="text-sm text-gray-500 hover:text-gray-700 transition-colors"
+                >
+                  + Add bio
+                </button>
+              )}
+            </div>
+          )}
         </div>
 
         <div className="space-y-8">
@@ -203,7 +269,40 @@ const Profile = () => {
           <div>
             <h2 className="text-lg font-medium text-gray-900 mb-6">Privacy & Security</h2>
 
-            <div className="space-y-4">
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 flex items-center">
+                    <Eye className="w-4 h-4 mr-2" />
+                    Show Online Status
+                  </h3>
+                  <p className="text-sm text-gray-500">Let others see when you're online</p>
+                </div>
+                <Switch checked={showOnlineStatus} onCheckedChange={setShowOnlineStatus} />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 flex items-center">
+                    <MapPin className="w-4 h-4 mr-2" />
+                    Location Visibility
+                  </h3>
+                  <p className="text-sm text-gray-500">Show your general location to others</p>
+                </div>
+                <Switch checked={locationVisible} onCheckedChange={setLocationVisible} />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-medium text-gray-900 flex items-center">
+                    <Clock className="w-4 h-4 mr-2" />
+                    Activity Status
+                  </h3>
+                  <p className="text-sm text-gray-500">Show your recent activity in groups</p>
+                </div>
+                <Switch checked={activityVisible} onCheckedChange={setActivityVisible} />
+              </div>
+
               <div className="p-4 bg-green-50 rounded-lg border border-green-200">
                 <h3 className="font-medium text-green-800 mb-3 flex items-center text-sm">
                   <Shield className="w-4 h-4 mr-2" />
@@ -214,6 +313,7 @@ const Profile = () => {
                   <li>• No photos or real name required</li>
                   <li>• Anonymous by design</li>
                   <li>• Data stays encrypted</li>
+                  <li>• You control what others see</li>
                 </ul>
               </div>
 
@@ -224,6 +324,16 @@ const Profile = () => {
                 </h3>
                 <p className="text-sm text-blue-700">
                   Your username is your only identifier. Keep it safe and memorable!
+                </p>
+              </div>
+
+              <div className="p-4 bg-amber-50 rounded-lg border border-amber-200">
+                <h3 className="font-medium text-amber-800 mb-2 flex items-center text-sm">
+                  <Lock className="w-4 h-4 mr-2" />
+                  Data Security
+                </h3>
+                <p className="text-sm text-amber-700">
+                  All your messages and interactions are encrypted. We never sell your data or track you outside this platform.
                 </p>
               </div>
             </div>
