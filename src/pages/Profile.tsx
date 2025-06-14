@@ -26,7 +26,16 @@ const Profile = () => {
   const [activityVisible, setActivityVisible] = useState(true);
   const navigate = useNavigate();
 
-  if (!user) return null;
+  // Move the early return AFTER all hooks
+  if (!user) {
+    return (
+      <div className="min-h-screen pt-20">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          <div className="text-center">Please log in to view your profile.</div>
+        </div>
+      </div>
+    );
+  }
 
   const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
     year: 'numeric',
