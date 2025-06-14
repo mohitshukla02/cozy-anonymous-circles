@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, MapPin, Users, Clock, Search, Filter, Sparkles, Globe } from 'lucide-react';
@@ -9,7 +8,7 @@ import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupCard from '@/components/GroupCard';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAuth } from '@/contexts/AuthContext';
-import { generateUsername } from '@/utils/usernameGenerator';
+import { generateRandomUsername } from '@/utils/usernameGenerator';
 
 const Groups = () => {
   const [groups, setGroups] = useState<Group[]>([]);
@@ -96,7 +95,7 @@ const Groups = () => {
     if (!user) return;
     
     try {
-      const anonymousName = generateUsername();
+      const anonymousName = generateRandomUsername();
       await joinGroup(groupId, anonymousName);
       
       // Update local state
