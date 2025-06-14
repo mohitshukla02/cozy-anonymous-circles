@@ -1,3 +1,4 @@
+
 import { Group, Post, Comment, UserGroup } from '../types/groups';
 
 const GROUPS_KEY = 'cozy_groups';
@@ -57,6 +58,72 @@ export const getUserGroups = (): UserGroup[] => {
 
 export const saveUserGroups = (userGroups: UserGroup[]): void => {
   localStorage.setItem(USER_GROUPS_KEY, JSON.stringify(userGroups));
+};
+
+// New functions for post and comment management
+export const createPost = (groupId: string, authorId: string, content: string): Post => {
+  const newPost: Post = {
+    id: Date.now().toString(),
+    groupId,
+    authorId,
+    content,
+    timestamp: new Date().toISOString(),
+    likes: []
+  };
+  
+  const posts = getPosts();
+  posts.push(newPost);
+  savePosts(posts);
+  
+  return newPost;
+};
+
+export const likePost = (postId: string, userId: string): void => {
+  const posts = getPosts();
+  const post = posts.find(p => p.id === postId);
+  
+  if (post) {
+    const likeIndex = post.likes.indexOf(userId);
+    if (likeIndex === -1) {
+      post.likes.push(userId);
+    } else {
+      post.likes.splice(likeIndex, 1);
+    }
+    savePosts(posts);
+  }
+};
+
+export const createComment = (postId: string, authorId: string, content: string, parentCommentId?: string): Comment => {
+  const newComment: Comment = {
+    id: Date.now().toString(),
+    postId,
+    authorId,
+    content,
+    timestamp: new Date().toISOString(),
+    likes: [],
+    ...(parentCommentId && { parentCommentId })
+  };
+  
+  const comments = getComments();
+  comments.push(newComment);
+  saveComments(comments);
+  
+  return newComment;
+};
+
+export const likeComment = (commentId: string, userId: string): void => {
+  const comments = getComments();
+  const comment = comments.find(c => c.id === commentId);
+  
+  if (comment) {
+    const likeIndex = comment.likes.indexOf(userId);
+    if (likeIndex === -1) {
+      comment.likes.push(userId);
+    } else {
+      comment.likes.splice(likeIndex, 1);
+    }
+    saveComments(comments);
+  }
 };
 
 export const createSampleGroups = () => {
