@@ -144,7 +144,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   const signInWithReddit = async () => {
     const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'reddit',
+      provider: 'reddit' as any,
       options: {
         scopes: 'identity read mysubreddits',
         redirectTo: `${window.location.origin}/dashboard`
