@@ -1,15 +1,14 @@
 
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search, MapPin, Users, TrendingUp } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { getGroups, getPosts, getComments, getUserGroups, createPost, likePost, createComment, likeComment } from '../utils/groupStorage';
+import { getGroups, getPostsByGroup, getCommentsByPost, getUserGroups, createPost, likePost, createComment, likeComment } from '../utils/supabaseStorage';
 import { Post, Comment, Group } from '../types/groups';
 import PostCard from '../components/PostCard';
-import { TAG_CATEGORIES } from '../types/tags';
 
 const Feed = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const navigate = useNavigate();
   const [posts, setPosts] = useState<Post[]>([]);
   const [groups, setGroups] = useState<Group[]>([]);
@@ -28,21 +27,38 @@ const Feed = () => {
       return;
     }
 
-    const allGroups = getGroups();
-    const allPosts = getPosts();
-    const allComments = getComments();
-    const userGroupData = getUserGroups().filter(ug => ug.userId === user.username);
-
-    setGroups(allGroups);
-    setComments(allComments);
-    setUserGroups(userGroupData.map(ug => ug.groupId));
-
-    // Filter posts from user's joined groups
-    const userGroupIds = userGroupData.map(ug => ug.groupId);
-    const feedPosts = allPosts.filter(post => userGroupIds.includes(post.groupId));
-    
-    setPosts(feedPosts);
+    loadData();
   }, [user, navigate]);
+
+  const loadData = async () => {
+    try {
+      const allGroups = await getGroups();
+      const userGroupData = await getUserGroups(user.id);
+      
+      setGroups(allGroups);
+      setUserGroups(userGroupData.map(ug => ug.groupId));
+
+      // Load posts from user's groups
+      const userGroupIds = userGroupData.map(ug => ug.groupId);
+      const allPosts: Post[] = [];
+      const allComments: Comment[] = [];
+
+      for (const groupId of userGroupIds) {
+        const groupPosts = await getPostsByGroup(groupId);
+        allPosts.push(...groupPosts);
+
+        for (const post of groupPosts) {
+          const postComments = await getCommentsByPost(post.id);
+          allComments.push(...postComments);
+        }
+      }
+
+      setPosts(allPosts);
+      setComments(allComments);
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
 
   const filteredPosts = posts.filter(post => {
     const group = groups.find(g => g.id === post.groupId);
@@ -55,7 +71,7 @@ const Feed = () => {
       case 'interest':
         return group.type === 'interest';
       case 'my-posts':
-        return post.authorId === user?.username;
+        return post.authorId === user?.id;
       default:
         return true;
     }
@@ -73,63 +89,72 @@ const Feed = () => {
       case 'trending':
         // Simple trending based on recent engagement
         const aRecent = a.likes.length + comments.filter(c => c.postId === a.id && 
-          Date.now() - new Date(c.timestamp).getTime() < 24 * 60 * 60 * 1000).length;
+          Date.now() - new Date(c.createdAt).getTime() < 24 * 60 * 60 * 1000).length;
         const bRecent = b.likes.length + comments.filter(c => c.postId === b.id && 
-          Date.now() - new Date(c.timestamp).getTime() < 24 * 60 * 60 * 1000).length;
+          Date.now() - new Date(c.createdAt).getTime() < 24 * 60 * 60 * 1000).length;
         return bRecent - aRecent;
       default:
-        return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+        return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
     }
   });
 
-  const handleCreatePost = () => {
+  const handleCreatePost = async () => {
     if (!user || !newPostContent.trim() || !selectedGroupId) return;
 
-    const newPost: Post = {
-      id: Date.now().toString(),
-      groupId: selectedGroupId,
-      authorId: user.username,
-      content: newPostContent.trim(),
-      timestamp: new Date().toISOString(),
-      likes: []
-    };
+    try {
+      await createPost({
+        groupId: selectedGroupId,
+        authorId: user.id,
+        content: newPostContent.trim(),
+        editedAt: undefined
+      });
 
-    const updatedPosts = [...posts, newPost];
-    setPosts(updatedPosts);
-    localStorage.setItem('cozyPosts', JSON.stringify([...getPosts(), newPost]));
-
-    setNewPostContent('');
-    setSelectedGroupId('');
-    setShowCreatePost(false);
+      setNewPostContent('');
+      setSelectedGroupId('');
+      setShowCreatePost(false);
+      loadData(); // Reload data
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
-  const handleLikePost = (postId: string) => {
+  const handleLikePost = async (postId: string) => {
     if (!user) return;
-    likePost(postId, user.username);
-    setPosts(getPosts().filter(post => userGroups.includes(post.groupId)));
+    try {
+      await likePost(postId);
+      loadData(); // Reload data
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
   };
 
-  const handleComment = (postId: string, content: string) => {
+  const handleComment = async (postId: string, content: string) => {
     if (!user) return;
-    createComment(postId, user.username, content);
-    setComments(getComments());
+    try {
+      await createComment({
+        postId,
+        authorId: user.id,
+        content
+      });
+      loadData(); // Reload data
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   };
 
-  const handleLikeComment = (commentId: string) => {
+  const handleLikeComment = async (commentId: string) => {
     if (!user) return;
-    likeComment(commentId, user.username);
-    setComments(getComments());
-  };
-
-  const handleReply = (commentId: string, content: string) => {
-    if (!user) return;
-    createComment(comments.find(c => c.id === commentId)?.postId || '', user.username, content, commentId);
-    setComments(getComments());
+    try {
+      await likeComment(commentId);
+      loadData(); // Reload data
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
   };
 
   const getUserName = (userId: string, groupId: string) => {
-    const userGroupData = getUserGroups().find(ug => ug.userId === userId && ug.groupId === groupId);
-    return userGroupData?.anonymousName || 'Anonymous';
+    // For now, return a placeholder. In a real app, you'd get this from user_groups table
+    return 'Anonymous User';
   };
 
   const getGroupName = (groupId: string) => {
@@ -176,7 +201,7 @@ const Feed = () => {
                   <optgroup label="Local Meetup Groups">
                     {localGroups.map(group => (
                       <option key={group.id} value={group.id}>
-                        {group.name} {group.location && `(${group.location.city})`}
+                        {group.name} {group.locationCity && `(${group.locationCity})`}
                       </option>
                     ))}
                   </optgroup>
@@ -315,7 +340,7 @@ const Feed = () => {
               const group = groups.find(g => g.id === post.groupId);
               const postComments = comments.filter(c => c.postId === post.id);
               const authorName = getUserName(post.authorId, post.groupId);
-              const isLiked = post.likes.includes(user.username);
+              const isLiked = post.likes.includes(user.id);
 
               return (
                 <div key={post.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
@@ -327,10 +352,10 @@ const Feed = () => {
                     <span className="text-xs font-medium text-gray-700">
                       {getGroupName(post.groupId)}
                     </span>
-                    {group?.type === 'local-meetup' && group.location && (
+                    {group?.type === 'local-meetup' && group.locationCity && (
                       <div className="flex items-center gap-1 text-xs text-gray-500">
                         <MapPin size={10} />
-                        <span>{group.location.city}</span>
+                        <span>{group.locationCity}</span>
                       </div>
                     )}
                   </div>
@@ -344,11 +369,14 @@ const Feed = () => {
                       onLike={handleLikePost}
                       onComment={handleComment}
                       onLikeComment={handleLikeComment}
-                      onReply={handleReply}
-                      currentUserId={user.username}
-                      getUserName={getUserName}
+                      currentUserId={user.id}
+                      getAuthorName={getUserName}
                       groupId={post.groupId}
                       isLiked={isLiked}
+                      getCommentLikeStatus={(commentId) => {
+                        const comment = comments.find(c => c.id === commentId);
+                        return comment?.likes.includes(user.id) || false;
+                      }}
                     />
                   </div>
                 </div>

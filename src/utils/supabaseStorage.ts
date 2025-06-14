@@ -7,7 +7,7 @@ export const getGroups = async (): Promise<Group[]> => {
   const { data, error } = await supabase
     .from('groups')
     .select('*')
-    .eq('archived', false);
+    .eq('status', 'active');
   
   if (error) throw error;
   
@@ -24,7 +24,7 @@ export const getGroups = async (): Promise<Group[]> => {
     type: group.type as 'interest' | 'local-meetup',
     locationCity: group.location_city,
     locationRegion: group.location_region,
-    isArchived: group.archived,
+    isArchived: group.status === 'archived',
     lastMeetupDate: group.last_activity,
     meetupDeadline: group.meetup_deadline
   }));
@@ -53,7 +53,7 @@ export const getGroupById = async (groupId: string): Promise<Group | null> => {
     type: data.type as 'interest' | 'local-meetup',
     locationCity: data.location_city,
     locationRegion: data.location_region,
-    isArchived: data.archived,
+    isArchived: data.status === 'archived',
     lastMeetupDate: data.last_activity,
     meetupDeadline: data.meetup_deadline
   };
@@ -76,7 +76,7 @@ export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'mem
       type: group.type,
       location_city: group.locationCity,
       location_region: group.locationRegion,
-      archived: false
+      status: 'active'
     }])
     .select()
     .single();
@@ -96,7 +96,7 @@ export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'mem
     type: data.type as 'interest' | 'local-meetup',
     locationCity: data.location_city,
     locationRegion: data.location_region,
-    isArchived: data.archived,
+    isArchived: data.status === 'archived',
     lastMeetupDate: data.last_activity,
     meetupDeadline: data.meetup_deadline
   };
@@ -162,16 +162,28 @@ export const getPostsByGroup = async (groupId: string): Promise<Post[]> => {
   
   if (error) throw error;
   
-  return data.map(post => ({
-    id: post.id,
-    authorId: post.author_id,
-    groupId: post.group_id,
-    content: post.content,
-    createdAt: post.created_at,
-    editedAt: post.edited_at,
-    likes: post.likes || [],
-    commentCount: post.comment_count || 0
-  }));
+  // Count comments for each post
+  const postsWithCommentCount = await Promise.all(
+    data.map(async (post) => {
+      const { count } = await supabase
+        .from('comments')
+        .select('*', { count: 'exact', head: true })
+        .eq('post_id', post.id);
+      
+      return {
+        id: post.id,
+        authorId: post.author_id,
+        groupId: post.group_id,
+        content: post.content,
+        createdAt: post.created_at,
+        editedAt: post.edited_at,
+        likes: post.likes || [],
+        commentCount: count || 0
+      };
+    })
+  );
+  
+  return postsWithCommentCount;
 };
 
 export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'commentCount'>): Promise<Post> => {
@@ -181,8 +193,7 @@ export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' |
       author_id: post.authorId,
       group_id: post.groupId,
       content: post.content,
-      likes: [],
-      comment_count: 0
+      likes: []
     }])
     .select()
     .single();
@@ -197,7 +208,7 @@ export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' |
     createdAt: data.created_at,
     editedAt: data.edited_at,
     likes: data.likes || [],
-    commentCount: data.comment_count || 0
+    commentCount: 0
   };
 };
 

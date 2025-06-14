@@ -67,8 +67,9 @@ export const createPost = (groupId: string, authorId: string, content: string): 
     groupId,
     authorId,
     content,
-    timestamp: new Date().toISOString(),
-    likes: []
+    createdAt: new Date().toISOString(),
+    likes: [],
+    commentCount: 0
   };
   
   const posts = getPosts();
@@ -99,9 +100,8 @@ export const createComment = (postId: string, authorId: string, content: string,
     postId,
     authorId,
     content,
-    timestamp: new Date().toISOString(),
-    likes: [],
-    ...(parentCommentId && { parentCommentId })
+    createdAt: new Date().toISOString(),
+    likes: []
   };
   
   const comments = getComments();
@@ -142,7 +142,8 @@ export const createSampleGroups = () => {
       memberLimit: 50,
       privacy: 'open',
       adminId: 'user1',
-      type: 'interest'
+      type: 'interest',
+      isArchived: false
     },
     {
       id: '2',
@@ -154,7 +155,8 @@ export const createSampleGroups = () => {
       memberLimit: 40,
       privacy: 'open',
       adminId: 'user2',
-      type: 'interest'
+      type: 'interest',
+      isArchived: false
     },
     {
       id: '3',
@@ -166,7 +168,8 @@ export const createSampleGroups = () => {
       memberLimit: 45,
       privacy: 'open',
       adminId: 'user3',
-      type: 'interest'
+      type: 'interest',
+      isArchived: false
     },
     
     // Local Meetup Groups
@@ -181,11 +184,9 @@ export const createSampleGroups = () => {
       privacy: 'open',
       adminId: 'user4',
       type: 'local-meetup',
-      location: {
-        city: 'San Francisco',
-        region: 'California',
-        coordinates: { lat: 37.7749, lng: -122.4194 }
-      }
+      locationCity: 'San Francisco',
+      locationRegion: 'California',
+      isArchived: false
     },
     {
       id: '5',
@@ -198,11 +199,9 @@ export const createSampleGroups = () => {
       privacy: 'open',
       adminId: 'user5',
       type: 'local-meetup',
-      location: {
-        city: 'Brooklyn',
-        region: 'New York',
-        coordinates: { lat: 40.6782, lng: -73.9442 }
-      }
+      locationCity: 'Brooklyn',
+      locationRegion: 'New York',
+      isArchived: false
     },
     {
       id: '6',
@@ -215,11 +214,9 @@ export const createSampleGroups = () => {
       privacy: 'open',
       adminId: 'user6',
       type: 'local-meetup',
-      location: {
-        city: 'Austin',
-        region: 'Texas',
-        coordinates: { lat: 30.2672, lng: -97.7431 }
-      }
+      locationCity: 'Austin',
+      locationRegion: 'Texas',
+      isArchived: false
     }
   ];
 

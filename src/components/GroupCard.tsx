@@ -8,12 +8,12 @@ import { TAG_CATEGORIES } from '../types/tags';
 
 interface GroupCardProps {
   group: Group;
-  userTags: string[];
-  onJoin: (groupId: string) => void;
-  isJoined: boolean;
+  userTags?: string[];
+  onJoin?: (groupId: string) => void;
+  isJoined?: boolean;
 }
 
-const GroupCard = ({ group, userTags, onJoin, isJoined }: GroupCardProps) => {
+const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCardProps) => {
   const navigate = useNavigate();
   const matchingTags = group.tags.filter(tag => userTags.includes(tag));
   const tagNames = new Map();
@@ -35,7 +35,9 @@ const GroupCard = ({ group, userTags, onJoin, isJoined }: GroupCardProps) => {
 
   const handleJoinClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onJoin(group.id);
+    if (onJoin) {
+      onJoin(group.id);
+    }
   };
 
   return (
@@ -75,10 +77,10 @@ const GroupCard = ({ group, userTags, onJoin, isJoined }: GroupCardProps) => {
             </div>
             
             {/* Location for local groups */}
-            {group.type === 'local-meetup' && group.location && (
+            {group.type === 'local-meetup' && group.locationCity && (
               <div className="flex items-center gap-1 mb-2 text-xs text-gray-500">
                 <MapPin size={12} />
-                <span>{group.location.city}, {group.location.region}</span>
+                <span>{group.locationCity}, {group.locationRegion}</span>
               </div>
             )}
             
@@ -119,21 +121,23 @@ const GroupCard = ({ group, userTags, onJoin, isJoined }: GroupCardProps) => {
           )}
         </div>
 
-        <button
-          onClick={handleJoinClick}
-          disabled={group.memberIds.length >= group.memberLimit}
-          className={`
-            w-full py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 relative overflow-hidden
-            ${isJoined 
-              ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 hover:from-green-100 hover:to-emerald-100 border border-green-200/50' 
-              : group.memberIds.length >= group.memberLimit
-              ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-              : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-sm hover:shadow-md'
-            }
-          `}
-        >
-          {isJoined ? 'View Group' : group.memberIds.length >= group.memberLimit ? 'Full' : 'Join Group'}
-        </button>
+        {onJoin && (
+          <button
+            onClick={handleJoinClick}
+            disabled={group.memberIds.length >= group.memberLimit}
+            className={`
+              w-full py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 relative overflow-hidden
+              ${isJoined 
+                ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 hover:from-green-100 hover:to-emerald-100 border border-green-200/50' 
+                : group.memberIds.length >= group.memberLimit
+                ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
+                : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-sm hover:shadow-md'
+              }
+            `}
+          >
+            {isJoined ? 'View Group' : group.memberIds.length >= group.memberLimit ? 'Full' : 'Join Group'}
+          </button>
+        )}
       </div>
     </div>
   );
