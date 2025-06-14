@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -163,10 +162,7 @@ const MessagingInterface = () => {
       {/* Conversations List */}
       <Card className="md:col-span-1">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageCircle className="w-5 h-5" />
-            Messages
-          </CardTitle>
+          <CardTitle>Conversations</CardTitle>
         </CardHeader>
         <CardContent className="p-0">
           <ScrollArea className="h-[500px]">

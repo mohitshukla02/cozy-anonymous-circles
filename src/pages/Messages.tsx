@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { MessageCircle, Clock, AlertTriangle } from 'lucide-react';
+import { Clock, AlertTriangle } from 'lucide-react';
 import MessagingInterface from '@/components/MessagingInterface';
 import MessagingGuidelinesModal from '@/components/MessagingGuidelinesModal';
 import { useAuth } from '@/contexts/AuthContext';
@@ -56,16 +56,15 @@ const Messages = () => {
   return (
     <div className="container mx-auto px-4 py-8 max-w-7xl pt-16">
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <MessageCircle className="w-8 h-8 text-blue-600" />
-          <h1 className="text-3xl font-bold text-gray-900">Messages</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-2">Messages</h1>
+        <div className="flex items-center gap-3">
+          <p className="text-gray-600">
+            Connect with people you've built relationships with in groups
+          </p>
           {unreadCount > 0 && (
             <Badge variant="destructive">{unreadCount} unread</Badge>
           )}
         </div>
-        <p className="text-gray-600">
-          Connect with people you've built relationships with in groups
-        </p>
       </div>
 
       {/* Group Warnings */}
