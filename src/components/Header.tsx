@@ -5,11 +5,13 @@ import { useAuth } from '@/contexts/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+  const isMobile = useIsMobile();
 
   // Mock notification and message states - replace with real data later
   const [hasNewNotifications] = useState(true);
@@ -38,6 +40,86 @@ const Header = () => {
     { id: 1, sender: 'Sarah', message: 'Hey, are you coming to the meetup?', time: '30 min ago' },
     { id: 2, sender: 'Mike', message: 'Thanks for the book recommendation!', time: '2 hours ago' }
   ];
+
+  const NotificationsContent = () => (
+    <div className="p-4">
+      <h3 className="font-semibold text-sm mb-3">Notifications</h3>
+      <div className="space-y-3">
+        {notifications.map((notification) => (
+          <div key={notification.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+            <div className="font-medium text-sm">{notification.title}</div>
+            <div className="text-xs text-gray-600 mt-1">{notification.message}</div>
+            <div className="text-xs text-gray-400 mt-1">{notification.time}</div>
+          </div>
+        ))}
+      </div>
+      <div className="mt-3 pt-3 border-t border-gray-200">
+        <button className="text-xs text-amber-600 hover:text-amber-700 font-medium">
+          View all notifications
+        </button>
+      </div>
+    </div>
+  );
+
+  const MessagesContent = () => (
+    <div className="p-4">
+      <h3 className="font-semibold text-sm mb-3">Messages</h3>
+      <div className="space-y-3">
+        {messages.length > 0 ? (
+          messages.map((message) => (
+            <div key={message.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+              <div className="font-medium text-sm">{message.sender}</div>
+              <div className="text-xs text-gray-600 mt-1 line-clamp-2">{message.message}</div>
+              <div className="text-xs text-gray-400 mt-1">{message.time}</div>
+            </div>
+          ))
+        ) : (
+          <div className="text-xs text-gray-500 text-center py-4">No new messages</div>
+        )}
+      </div>
+      <div className="mt-3 pt-3 border-t border-gray-200">
+        <Link to="/messages" className="text-xs text-amber-600 hover:text-amber-700 font-medium">
+          View all messages
+        </Link>
+      </div>
+    </div>
+  );
+
+  const ProfileContent = () => (
+    <div className="p-4">
+      <div className="flex items-center space-x-3 mb-4">
+        <Avatar className="h-12 w-12">
+          <AvatarImage src={user.user_metadata?.avatar_url} />
+          <AvatarFallback className="bg-amber-100 text-amber-700">
+            {username.charAt(0).toUpperCase()}
+          </AvatarFallback>
+        </Avatar>
+        <div>
+          <div className="font-medium text-sm">{username}</div>
+          <div className="text-xs text-gray-500">{user.email}</div>
+        </div>
+      </div>
+      
+      <div className="space-y-2">
+        <Link 
+          to="/profile" 
+          className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors w-full"
+        >
+          <User size={16} />
+          <span>View Profile</span>
+        </Link>
+        
+        <button
+          onClick={handleLogout}
+          className="flex items-center space-x-2 p-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+        >
+          <LogOut size={16} />
+          <span>Sign Out</span>
+        </button>
+      </div>
+    </div>
+  );
+
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
@@ -90,7 +172,7 @@ const Header = () => {
             </nav>
           </div>
 
-          <div className="flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-2">
             {/* Notifications */}
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
@@ -105,23 +187,7 @@ const Header = () => {
                 </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm mb-3">Notifications</h3>
-                  <div className="space-y-3">
-                    {notifications.map((notification) => (
-                      <div key={notification.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
-                        <div className="font-medium text-sm">{notification.title}</div>
-                        <div className="text-xs text-gray-600 mt-1">{notification.message}</div>
-                        <div className="text-xs text-gray-400 mt-1">{notification.time}</div>
-                      </div>
-                    ))}
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <button className="text-xs text-amber-600 hover:text-amber-700 font-medium">
-                      View all notifications
-                    </button>
-                  </div>
-                </div>
+                <NotificationsContent />
               </HoverCardContent>
             </HoverCard>
             
@@ -144,27 +210,7 @@ const Header = () => {
                 </Link>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
-                <div className="p-4">
-                  <h3 className="font-semibold text-sm mb-3">Messages</h3>
-                  <div className="space-y-3">
-                    {messages.length > 0 ? (
-                      messages.map((message) => (
-                        <div key={message.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
-                          <div className="font-medium text-sm">{message.sender}</div>
-                          <div className="text-xs text-gray-600 mt-1 line-clamp-2">{message.message}</div>
-                          <div className="text-xs text-gray-400 mt-1">{message.time}</div>
-                        </div>
-                      ))
-                    ) : (
-                      <div className="text-xs text-gray-500 text-center py-4">No new messages</div>
-                    )}
-                  </div>
-                  <div className="mt-3 pt-3 border-t border-gray-200">
-                    <Link to="/messages" className="text-xs text-amber-600 hover:text-amber-700 font-medium">
-                      View all messages
-                    </Link>
-                  </div>
-                </div>
+                <MessagesContent />
               </HoverCardContent>
             </HoverCard>
             
@@ -176,38 +222,7 @@ const Header = () => {
                 </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-64 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
-                <div className="p-4">
-                  <div className="flex items-center space-x-3 mb-4">
-                    <Avatar className="h-12 w-12">
-                      <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-amber-100 text-amber-700">
-                        {username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-sm">{username}</div>
-                      <div className="text-xs text-gray-500">{user.email}</div>
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Link 
-                      to="/profile" 
-                      className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors w-full"
-                    >
-                      <User size={16} />
-                      <span>View Profile</span>
-                    </Link>
-                    
-                    <button
-                      onClick={handleLogout}
-                      className="flex items-center space-x-2 p-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
-                    >
-                      <LogOut size={16} />
-                      <span>Sign Out</span>
-                    </button>
-                  </div>
-                </div>
+                <ProfileContent />
               </HoverCardContent>
             </HoverCard>
           </div>
@@ -215,28 +230,54 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         <div className="md:hidden border-t border-gray-200 py-2">
-          <nav className="flex justify-around">
+          <nav className="flex justify-around items-center">
             <Link to="/dashboard" className={`p-2 rounded-lg transition-colors ${isActive('/dashboard') ? 'text-amber-700' : 'text-gray-500'}`}>
-              <Home size={18} />
+              <Home size={20} />
             </Link>
             <Link to="/groups" className={`p-2 rounded-lg transition-colors ${isActive('/groups') ? 'text-amber-700' : 'text-gray-500'}`}>
-              <Users size={18} />
+              <Users size={20} />
             </Link>
             <Link to="/feed" className={`p-2 rounded-lg transition-colors ${isActive('/feed') ? 'text-amber-700' : 'text-gray-500'}`}>
-              <Rss size={18} />
+              <Rss size={20} />
             </Link>
-            <button className="p-2 rounded-lg text-gray-500 relative">
-              <Bell size={18} />
-              {hasNewNotifications && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-              )}
-            </button>
+            
+            <Popover>
+              <PopoverTrigger asChild>
+                <button className="p-2 rounded-lg text-gray-500 relative">
+                  <Bell size={20} />
+                  {hasNewNotifications && (
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent align="center" side="top" sideOffset={12} className="w-[calc(100vw-2rem)] max-w-sm p-0 mb-2 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl">
+                <NotificationsContent />
+              </PopoverContent>
+            </Popover>
+
             <Link to="/messages" className={`p-2 rounded-lg transition-colors relative ${isActive('/messages') ? 'text-amber-700' : 'text-gray-500'}`}>
-              <MessageCircle size={18} />
+              <MessageCircle size={20} />
               {hasNewMessages && (
-                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
               )}
             </Link>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                 <button className="p-1 rounded-full">
+                    <Avatar className="h-7 w-7">
+                      <AvatarImage src={user.user_metadata?.avatar_url} />
+                      <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">
+                        {username.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
+              </PopoverTrigger>
+              <PopoverContent align="end" side="top" sideOffset={12} className="w-[calc(100vw-2rem)] max-w-xs p-0 mb-2 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl">
+                <ProfileContent />
+              </PopoverContent>
+            </Popover>
+
           </nav>
         </div>
       </div>
