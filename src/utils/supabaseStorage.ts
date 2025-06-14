@@ -1,327 +1,267 @@
 
 import { supabase } from '@/integrations/supabase/client';
-import { generateAnonymousName } from './groupStorage';
+import { Group, Post, Comment, UserGroup } from '@/types/groups';
 
-export interface Group {
-  id: string;
-  name: string;
-  description: string;
-  tags: string[];
-  member_ids: string[];
-  created_date: string;
-  member_limit: number;
-  privacy: 'open' | 'invitation';
-  admin_id: string;
-  type: 'interest' | 'local-meetup';
-  location_city?: string;
-  location_region?: string;
-  location_lat?: number;
-  location_lng?: number;
-  status?: string;
-  last_activity?: string;
-  meetup_deadline?: string;
-}
-
-export interface Post {
-  id: string;
-  group_id: string;
-  author_id: string;
-  content: string;
-  created_at: string;
-  likes: string[];
-  edited_at?: string;
-}
-
-export interface Comment {
-  id: string;
-  post_id: string;
-  author_id: string;
-  content: string;
-  created_at: string;
-  parent_comment_id?: string;
-  likes: string[];
-}
-
-export interface UserGroup {
-  id: string;
-  user_id: string;
-  group_id: string;
-  join_date: string;
-  role: 'admin' | 'member';
-  anonymous_name: string;
-}
-
-// Groups
+// Group operations
 export const getGroups = async (): Promise<Group[]> => {
   const { data, error } = await supabase
     .from('groups')
     .select('*')
-    .order('created_date', { ascending: false });
-
-  if (error) {
-    console.error('Error fetching groups:', error);
-    return [];
-  }
-
+    .eq('is_archived', false);
+  
+  if (error) throw error;
+  
   return data.map(group => ({
     id: group.id,
     name: group.name,
     description: group.description,
     tags: group.tags || [],
-    member_ids: group.member_ids || [],
-    created_date: group.created_date,
-    member_limit: group.member_limit,
-    privacy: group.privacy,
-    admin_id: group.admin_id,
-    type: group.type,
-    location_city: group.location_city,
-    location_region: group.location_region,
-    location_lat: group.location_lat,
-    location_lng: group.location_lng,
-    status: group.status,
-    last_activity: group.last_activity,
-    meetup_deadline: group.meetup_deadline
+    memberIds: group.member_ids || [],
+    createdDate: group.created_date,
+    memberLimit: group.member_limit,
+    privacy: group.privacy as 'open' | 'invitation',
+    adminId: group.admin_id,
+    type: group.type as 'interest' | 'local-meetup',
+    locationCity: group.location_city,
+    locationState: group.location_state,
+    locationCountry: group.location_country,
+    isArchived: group.is_archived,
+    lastMeetupDate: group.last_meetup_date,
+    meetupDeadline: group.meetup_deadline
   }));
 };
 
-export const createGroup = async (groupData: Omit<Group, 'id' | 'created_date' | 'member_ids'>): Promise<Group | null> => {
+export const getGroupById = async (groupId: string): Promise<Group | null> => {
   const { data, error } = await supabase
     .from('groups')
-    .insert({
-      name: groupData.name,
-      description: groupData.description,
-      tags: groupData.tags,
-      member_ids: [groupData.admin_id],
-      member_limit: groupData.member_limit,
-      privacy: groupData.privacy,
-      admin_id: groupData.admin_id,
-      type: groupData.type,
-      location_city: groupData.location_city,
-      location_region: groupData.location_region,
-      location_lat: groupData.location_lat,
-      location_lng: groupData.location_lng
-    })
+    .select('*')
+    .eq('id', groupId)
+    .single();
+  
+  if (error) throw error;
+  if (!data) return null;
+  
+  return {
+    id: data.id,
+    name: data.name,
+    description: data.description,
+    tags: data.tags || [],
+    memberIds: data.member_ids || [],
+    createdDate: data.created_date,
+    memberLimit: data.member_limit,
+    privacy: data.privacy as 'open' | 'invitation',
+    adminId: data.admin_id,
+    type: data.type as 'interest' | 'local-meetup',
+    locationCity: data.location_city,
+    locationState: data.location_state,
+    locationCountry: data.location_country,
+    isArchived: data.is_archived,
+    lastMeetupDate: data.last_meetup_date,
+    meetupDeadline: data.meetup_deadline
+  };
+};
+
+export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'memberIds' | 'isArchived'>): Promise<Group> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { data, error } = await supabase
+    .from('groups')
+    .insert([{
+      name: group.name,
+      description: group.description,
+      tags: group.tags,
+      member_ids: [user.id],
+      member_limit: group.memberLimit,
+      privacy: group.privacy,
+      admin_id: user.id,
+      type: group.type,
+      location_city: group.locationCity,
+      location_state: group.locationState,
+      location_country: group.locationCountry,
+      is_archived: false
+    }])
     .select()
     .single();
 
-  if (error) {
-    console.error('Error creating group:', error);
-    return null;
-  }
+  if (error) throw error;
 
   return {
     id: data.id,
     name: data.name,
     description: data.description,
     tags: data.tags || [],
-    member_ids: data.member_ids || [],
-    created_date: data.created_date,
-    member_limit: data.member_limit,
-    privacy: data.privacy,
-    admin_id: data.admin_id,
-    type: data.type,
-    location_city: data.location_city,
-    location_region: data.location_region,
-    location_lat: data.location_lat,
-    location_lng: data.location_lng,
-    status: data.status,
-    last_activity: data.last_activity,
-    meetup_deadline: data.meetup_deadline
+    memberIds: data.member_ids || [],
+    createdDate: data.created_date,
+    memberLimit: data.member_limit,
+    privacy: data.privacy as 'open' | 'invitation',
+    adminId: data.admin_id,
+    type: data.type as 'interest' | 'local-meetup',
+    locationCity: data.location_city,
+    locationState: data.location_state,
+    locationCountry: data.location_country,
+    isArchived: data.is_archived,
+    lastMeetupDate: data.last_meetup_date,
+    meetupDeadline: data.meetup_deadline
   };
 };
 
-export const joinGroup = async (groupId: string, userId: string): Promise<boolean> => {
-  try {
-    // First, update the group's member_ids array
-    const { data: group } = await supabase
-      .from('groups')
-      .select('member_ids')
-      .eq('id', groupId)
-      .single();
-
-    if (!group) return false;
-
-    const updatedMemberIds = [...(group.member_ids || []), userId];
-
-    const { error: groupError } = await supabase
-      .from('groups')
-      .update({ member_ids: updatedMemberIds })
-      .eq('id', groupId);
-
-    if (groupError) {
-      console.error('Error updating group members:', groupError);
-      return false;
-    }
-
-    // Then, create user_group record
-    const anonymousName = generateAnonymousName(userId, groupId);
-    
-    const { error: userGroupError } = await supabase
-      .from('user_groups')
-      .insert({
-        user_id: userId,
-        group_id: groupId,
-        role: 'member',
-        anonymous_name: anonymousName
-      });
-
-    if (userGroupError) {
-      console.error('Error creating user group:', userGroupError);
-      return false;
-    }
-
-    return true;
-  } catch (error) {
-    console.error('Error joining group:', error);
-    return false;
-  }
-};
-
-// User Groups
+// User Groups operations
 export const getUserGroups = async (userId: string): Promise<UserGroup[]> => {
   const { data, error } = await supabase
     .from('user_groups')
     .select('*')
     .eq('user_id', userId);
-
-  if (error) {
-    console.error('Error fetching user groups:', error);
-    return [];
-  }
-
-  return data || [];
-};
-
-// Posts
-export const getPosts = async (groupId?: string): Promise<Post[]> => {
-  let query = supabase.from('posts').select('*').order('created_at', { ascending: false });
   
-  if (groupId) {
-    query = query.eq('group_id', groupId);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('Error fetching posts:', error);
-    return [];
-  }
-
-  return data || [];
+  if (error) throw error;
+  
+  return data.map(userGroup => ({
+    id: userGroup.id,
+    userId: userGroup.user_id,
+    groupId: userGroup.group_id,
+    role: userGroup.role as 'admin' | 'member',
+    joinDate: userGroup.join_date,
+    anonymousName: userGroup.anonymous_name
+  }));
 };
 
-export const createPost = async (groupId: string, authorId: string, content: string): Promise<Post | null> => {
+export const joinGroup = async (groupId: string, anonymousName: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { error } = await supabase
+    .from('user_groups')
+    .insert([{
+      user_id: user.id,
+      group_id: groupId,
+      role: 'member',
+      anonymous_name: anonymousName
+    }]);
+
+  if (error) throw error;
+
+  // Update group member count
+  const { error: updateError } = await supabase.rpc('add_member_to_group', {
+    group_id: groupId,
+    user_id: user.id
+  });
+
+  if (updateError) throw updateError;
+};
+
+// Posts operations
+export const getPostsByGroup = async (groupId: string): Promise<Post[]> => {
   const { data, error } = await supabase
     .from('posts')
-    .insert({
-      group_id: groupId,
-      author_id: authorId,
-      content
-    })
+    .select('*')
+    .eq('group_id', groupId)
+    .order('created_at', { ascending: false });
+  
+  if (error) throw error;
+  
+  return data.map(post => ({
+    id: post.id,
+    authorId: post.author_id,
+    groupId: post.group_id,
+    content: post.content,
+    createdAt: post.created_at,
+    editedAt: post.edited_at,
+    likes: post.likes || [],
+    commentCount: post.comment_count || 0
+  }));
+};
+
+export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'commentCount'>): Promise<Post> => {
+  const { data, error } = await supabase
+    .from('posts')
+    .insert([{
+      author_id: post.authorId,
+      group_id: post.groupId,
+      content: post.content,
+      likes: [],
+      comment_count: 0
+    }])
     .select()
     .single();
 
-  if (error) {
-    console.error('Error creating post:', error);
-    return null;
-  }
+  if (error) throw error;
 
-  return data;
+  return {
+    id: data.id,
+    authorId: data.author_id,
+    groupId: data.group_id,
+    content: data.content,
+    createdAt: data.created_at,
+    editedAt: data.edited_at,
+    likes: data.likes || [],
+    commentCount: data.comment_count || 0
+  };
 };
 
-export const likePost = async (postId: string, userId: string): Promise<boolean> => {
-  try {
-    const { data: post } = await supabase
-      .from('posts')
-      .select('likes')
-      .eq('id', postId)
-      .single();
-
-    if (!post) return false;
-
-    const likes = post.likes || [];
-    const updatedLikes = likes.includes(userId) 
-      ? likes.filter((id: string) => id !== userId)
-      : [...likes, userId];
-
-    const { error } = await supabase
-      .from('posts')
-      .update({ likes: updatedLikes })
-      .eq('id', postId);
-
-    return !error;
-  } catch (error) {
-    console.error('Error liking post:', error);
-    return false;
-  }
-};
-
-// Comments
-export const getComments = async (postId?: string): Promise<Comment[]> => {
-  let query = supabase.from('comments').select('*').order('created_at', { ascending: true });
-  
-  if (postId) {
-    query = query.eq('post_id', postId);
-  }
-
-  const { data, error } = await query;
-
-  if (error) {
-    console.error('Error fetching comments:', error);
-    return [];
-  }
-
-  return data || [];
-};
-
-export const createComment = async (
-  postId: string, 
-  authorId: string, 
-  content: string, 
-  parentCommentId?: string
-): Promise<Comment | null> => {
+// Comments operations
+export const getCommentsByPost = async (postId: string): Promise<Comment[]> => {
   const { data, error } = await supabase
     .from('comments')
-    .insert({
-      post_id: postId,
-      author_id: authorId,
-      content,
-      parent_comment_id: parentCommentId
-    })
+    .select('*')
+    .eq('post_id', postId)
+    .order('created_at', { ascending: true });
+  
+  if (error) throw error;
+  
+  return data.map(comment => ({
+    id: comment.id,
+    postId: comment.post_id,
+    authorId: comment.author_id,
+    content: comment.content,
+    createdAt: comment.created_at,
+    likes: comment.likes || []
+  }));
+};
+
+export const createComment = async (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>): Promise<Comment> => {
+  const { data, error } = await supabase
+    .from('comments')
+    .insert([{
+      post_id: comment.postId,
+      author_id: comment.authorId,
+      content: comment.content,
+      likes: []
+    }])
     .select()
     .single();
 
-  if (error) {
-    console.error('Error creating comment:', error);
-    return null;
-  }
+  if (error) throw error;
 
-  return data;
+  return {
+    id: data.id,
+    postId: data.post_id,
+    authorId: data.author_id,
+    content: data.content,
+    createdAt: data.created_at,
+    likes: data.likes || []
+  };
 };
 
-export const likeComment = async (commentId: string, userId: string): Promise<boolean> => {
-  try {
-    const { data: comment } = await supabase
-      .from('comments')
-      .select('likes')
-      .eq('id', commentId)
-      .single();
+export const likePost = async (postId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-    if (!comment) return false;
+  const { error } = await supabase.rpc('toggle_post_like', {
+    post_id: postId,
+    user_id: user.id
+  });
 
-    const likes = comment.likes || [];
-    const updatedLikes = likes.includes(userId) 
-      ? likes.filter((id: string) => id !== userId)
-      : [...likes, userId];
+  if (error) throw error;
+};
 
-    const { error } = await supabase
-      .from('comments')
-      .update({ likes: updatedLikes })
-      .eq('id', commentId);
+export const likeComment = async (commentId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
 
-    return !error;
-  } catch (error) {
-    console.error('Error liking comment:', error);
-    return false;
-  }
+  const { error } = await supabase.rpc('toggle_comment_like', {
+    comment_id: commentId,
+    user_id: user.id
+  });
+
+  if (error) throw error;
 };

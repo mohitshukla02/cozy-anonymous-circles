@@ -1,10 +1,8 @@
-
 import React, { useState } from 'react';
-import { Heart, MessageSquare, MoreHorizontal } from 'lucide-react';
-import { Post, Comment } from '../types/groups';
+import { Heart, MessageCircle, MoreHorizontal, Edit, Trash2 } from 'lucide-react';
+import { Post, Comment } from '@/types/groups';
 import { formatDistanceToNow } from 'date-fns';
 import InteractionTracker from './InteractionTracker';
-import { useAuth } from '@/contexts/AuthContext';
 
 interface PostCardProps {
   post: Post;
@@ -13,238 +11,288 @@ interface PostCardProps {
   onLike: (postId: string) => void;
   onComment: (postId: string, content: string) => void;
   onLikeComment: (commentId: string) => void;
-  onReply: (commentId: string, content: string) => void;
-  getUserName: (userId: string, groupId: string) => string;
-  groupId: string;
+  onEditPost?: (postId: string, content: string) => void;
+  onDeletePost?: (postId: string) => void;
+  onEditComment?: (commentId: string, content: string) => void;
+  onDeleteComment?: (commentId: string) => void;
   isLiked: boolean;
+  getCommentLikeStatus: (commentId: string) => boolean;
+  getAuthorName: (authorId: string) => string;
+  currentUserId: string;
+  groupId: string;
 }
 
-const PostCard = ({ 
-  post, 
-  authorName, 
-  comments, 
-  onLike, 
-  onComment, 
+const PostCard: React.FC<PostCardProps> = ({
+  post,
+  authorName,
+  comments,
+  onLike,
+  onComment,
   onLikeComment,
-  onReply,
-  getUserName,
-  groupId,
-  isLiked 
-}: PostCardProps) => {
-  const { user } = useAuth();
+  onEditPost,
+  onDeletePost,
+  onEditComment,
+  onDeleteComment,
+  isLiked,
+  getCommentLikeStatus,
+  getAuthorName,
+  currentUserId,
+  groupId
+}) => {
   const [showComments, setShowComments] = useState(false);
   const [newComment, setNewComment] = useState('');
-  const [replyingTo, setReplyingTo] = useState<string | null>(null);
-  const [replyContent, setReplyContent] = useState('');
+  const [showCommentForm, setShowCommentForm] = useState(false);
+  const [editingPost, setEditingPost] = useState(false);
+  const [editPostContent, setEditPostContent] = useState(post.content);
+  const [editingComment, setEditingComment] = useState<string | null>(null);
+  const [editCommentContent, setEditCommentContent] = useState('');
+
+  const handleLike = () => {
+    onLike(post.id);
+  };
 
   const handleSubmitComment = (e: React.FormEvent) => {
     e.preventDefault();
     if (newComment.trim()) {
       onComment(post.id, newComment.trim());
       setNewComment('');
+      setShowCommentForm(false);
     }
   };
 
-  const handleSubmitReply = (e: React.FormEvent, commentId: string) => {
-    e.preventDefault();
-    if (replyContent.trim()) {
-      onReply(commentId, replyContent.trim());
-      setReplyContent('');
-      setReplyingTo(null);
+  const handleEditPost = () => {
+    setEditingPost(true);
+    setEditPostContent(post.content);
+  };
+
+  const handleSavePostEdit = () => {
+    if (editPostContent.trim()) {
+      onEditPost?.(post.id, editPostContent.trim());
+      setEditingPost(false);
     }
   };
 
-  const topLevelComments = comments.filter(comment => !comment.parentCommentId);
-  const getReplies = (commentId: string) => 
-    comments.filter(comment => comment.parentCommentId === commentId);
+  const handleCancelCommentEdit = () => {
+    setEditingComment(null);
+    setEditCommentContent('');
+  };
 
-  if (!user) return null;
+  const handleEditComment = (commentId: string, content: string) => {
+    setEditingComment(commentId);
+    setEditCommentContent(content);
+  };
+
+  const handleSaveCommentEdit = (commentId: string) => {
+    if (editCommentContent.trim()) {
+      onEditComment?.(commentId, editCommentContent.trim());
+      setEditingComment(null);
+      setEditCommentContent('');
+    }
+  };
 
   return (
-    <div className="bg-white rounded-2xl p-4 shadow-soft border border-gray-100">
-      <div className="flex justify-between items-start mb-3">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-pastel-pink rounded-full flex items-center justify-center">
-            <span className="text-xs font-medium text-pink-700">
-              {authorName.slice(0, 2)}
+    <div className="bg-white rounded-xl shadow-soft p-6 mb-4">
+      <div className="flex items-start justify-between mb-4">
+        <div className="flex items-center space-x-3">
+          <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+            <span className="text-white text-sm font-medium">
+              {authorName.charAt(0).toUpperCase()}
             </span>
           </div>
           <div>
-            <span className="font-medium text-gray-800 text-sm">{authorName}</span>
-            <div className="text-xs text-gray-500">
-              {formatDistanceToNow(new Date(post.timestamp || post.created_at), { addSuffix: true })}
-              {post.edited_at && <span className="ml-1">(edited)</span>}
-            </div>
+            <p className="font-medium text-gray-900">{authorName}</p>
+            <p className="text-xs text-gray-500">
+              {formatDistanceToNow(new Date(post.createdAt), { addSuffix: true })}
+              {post.editedAt && ' (edited)'}
+            </p>
           </div>
         </div>
-        <button className="text-gray-400 hover:text-gray-600">
-          <MoreHorizontal size={16} />
-        </button>
-      </div>
-
-      <p className="text-gray-700 text-sm leading-relaxed mb-4">
-        {post.content}
-      </p>
-
-      <div className="flex items-center gap-4 mb-4">
-        <InteractionTracker
-          targetUserId={post.authorId || post.author_id}
-          groupId={groupId}
-          interactionType="like"
-          onInteraction={() => onLike(post.id)}
-        >
-          <button
-            className={`flex items-center gap-1 text-sm transition-colors ${
-              isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-            }`}
-          >
-            <Heart size={16} className={isLiked ? 'fill-current' : ''} />
-            <span>{post.likes.length}</span>
-          </button>
-        </InteractionTracker>
         
-        <button
-          onClick={() => setShowComments(!showComments)}
-          className="flex items-center gap-1 text-sm text-gray-500 hover:text-blue-500 transition-colors"
-        >
-          <MessageSquare size={16} />
-          <span>{comments.length}</span>
-        </button>
+        {post.authorId === currentUserId && (
+          <div className="relative">
+            <button className="p-1 hover:bg-gray-100 rounded-full">
+              <MoreHorizontal size={16} className="text-gray-500" />
+            </button>
+          </div>
+        )}
       </div>
 
-      {showComments && (
-        <div className="border-t border-gray-100 pt-4 space-y-4">
-          <form onSubmit={handleSubmitComment} className="flex gap-2">
-            <input
-              value={newComment}
-              onChange={(e) => setNewComment(e.target.value.slice(0, 300))}
-              placeholder="Write a comment..."
-              maxLength={300}
-              className="flex-1 px-3 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-            />
+      {editingPost ? (
+        <div className="mb-4">
+          <textarea
+            value={editPostContent}
+            onChange={(e) => setEditPostContent(e.target.value)}
+            className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-amber-500"
+            rows={3}
+          />
+          <div className="flex justify-end space-x-2 mt-2">
+            <button
+              onClick={() => setEditingPost(false)}
+              className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSavePostEdit}
+              className="px-3 py-1 text-sm bg-amber-500 text-white rounded hover:bg-amber-600"
+            >
+              Save
+            </button>
+          </div>
+        </div>
+      ) : (
+        <p className="text-gray-800 mb-4 leading-relaxed">{post.content}</p>
+      )}
+
+      {/* Actions */}
+      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+        <div className="flex items-center space-x-6">
+          <InteractionTracker
+            targetUserId={post.authorId}
+            groupId={groupId}
+            onInteraction={handleLike}
+            interactionType="like"
+          >
+            <button className={`flex items-center space-x-2 transition-colors ${
+              isLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+            }`}>
+              <Heart size={18} className={isLiked ? 'fill-current' : ''} />
+              <span className="text-sm">{post.likes.length}</span>
+            </button>
+          </InteractionTracker>
+
+          <button
+            onClick={() => setShowCommentForm(!showCommentForm)}
+            className="flex items-center space-x-2 text-gray-500 hover:text-blue-500 transition-colors"
+          >
+            <MessageCircle size={18} />
+            <span className="text-sm">{comments.length}</span>
+          </button>
+        </div>
+
+        {comments.length > 0 && (
+          <button
+            onClick={() => setShowComments(!showComments)}
+            className="text-sm text-amber-600 hover:text-amber-700 font-medium"
+          >
+            {showComments ? 'Hide' : 'Show'} comments
+          </button>
+        )}
+      </div>
+
+      {/* Comment Form */}
+      {showCommentForm && (
+        <form onSubmit={handleSubmitComment} className="mt-4 pt-4 border-t border-gray-100">
+          <textarea
+            value={newComment}
+            onChange={(e) => setNewComment(e.target.value)}
+            placeholder="Write a comment..."
+            className="w-full p-3 border border-gray-200 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-amber-500"
+            rows={2}
+          />
+          <div className="flex justify-end space-x-2 mt-2">
+            <button
+              type="button"
+              onClick={() => setShowCommentForm(false)}
+              className="px-3 py-1 text-sm text-gray-600 hover:text-gray-800"
+            >
+              Cancel
+            </button>
             <button
               type="submit"
               disabled={!newComment.trim()}
-              className="px-4 py-2 bg-amber-600 text-white rounded-full text-sm font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+              className="px-3 py-1 text-sm bg-amber-500 text-white rounded hover:bg-amber-600 disabled:opacity-50"
             >
-              Post
+              Comment
             </button>
-          </form>
+          </div>
+        </form>
+      )}
 
-          <div className="space-y-3">
-            {topLevelComments.map(comment => {
-              const replies = getReplies(comment.id);
-              const commentAuthor = getUserName(comment.authorId || comment.author_id, groupId);
-              const isCommentLiked = comment.likes.includes(user.id);
-              
-              return (
-                <div key={comment.id} className="space-y-2">
-                  <div className="bg-gray-50 rounded-lg p-3">
-                    <div className="flex justify-between items-start mb-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-6 h-6 bg-pastel-blue rounded-full flex items-center justify-center">
-                          <span className="text-xs font-medium text-blue-700">
-                            {commentAuthor.slice(0, 2)}
-                          </span>
-                        </div>
-                        <span className="font-medium text-gray-800 text-xs">{commentAuthor}</span>
-                        <span className="text-xs text-gray-500">
-                          {formatDistanceToNow(new Date(comment.timestamp || comment.created_at), { addSuffix: true })}
-                        </span>
+      {/* Comments */}
+      {showComments && comments.length > 0 && (
+        <div className="mt-4 pt-4 border-t border-gray-100 space-y-4">
+          {comments.map((comment) => (
+            <div key={comment.id} className="flex items-start space-x-3">
+              <div className="w-6 h-6 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
+                <span className="text-white text-xs">
+                  {getAuthorName(comment.authorId).charAt(0).toUpperCase()}
+                </span>
+              </div>
+              <div className="flex-1">
+                <div className="bg-gray-50 rounded-lg p-3">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="font-medium text-sm text-gray-900">
+                      {getAuthorName(comment.authorId)}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
+                    </span>
+                  </div>
+                  
+                  {editingComment === comment.id ? (
+                    <div>
+                      <textarea
+                        value={editCommentContent}
+                        onChange={(e) => setEditCommentContent(e.target.value)}
+                        className="w-full p-2 border border-gray-200 rounded text-sm resize-none"
+                        rows={2}
+                      />
+                      <div className="flex justify-end space-x-2 mt-2">
+                        <button
+                          onClick={handleCancelCommentEdit}
+                          className="px-2 py-1 text-xs text-gray-600 hover:text-gray-800"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          onClick={() => handleSaveCommentEdit(comment.id)}
+                          className="px-2 py-1 text-xs bg-amber-500 text-white rounded hover:bg-amber-600"
+                        >
+                          Save
+                        </button>
                       </div>
                     </div>
-                    <p className="text-gray-700 text-sm mb-2">{comment.content}</p>
-                    <div className="flex items-center gap-3">
-                      <InteractionTracker
-                        targetUserId={comment.authorId || comment.author_id}
-                        groupId={groupId}
-                        interactionType="like"
-                        onInteraction={() => onLikeComment(comment.id)}
-                      >
-                        <button
-                          className={`flex items-center gap-1 text-xs transition-colors ${
-                            isCommentLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-                          }`}
-                        >
-                          <Heart size={12} className={isCommentLiked ? 'fill-current' : ''} />
-                          <span>{comment.likes.length}</span>
-                        </button>
-                      </InteractionTracker>
-                      <button
-                        onClick={() => setReplyingTo(replyingTo === comment.id ? null : comment.id)}
-                        className="text-xs text-gray-500 hover:text-blue-500 transition-colors"
-                      >
-                        Reply
-                      </button>
-                    </div>
-                  </div>
-
-                  {replyingTo === comment.id && (
-                    <form 
-                      onSubmit={(e) => handleSubmitReply(e, comment.id)}
-                      className="flex gap-2 ml-6"
-                    >
-                      <input
-                        value={replyContent}
-                        onChange={(e) => setReplyContent(e.target.value.slice(0, 300))}
-                        placeholder="Write a reply..."
-                        maxLength={300}
-                        className="flex-1 px-3 py-2 border border-gray-200 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!replyContent.trim()}
-                        className="px-3 py-2 bg-amber-600 text-white rounded-full text-xs font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
-                      >
-                        Reply
-                      </button>
-                    </form>
+                  ) : (
+                    <p className="text-sm text-gray-800">{comment.content}</p>
                   )}
+                </div>
+                
+                <div className="flex items-center justify-between mt-2">
+                  <InteractionTracker
+                    targetUserId={comment.authorId}
+                    groupId={groupId}
+                    onInteraction={() => onLikeComment(comment.id)}
+                    interactionType="like"
+                  >
+                    <button className={`flex items-center space-x-1 text-xs transition-colors ${
+                      getCommentLikeStatus(comment.id) ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
+                    }`}>
+                      <Heart size={14} className={getCommentLikeStatus(comment.id) ? 'fill-current' : ''} />
+                      <span>{comment.likes.length}</span>
+                    </button>
+                  </InteractionTracker>
 
-                  {replies.length > 0 && (
-                    <div className="ml-6 space-y-2">
-                      {replies.map(reply => {
-                        const replyAuthor = getUserName(reply.authorId || reply.author_id, groupId);
-                        const isReplyLiked = reply.likes.includes(user.id);
-                        
-                        return (
-                          <div key={reply.id} className="bg-gray-50 rounded-lg p-3">
-                            <div className="flex items-center gap-2 mb-2">
-                              <div className="w-5 h-5 bg-pastel-green rounded-full flex items-center justify-center">
-                                <span className="text-xs font-medium text-green-700">
-                                  {replyAuthor.slice(0, 2)}
-                                </span>
-                              </div>
-                              <span className="font-medium text-gray-800 text-xs">{replyAuthor}</span>
-                              <span className="text-xs text-gray-500">
-                                {formatDistanceToNow(new Date(reply.timestamp || reply.created_at), { addSuffix: true })}
-                              </span>
-                            </div>
-                            <p className="text-gray-700 text-sm mb-2">{reply.content}</p>
-                            <InteractionTracker
-                              targetUserId={reply.authorId || reply.author_id}
-                              groupId={groupId}
-                              interactionType="like"
-                              onInteraction={() => onLikeComment(reply.id)}
-                            >
-                              <button
-                                className={`flex items-center gap-1 text-xs transition-colors ${
-                                  isReplyLiked ? 'text-red-500' : 'text-gray-500 hover:text-red-500'
-                                }`}
-                              >
-                                <Heart size={12} className={isReplyLiked ? 'fill-current' : ''} />
-                                <span>{reply.likes.length}</span>
-                              </button>
-                            </InteractionTracker>
-                          </div>
-                        );
-                      })}
+                  {comment.authorId === currentUserId && (
+                    <div className="flex items-center space-x-2">
+                      <button
+                        onClick={() => handleEditComment(comment.id, comment.content)}
+                        className="text-xs text-gray-500 hover:text-amber-600"
+                      >
+                        Edit
+                      </button>
+                      <button
+                        onClick={() => onDeleteComment?.(comment.id)}
+                        className="text-xs text-gray-500 hover:text-red-600"
+                      >
+                        Delete
+                      </button>
                     </div>
                   )}
                 </div>
-              );
-            })}
-          </div>
+              </div>
+            </div>
+          ))}
         </div>
       )}
     </div>

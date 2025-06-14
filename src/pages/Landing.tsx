@@ -26,14 +26,14 @@ const Landing = () => {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Link
               to="/auth"
-              className="bg-amber-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-amber-700 transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
+              className="bg-amber-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition-all shadow-sm hover:shadow-md flex items-center justify-center space-x-2 border border-amber-600"
             >
               <span>Join the Community</span>
-              <ArrowRight size={20} />
+              <ArrowRight size={18} />
             </Link>
             <Link
               to="/auth"
-              className="bg-white text-amber-700 px-8 py-4 rounded-full font-semibold hover:bg-gray-50 transition-all border-2 border-amber-200 hover:border-amber-300 flex items-center justify-center space-x-2"
+              className="bg-white text-amber-700 px-6 py-3 rounded-lg font-medium hover:bg-gray-50 transition-all border border-amber-200 hover:border-amber-300 flex items-center justify-center space-x-2"
             >
               <span>Sign In</span>
             </Link>
@@ -175,10 +175,10 @@ const Landing = () => {
           </p>
           <Link
             to="/auth"
-            className="inline-flex items-center space-x-2 bg-amber-600 text-white px-8 py-4 rounded-full font-semibold hover:bg-amber-700 transition-all shadow-lg hover:shadow-xl"
+            className="inline-flex items-center space-x-2 bg-amber-600 text-white px-6 py-3 rounded-lg font-medium hover:bg-amber-700 transition-all shadow-sm hover:shadow-md border border-amber-600"
           >
             <span>Start Your Anonymous Journey</span>
-            <ArrowRight size={20} />
+            <ArrowRight size={18} />
           </Link>
         </div>
       </div>
