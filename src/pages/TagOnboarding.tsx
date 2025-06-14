@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -6,7 +5,7 @@ import { TAG_CATEGORIES } from '@/types/tags';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useUserProfile } from '@/hooks/useUserProfile';
-import { Cpu, Palette, HeartHandshake, Brain, Globe, ToyBrick, Bike, Spa } from 'lucide-react';
+import { Cpu, Palette, HeartHandshake, Brain, Globe, ToyBrick, Bike, Heart } from 'lucide-react';
 
 const categoryIcons: { [key: string]: React.ElementType } = {
   technology: Cpu,
@@ -16,7 +15,7 @@ const categoryIcons: { [key: string]: React.ElementType } = {
   'social-causes': Globe,
   hobbies: ToyBrick,
   'sports-outdoors': Bike,
-  wellness: Spa,
+  wellness: Heart,
 };
 
 const TagOnboarding = () => {
