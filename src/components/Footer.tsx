@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,10 +8,10 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-6 h-6 flex items-center justify-center">
-                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-6 h-6" />
+              <div className="w-5 h-5 flex items-center justify-center">
+                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-5 h-5" />
               </div>
-              <span className="font-semibold text-gray-800">Cozy Circles</span>
+              <span className="font-medium text-gray-800">Cozy Circles</span>
             </div>
             <p className="text-sm text-gray-600">
               Building authentic connections through anonymous interaction.
