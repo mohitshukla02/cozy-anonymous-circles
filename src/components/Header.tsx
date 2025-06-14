@@ -1,12 +1,20 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const location = useLocation();
+
+  // Mock notification and message states - replace with real data later
+  const [hasNewNotifications] = useState(true);
+  const [hasNewMessages] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -18,6 +26,19 @@ const Header = () => {
 
   // Get username from user metadata or email
   const username = user.user_metadata?.username || user.email?.split('@')[0] || 'User';
+
+  // Mock notifications - replace with real data later
+  const notifications = [
+    { id: 1, title: 'New group invitation', message: 'You were invited to join "Book Lovers"', time: '2 min ago' },
+    { id: 2, title: 'Post liked', message: 'Someone liked your post about hiking', time: '1 hour ago' },
+    { id: 3, title: 'Group activity', message: 'New posts in "Photography Circle"', time: '3 hours ago' }
+  ];
+
+  // Mock messages - replace with real data later
+  const messages = [
+    { id: 1, sender: 'Sarah', message: 'Hey, are you coming to the meetup?', time: '30 min ago' },
+    { id: 2, sender: 'Mike', message: 'Thanks for the book recommendation!', time: '2 hours ago' }
+  ];
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
@@ -76,45 +97,124 @@ const Header = () => {
             </span>
             
             {/* Notifications */}
-            <button
-              className="relative p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors"
-              title="Notifications"
-            >
-              <Bell size={18} />
-              {/* Notification badge */}
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full text-xs"></span>
-            </button>
+            <HoverCard openDelay={200} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <button
+                  className="relative p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors"
+                  title="Notifications"
+                >
+                  <Bell size={18} />
+                  {hasNewNotifications && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                  )}
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-3">Notifications</h3>
+                  <div className="space-y-3">
+                    {notifications.map((notification) => (
+                      <div key={notification.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+                        <div className="font-medium text-sm">{notification.title}</div>
+                        <div className="text-xs text-gray-600 mt-1">{notification.message}</div>
+                        <div className="text-xs text-gray-400 mt-1">{notification.time}</div>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <button className="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                      View all notifications
+                    </button>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
             
             {/* Messages */}
-            <Link
-              to="/messages"
-              className={`relative p-2 rounded-lg transition-colors ${
-                isActive('/messages')
-                  ? 'text-amber-700 bg-amber-50'
-                  : 'text-gray-500 hover:text-amber-700 hover:bg-amber-50/50'
-              }`}
-              title="Messages"
-            >
-              <MessageCircle size={18} />
-              {/* Message badge */}
-              <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full text-xs"></span>
-            </Link>
+            <HoverCard openDelay={200} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <Link
+                  to="/messages"
+                  className={`relative p-2 rounded-lg transition-colors ${
+                    isActive('/messages')
+                      ? 'text-amber-700 bg-amber-50'
+                      : 'text-gray-500 hover:text-amber-700 hover:bg-amber-50/50'
+                  }`}
+                  title="Messages"
+                >
+                  <MessageCircle size={18} />
+                  {hasNewMessages && (
+                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></span>
+                  )}
+                </Link>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
+                <div className="p-4">
+                  <h3 className="font-semibold text-sm mb-3">Messages</h3>
+                  <div className="space-y-3">
+                    {messages.length > 0 ? (
+                      messages.map((message) => (
+                        <div key={message.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+                          <div className="font-medium text-sm">{message.sender}</div>
+                          <div className="text-xs text-gray-600 mt-1 line-clamp-2">{message.message}</div>
+                          <div className="text-xs text-gray-400 mt-1">{message.time}</div>
+                        </div>
+                      ))
+                    ) : (
+                      <div className="text-xs text-gray-500 text-center py-4">No new messages</div>
+                    )}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-200">
+                    <Link to="/messages" className="text-xs text-amber-600 hover:text-amber-700 font-medium">
+                      View all messages
+                    </Link>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
             
-            <Link 
-              to="/profile" 
-              className="p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors"
-              title="Profile"
-            >
-              <User size={18} />
-            </Link>
-            
-            <button
-              onClick={handleLogout}
-              className="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50/50 transition-colors"
-              title="Logout"
-            >
-              <LogOut size={18} />
-            </button>
+            {/* User Profile */}
+            <HoverCard openDelay={200} closeDelay={100}>
+              <HoverCardTrigger asChild>
+                <button className="p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors">
+                  <User size={18} />
+                </button>
+              </HoverCardTrigger>
+              <HoverCardContent className="w-64 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
+                <div className="p-4">
+                  <div className="flex items-center space-x-3 mb-4">
+                    <Avatar className="h-12 w-12">
+                      <AvatarImage src={user.user_metadata?.avatar_url} />
+                      <AvatarFallback className="bg-amber-100 text-amber-700">
+                        {username.charAt(0).toUpperCase()}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-sm">{username}</div>
+                      <div className="text-xs text-gray-500">{user.email}</div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Link 
+                      to="/profile" 
+                      className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors w-full"
+                    >
+                      <User size={16} />
+                      <span>View Profile</span>
+                    </Link>
+                    
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 p-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors w-full"
+                    >
+                      <LogOut size={16} />
+                      <span>Sign Out</span>
+                    </button>
+                  </div>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
           </div>
         </div>
 
@@ -132,11 +232,15 @@ const Header = () => {
             </Link>
             <button className="p-2 rounded-lg text-gray-500 relative">
               <Bell size={18} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              {hasNewNotifications && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
             </button>
             <Link to="/messages" className={`p-2 rounded-lg transition-colors relative ${isActive('/messages') ? 'text-amber-700' : 'text-gray-500'}`}>
               <MessageCircle size={18} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+              {hasNewMessages && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+              )}
             </Link>
           </nav>
         </div>
