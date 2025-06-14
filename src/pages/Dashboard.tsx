@@ -1,10 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { Users, MessageCircle, Rss, Heart, TrendingUp, Clock, ArrowRight, Sparkles, MapPin, Star } from 'lucide-react';
+import { TrendingUp, Clock, Heart, MessageCircle, MapPin, Star, Sparkles, ArrowRight } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import AnonymousJourneyModal from '../components/AnonymousJourneyModal';
+import MeetupMap from '../components/MeetupMap';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -84,57 +85,6 @@ const Dashboard = () => {
               </p>
             </div>
           </div>
-
-          {/* Quick Actions */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <Link
-              to="/groups"
-              className="group p-4 bg-gradient-to-r from-blue-50 to-blue-100 rounded-2xl hover:from-blue-100 hover:to-blue-200 transition-all"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                  <Users className="text-white" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">Explore Groups</h3>
-                  <p className="text-sm text-gray-600">Find your community</p>
-                </div>
-                <ArrowRight className="text-blue-500 group-hover:translate-x-1 transition-transform" size={16} />
-              </div>
-            </Link>
-
-            <Link
-              to="/feed"
-              className="group p-4 bg-gradient-to-r from-purple-50 to-purple-100 rounded-2xl hover:from-purple-100 hover:to-purple-200 transition-all"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-purple-500 rounded-full flex items-center justify-center">
-                  <Rss className="text-white" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">Your Feed</h3>
-                  <p className="text-sm text-gray-600">See what's happening</p>
-                </div>
-                <ArrowRight className="text-purple-500 group-hover:translate-x-1 transition-transform" size={16} />
-              </div>
-            </Link>
-
-            <Link
-              to="/messages"
-              className="group p-4 bg-gradient-to-r from-green-50 to-green-100 rounded-2xl hover:from-green-100 hover:to-green-200 transition-all"
-            >
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                  <MessageCircle className="text-white" size={20} />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800">Messages</h3>
-                  <p className="text-sm text-gray-600">Connect privately</p>
-                </div>
-                <ArrowRight className="text-green-500 group-hover:translate-x-1 transition-transform" size={16} />
-              </div>
-            </Link>
-          </div>
         </div>
 
         {/* Onboarding Prompt */}
@@ -159,6 +109,11 @@ const Dashboard = () => {
           </div>
         )}
 
+        {/* Meetup Map */}
+        <div className="bg-white rounded-3xl shadow-sm p-8 mb-8">
+          <MeetupMap />
+        </div>
+
         {/* Featured Groups */}
         <div className="bg-white rounded-3xl shadow-sm p-8 mb-8">
           <div className="flex items-center space-x-2 mb-6">
@@ -175,7 +130,7 @@ const Dashboard = () => {
                 <div className="flex justify-between items-start mb-4">
                   <div className="flex items-start space-x-3">
                     <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-full flex items-center justify-center">
-                      <Users className="text-white" size={20} />
+                      <MapPin className="text-white" size={20} />
                     </div>
                     <div>
                       <h3 className="font-semibold text-gray-800 group-hover:text-amber-800 transition-colors flex items-center space-x-2">
