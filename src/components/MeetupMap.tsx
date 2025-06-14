@@ -31,7 +31,7 @@ const MeetupMap = () => {
     }
   }, []);
 
-  // Generate meetups based on user's location or default to NYC
+  // Generate meetups based on user's location or default to Hyderabad
   const getUserLocation = () => {
     if (profile?.location_coordinates) {
       return {
@@ -46,11 +46,11 @@ const MeetupMap = () => {
         region: user.location.region
       };
     }
-    // Default to NYC if no location is set
+    // Default to Hyderabad instead of NYC
     return {
-      center: [-73.9665, 40.7829] as [number, number],
-      city: 'New York',
-      region: 'NY'
+      center: [78.4867, 17.3850] as [number, number],
+      city: 'Hyderabad',
+      region: 'Telangana'
     };
   };
 

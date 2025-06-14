@@ -50,7 +50,7 @@ const Dashboard = () => {
     category: "Intellectual",
     isLocal: false,
     trending: true,
-    image: "/lovable-uploads/a4d455b6-8ac7-4a26-b964-a285922f9f53.png"
+    image: "/lovable-uploads/d9cd9dda-8dd7-4348-adce-1fd23806b825.png"
   }, {
     id: 4,
     name: "Chai & Conversations",
