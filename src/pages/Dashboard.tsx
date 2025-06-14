@@ -5,6 +5,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import AnonymousJourneyModal from '../components/AnonymousJourneyModal';
 import MeetupMap from '../components/MeetupMap';
+
 const Dashboard = () => {
   const {
     user
@@ -49,7 +50,7 @@ const Dashboard = () => {
     category: "Intellectual",
     isLocal: false,
     trending: true,
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
+    image: "/lovable-uploads/a4d455b6-8ac7-4a26-b964-a285922f9f53.png"
   }, {
     id: 4,
     name: "Coffee & Conversations",
@@ -193,4 +194,5 @@ const Dashboard = () => {
       <AnonymousJourneyModal open={showAnonymousModal} onClose={handleCloseAnonymousModal} />
     </div>;
 };
+
 export default Dashboard;
