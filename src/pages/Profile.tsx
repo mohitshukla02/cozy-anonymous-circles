@@ -1,31 +1,39 @@
 
 import React, { useState } from 'react';
 import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3 } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '@/contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
 import { TAG_CATEGORIES } from '../types/tags';
 import { Badge } from '../components/ui/badge';
 
 const Profile = () => {
-  const { user, updatePreferences, logout } = useUser();
+  const { user, signOut } = useAuth();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const navigate = useNavigate();
 
   if (!user) return null;
 
-  // Debug logging
-  console.log('User data in Profile:', user);
-  console.log('Selected tags:', user.selectedTags);
-  console.log('Tag categories:', TAG_CATEGORIES);
+  // For now, we'll use placeholder data since we don't have user profile storage yet
+  const userData = {
+    username: user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous',
+    selectedTags: [], // This will need to be implemented with a profile system
+    joinDate: user.created_at,
+    preferences: {
+      theme: 'light' as const
+    }
+  };
 
-  const joinDate = new Date(user.joinDate).toLocaleDateString('en-US', {
+  console.log('User data in Profile:', user);
+  console.log('Selected tags:', userData.selectedTags);
+
+  const joinDate = new Date(userData.joinDate).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long',
     day: 'numeric'
   });
 
   const handleDeleteAccount = () => {
-    logout();
+    signOut();
   };
 
   const handleEditTags = () => {
@@ -55,7 +63,7 @@ const Profile = () => {
               <User className="text-white" size={20} />
             </div>
             <div>
-              <h1 className="text-xl font-heading font-bold text-gray-800 mb-1">{user.username}</h1>
+              <h1 className="text-xl font-heading font-bold text-gray-800 mb-1">{userData.username}</h1>
               <div className="flex items-center space-x-2 text-gray-500">
                 <Calendar size={14} />
                 <span className="text-xs">Joined {joinDate}</span>
@@ -80,18 +88,9 @@ const Profile = () => {
             </button>
           </div>
 
-          {/* Debug info - temporary */}
-          <div className="mb-4 p-3 bg-gray-50 rounded-lg text-xs">
-            <p><strong>Debug Info:</strong></p>
-            <p>Has selectedTags: {user.selectedTags ? 'Yes' : 'No'}</p>
-            <p>selectedTags type: {typeof user.selectedTags}</p>
-            <p>selectedTags length: {user.selectedTags?.length || 0}</p>
-            <p>selectedTags content: {JSON.stringify(user.selectedTags)}</p>
-          </div>
-
-          {user.selectedTags && user.selectedTags.length > 0 ? (
+          {userData.selectedTags && userData.selectedTags.length > 0 ? (
             <div className="flex flex-wrap gap-2">
-              {user.selectedTags.map((tagId) => {
+              {userData.selectedTags.map((tagId) => {
                 const tagName = getTagName(tagId);
                 return (
                   <Badge key={tagId} variant="secondary" className="px-2 py-1 text-xs">
@@ -143,8 +142,7 @@ const Profile = () => {
                 <p className="text-xs text-gray-500">Choose your preferred theme</p>
               </div>
               <select
-                value={user.preferences.theme}
-                onChange={(e) => updatePreferences({ theme: e.target.value as 'light' | 'dark' })}
+                value={userData.preferences.theme}
                 className="px-3 py-1.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent text-xs"
               >
                 <option value="light">Light</option>
@@ -183,9 +181,9 @@ const Profile = () => {
             </div>
 
             <div className="p-3 bg-amber-50 rounded-xl">
-              <h3 className="font-semibold text-amber-800 mb-1 text-sm">Username: {user.username}</h3>
+              <h3 className="font-semibold text-amber-800 mb-1 text-sm">Username: {userData.username}</h3>
               <p className="text-xs text-amber-700">
-                Your randomly generated username is your only identifier. Keep it safe!
+                Your username is your only identifier. Keep it safe!
               </p>
             </div>
           </div>
