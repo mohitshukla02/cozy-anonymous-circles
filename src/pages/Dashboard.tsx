@@ -41,7 +41,7 @@ const Dashboard = () => {
     category: "Sports & Outdoors",
     isLocal: true,
     trending: false,
-    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop"
+    image: "/lovable-uploads/6e18371c-1606-4423-a38e-e1ca52624fa8.png"
   }, {
     id: 3,
     name: "Book Club Enthusiasts",
