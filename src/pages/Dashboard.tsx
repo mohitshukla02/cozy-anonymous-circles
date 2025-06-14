@@ -1,11 +1,25 @@
-
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, MessageCircle, Rss, Heart, TrendingUp, Clock } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
+import AnonymousJourneyModal from '../components/AnonymousJourneyModal';
 
 const Dashboard = () => {
   const { user } = useUser();
+  const [showAnonymousModal, setShowAnonymousModal] = useState(false);
+
+  useEffect(() => {
+    // Check if user has seen the anonymous journey modal before
+    const hasSeenModal = localStorage.getItem('hasSeenAnonymousJourney');
+    if (!hasSeenModal) {
+      setShowAnonymousModal(true);
+    }
+  }, []);
+
+  const handleCloseAnonymousModal = () => {
+    setShowAnonymousModal(false);
+    localStorage.setItem('hasSeenAnonymousJourney', 'true');
+  };
 
   const quickStats = [
     { label: 'Groups Joined', value: '0', icon: Users, color: 'bg-blue-500' },
@@ -70,56 +84,37 @@ const Dashboard = () => {
         </div>
 
         {/* Getting Started */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-          <div className="bg-white rounded-3xl shadow-sm p-8">
-            <h2 className="text-2xl font-bold text-gray-800 mb-4">Getting Started</h2>
-            <div className="space-y-4">
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-amber-600 font-semibold text-sm">1</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Explore Interest Groups</h3>
-                  <p className="text-gray-600 text-sm">Find communities that match your hobbies and interests.</p>
-                </div>
+        <div className="bg-white rounded-3xl shadow-sm p-8 mb-8">
+          <h2 className="text-2xl font-bold text-gray-800 mb-6">Getting Started</h2>
+          <div className="space-y-4">
+            <div className="flex items-start space-x-4">
+              <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <span className="text-amber-600 font-semibold text-sm">1</span>
               </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-amber-600 font-semibold text-sm">2</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Join Conversations</h3>
-                  <p className="text-gray-600 text-sm">Share your thoughts and connect with like-minded people.</p>
-                </div>
-              </div>
-              
-              <div className="flex items-start space-x-4">
-                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                  <span className="text-amber-600 font-semibold text-sm">3</span>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-800 mb-1">Build Connections</h3>
-                  <p className="text-gray-600 text-sm">Form meaningful relationships through authentic dialogue.</p>
-                </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Explore Interest Groups</h3>
+                <p className="text-gray-600 text-sm">Find communities that match your hobbies and interests.</p>
               </div>
             </div>
-          </div>
-
-          <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-3xl shadow-sm p-8 text-white">
-            <h2 className="text-2xl font-bold mb-4">Your Anonymous Journey</h2>
-            <p className="mb-6 text-amber-100">
-              Remember, in Cozy Circles, you're valued for your thoughts and authenticity, 
-              not your appearance or status. Be yourself, be kind, and enjoy meaningful connections.
-            </p>
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
-              <h3 className="font-semibold mb-2">Community Guidelines</h3>
-              <ul className="text-sm text-amber-100 space-y-1">
-                <li>• Be respectful and kind</li>
-                <li>• Keep conversations meaningful</li>
-                <li>• Respect others' anonymity</li>
-                <li>• Report inappropriate behavior</li>
-              </ul>
+            
+            <div className="flex items-start space-x-4">
+              <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <span className="text-amber-600 font-semibold text-sm">2</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Join Conversations</h3>
+                <p className="text-gray-600 text-sm">Share your thoughts and connect with like-minded people.</p>
+              </div>
+            </div>
+            
+            <div className="flex items-start space-x-4">
+              <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <span className="text-amber-600 font-semibold text-sm">3</span>
+              </div>
+              <div>
+                <h3 className="font-semibold text-gray-800 mb-1">Build Connections</h3>
+                <p className="text-gray-600 text-sm">Form meaningful relationships through authentic dialogue.</p>
+              </div>
             </div>
           </div>
         </div>
@@ -152,6 +147,12 @@ const Dashboard = () => {
           </div>
         </div>
       </div>
+
+      {/* Anonymous Journey Modal */}
+      <AnonymousJourneyModal 
+        open={showAnonymousModal} 
+        onClose={handleCloseAnonymousModal} 
+      />
     </div>
   );
 };
