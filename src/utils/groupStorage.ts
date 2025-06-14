@@ -1,4 +1,3 @@
-
 import { Group, Post, Comment, UserGroup } from '../types/groups';
 
 const GROUPS_KEY = 'cozy_groups';
@@ -60,43 +59,100 @@ export const saveUserGroups = (userGroups: UserGroup[]): void => {
   localStorage.setItem(USER_GROUPS_KEY, JSON.stringify(userGroups));
 };
 
-export const createSampleGroups = (): void => {
+export const createSampleGroups = () => {
   const existingGroups = getGroups();
   if (existingGroups.length > 0) return;
 
   const sampleGroups: Group[] = [
+    // Interest Communities (Global)
     {
       id: '1',
-      name: 'Digital Art Creators',
-      description: 'A cozy space for digital artists to share techniques, get feedback, and inspire each other.',
-      tags: ['digital-art', 'creative-arts', 'graphic-design'],
-      memberIds: ['sample1', 'sample2', 'sample3'],
+      name: 'Photography Enthusiasts',
+      description: 'Share your best shots, get feedback, and learn new techniques from fellow photographers.',
+      tags: ['photography', 'art', 'creativity'],
+      memberIds: ['user1', 'user2'],
       createdDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString(),
-      memberLimit: 30,
+      memberLimit: 50,
       privacy: 'open',
-      adminId: 'sample1',
+      adminId: 'user1',
+      type: 'interest'
     },
     {
       id: '2',
-      name: 'Mindful Morning Routines',
-      description: 'Start your day right! Share morning rituals, meditation tips, and wellness practices.',
-      tags: ['mindfulness', 'wellness', 'meditation'],
-      memberIds: ['sample1', 'sample4', 'sample5', 'sample6'],
-      createdDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
-      memberLimit: 25,
-      privacy: 'open',
-      adminId: 'sample4',
-    },
-    {
-      id: '3',
-      name: 'Sustainable Living Tips',
-      description: 'Small changes, big impact. Share eco-friendly lifestyle tips and sustainable practices.',
-      tags: ['sustainable-living', 'environment', 'lifestyle'],
-      memberIds: ['sample2', 'sample7'],
+      name: 'Book Lovers Circle',
+      description: 'Monthly book discussions, reading recommendations, and literary conversations.',
+      tags: ['books', 'reading', 'literature'],
+      memberIds: ['user2'],
       createdDate: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString(),
       memberLimit: 40,
       privacy: 'open',
-      adminId: 'sample2',
+      adminId: 'user2',
+      type: 'interest'
+    },
+    {
+      id: '3',
+      name: 'Cooking Adventures',
+      description: 'Share recipes, cooking tips, and food photos. From beginners to master chefs!',
+      tags: ['cooking', 'food', 'recipes'],
+      memberIds: ['user3'],
+      createdDate: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000).toISOString(),
+      memberLimit: 45,
+      privacy: 'open',
+      adminId: 'user3',
+      type: 'interest'
+    },
+    
+    // Local Meetup Groups
+    {
+      id: '4',
+      name: 'SF Bay Area Hikers',
+      description: 'Weekly hiking meetups exploring the beautiful trails around San Francisco.',
+      tags: ['hiking', 'outdoors', 'fitness'],
+      memberIds: ['user4'],
+      createdDate: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString(),
+      memberLimit: 15,
+      privacy: 'open',
+      adminId: 'user4',
+      type: 'local-meetup',
+      location: {
+        city: 'San Francisco',
+        region: 'California',
+        coordinates: { lat: 37.7749, lng: -122.4194 }
+      }
+    },
+    {
+      id: '5',
+      name: 'Brooklyn Board Game Club',
+      description: 'Friendly board game nights every Tuesday. All skill levels welcome!',
+      tags: ['games', 'social', 'strategy'],
+      memberIds: ['user5'],
+      createdDate: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000).toISOString(),
+      memberLimit: 12,
+      privacy: 'open',
+      adminId: 'user5',
+      type: 'local-meetup',
+      location: {
+        city: 'Brooklyn',
+        region: 'New York',
+        coordinates: { lat: 40.6782, lng: -73.9442 }
+      }
+    },
+    {
+      id: '6',
+      name: 'Austin Coffee Enthusiasts',
+      description: 'Exploring the best coffee shops and roasters in Austin. Weekend coffee walks!',
+      tags: ['coffee', 'food', 'social'],
+      memberIds: ['user6'],
+      createdDate: new Date().toISOString(),
+      memberLimit: 18,
+      privacy: 'open',
+      adminId: 'user6',
+      type: 'local-meetup',
+      location: {
+        city: 'Austin',
+        region: 'Texas',
+        coordinates: { lat: 30.2672, lng: -97.7431 }
+      }
     }
   ];
 

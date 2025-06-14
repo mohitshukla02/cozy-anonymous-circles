@@ -1,6 +1,5 @@
-
 import React, { useState, useEffect } from 'react';
-import { Users, Plus, Search } from 'lucide-react';
+import { Users, Plus, Search, MapPin } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/groups';
@@ -51,10 +50,31 @@ const Groups = () => {
         filtered = filtered.filter(group => userGroups.includes(group.id));
         break;
       case 'recommended':
-        if (user?.selectedTags) {
+        if (user?.selectedTags && user.location) {
+          // Prioritize local groups that match interests
           filtered = filtered.filter(group => {
             const matchingTags = group.tags.filter(tag => user.selectedTags.includes(tag));
-            return matchingTags.length >= 2;
+            const isLocal = group.type === 'local-meetup' && 
+              group.location && user.location &&
+              group.location.city.toLowerCase() === user.location.city.toLowerCase();
+            
+            return matchingTags.length >= 2 || isLocal;
+          });
+          
+          // Sort to prioritize local groups
+          filtered.sort((a, b) => {
+            const aIsLocal = a.type === 'local-meetup' && a.location && user.location &&
+              a.location.city.toLowerCase() === user.location.city.toLowerCase();
+            const bIsLocal = b.type === 'local-meetup' && b.location && user.location &&
+              b.location.city.toLowerCase() === user.location.city.toLowerCase();
+            
+            if (aIsLocal && !bIsLocal) return -1;
+            if (!aIsLocal && bIsLocal) return 1;
+            
+            // Then by tag matches
+            const aMatches = a.tags.filter(tag => user.selectedTags.includes(tag)).length;
+            const bMatches = b.tags.filter(tag => user.selectedTags.includes(tag)).length;
+            return bMatches - aMatches;
           });
         }
         break;
@@ -70,7 +90,7 @@ const Groups = () => {
     }
 
     setFilteredGroups(filtered);
-  }, [groups, searchTerm, activeFilter, userGroups, user?.selectedTags]);
+  }, [groups, searchTerm, activeFilter, userGroups, user?.selectedTags, user?.location]);
 
   const handleJoinGroup = (groupId: string) => {
     if (!user) return;
@@ -111,6 +131,12 @@ const Groups = () => {
     tags: string[];
     memberLimit: number;
     privacy: 'open' | 'invitation';
+    type: 'interest' | 'local-meetup';
+    location?: {
+      city: string;
+      region: string;
+      coordinates?: { lat: number; lng: number };
+    };
   }) => {
     if (!user) return;
 
@@ -123,7 +149,9 @@ const Groups = () => {
       createdDate: new Date().toISOString(),
       memberLimit: groupData.memberLimit,
       privacy: groupData.privacy,
-      adminId: user.username
+      adminId: user.username,
+      type: groupData.type,
+      location: groupData.location
     };
 
     const updatedGroups = [...groups, newGroup];
@@ -164,8 +192,8 @@ const Groups = () => {
             Interest Groups
           </h1>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Discover and join communities based on your hobbies, interests, and passions. 
-            Connect with like-minded people in a safe, anonymous environment.
+            Discover and join communities based on your hobbies, interests, and location. 
+            Connect with like-minded people both online and in your city.
           </p>
         </div>
 
@@ -207,6 +235,16 @@ const Groups = () => {
           ))}
         </div>
 
+        {/* Location Info */}
+        {user?.location && (
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-6 flex items-center gap-2">
+            <MapPin size={16} className="text-blue-600" />
+            <span className="text-sm text-blue-800">
+              Showing groups in and around {user.location.city}, {user.location.region}
+            </span>
+          </div>
+        )}
+
         {/* Groups Grid */}
         {filteredGroups.length === 0 ? (
           <div className="text-center py-12">
@@ -225,6 +263,8 @@ const Groups = () => {
                   ? "Join some groups to start connecting with like-minded people."
                   : searchTerm
                   ? "Try adjusting your search terms or browse all groups."
+                  : !user?.location
+                  ? "Set your location to see local meetup groups in your area."
                   : "Create a new group or adjust your interests to see more recommendations."
                 }
               </p>
@@ -258,6 +298,7 @@ const Groups = () => {
           onClose={() => setShowCreateModal(false)}
           onCreate={handleCreateGroup}
           userTags={user.selectedTags}
+          userLocation={user.location}
         />
       </div>
     </div>

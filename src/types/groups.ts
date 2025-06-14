@@ -1,4 +1,3 @@
-
 export interface Group {
   id: string;
   name: string;
@@ -11,6 +10,15 @@ export interface Group {
   adminId: string;
   avatar?: string;
   pinnedPostId?: string;
+  type: 'interest' | 'local-meetup';
+  location?: {
+    city: string;
+    region: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
 }
 
 export interface Post {

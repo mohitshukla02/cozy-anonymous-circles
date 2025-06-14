@@ -6,6 +6,14 @@ interface User {
   joinDate: string;
   selectedTags: string[];
   hasCompletedOnboarding: boolean;
+  location?: {
+    city: string;
+    region: string;
+    coordinates?: {
+      lat: number;
+      lng: number;
+    };
+  };
   preferences: {
     theme: 'light' | 'dark';
   };
@@ -17,6 +25,7 @@ interface UserContextType {
   logout: () => void;
   updatePreferences: (preferences: Partial<User['preferences']>) => void;
   updateTags: (tags: string[]) => void;
+  updateLocation: (location: User['location']) => void;
   completeOnboarding: () => void;
 }
 
@@ -64,6 +73,17 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateLocation = (location: User['location']) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        location
+      };
+      setUser(updatedUser);
+      localStorage.setItem('cozyUser', JSON.stringify(updatedUser));
+    }
+  };
+
   const completeOnboarding = () => {
     if (user) {
       const updatedUser = {
@@ -82,6 +102,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
       logout, 
       updatePreferences, 
       updateTags, 
+      updateLocation,
       completeOnboarding 
     }}>
       {children}

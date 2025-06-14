@@ -5,6 +5,7 @@ import { Button } from './ui/button';
 import { Input } from './ui/input';
 import { Badge } from './ui/badge';
 import { TAG_CATEGORIES } from '../types/tags';
+import LocationSelector from './LocationSelector';
 
 interface CreateGroupModalProps {
   isOpen: boolean;
@@ -15,16 +16,29 @@ interface CreateGroupModalProps {
     tags: string[];
     memberLimit: number;
     privacy: 'open' | 'invitation';
+    type: 'interest' | 'local-meetup';
+    location?: {
+      city: string;
+      region: string;
+      coordinates?: { lat: number; lng: number };
+    };
   }) => void;
   userTags: string[];
+  userLocation?: {
+    city: string;
+    region: string;
+    coordinates?: { lat: number; lng: number };
+  };
 }
 
-const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupModalProps) => {
+const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }: CreateGroupModalProps) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [memberLimit, setMemberLimit] = useState(30);
   const [privacy, setPrivacy] = useState<'open' | 'invitation'>('open');
+  const [groupType, setGroupType] = useState<'interest' | 'local-meetup'>('interest');
+  const [groupLocation, setGroupLocation] = useState(userLocation);
 
   const availableTags = userTags;
   const tagNames = new Map();
@@ -37,12 +51,18 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (name.trim() && description.trim() && selectedTags.length >= 3) {
+      if (groupType === 'local-meetup' && !groupLocation) {
+        return; // Location required for local meetup groups
+      }
+
       onCreate({
         name: name.trim(),
         description: description.trim(),
         tags: selectedTags,
-        memberLimit,
-        privacy
+        memberLimit: groupType === 'local-meetup' ? Math.min(memberLimit, 20) : memberLimit,
+        privacy,
+        type: groupType,
+        location: groupType === 'local-meetup' ? groupLocation : undefined
       });
       
       // Reset form
@@ -51,6 +71,8 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
       setSelectedTags([]);
       setMemberLimit(30);
       setPrivacy('open');
+      setGroupType('interest');
+      setGroupLocation(userLocation);
       onClose();
     }
   };
@@ -81,6 +103,50 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Group Type <span className="text-red-500">*</span>
+            </label>
+            <div className="grid grid-cols-2 gap-3">
+              <button
+                type="button"
+                onClick={() => setGroupType('interest')}
+                className={`p-3 rounded-lg border text-sm transition-all ${
+                  groupType === 'interest'
+                    ? 'bg-blue-50 border-blue-300 text-blue-800'
+                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <div className="font-medium">Interest Community</div>
+                <div className="text-xs mt-1">Global discussions</div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setGroupType('local-meetup')}
+                className={`p-3 rounded-lg border text-sm transition-all ${
+                  groupType === 'local-meetup'
+                    ? 'bg-green-50 border-green-300 text-green-800'
+                    : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <div className="font-medium">Local Meetup</div>
+                <div className="text-xs mt-1">City-based group</div>
+              </button>
+            </div>
+          </div>
+
+          {groupType === 'local-meetup' && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">
+                Location <span className="text-red-500">*</span>
+              </label>
+              <LocationSelector
+                onLocationSelect={setGroupLocation}
+                selectedLocation={groupLocation}
+              />
+            </div>
+          )}
+
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
               Group Name <span className="text-red-500">*</span>
@@ -142,12 +208,20 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
             <Input
               type="number"
               value={memberLimit}
-              onChange={(e) => setMemberLimit(Math.min(50, Math.max(5, parseInt(e.target.value) || 30)))}
+              onChange={(e) => {
+                const maxLimit = groupType === 'local-meetup' ? 20 : 50;
+                setMemberLimit(Math.min(maxLimit, Math.max(5, parseInt(e.target.value) || 30)));
+              }}
               min={5}
-              max={50}
+              max={groupType === 'local-meetup' ? 20 : 50}
               className="w-full"
             />
-            <p className="text-xs text-gray-500 mt-1">Keep it intimate: 5-50 members</p>
+            <p className="text-xs text-gray-500 mt-1">
+              {groupType === 'local-meetup' 
+                ? 'Keep meetups intimate: 5-20 members' 
+                : 'Interest communities: 5-50 members'
+              }
+            </p>
           </div>
 
           <div>
@@ -187,6 +261,9 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
               <li>• Stay on topic and contribute meaningfully</li>
               <li>• No spam, self-promotion, or harmful content</li>
               <li>• Maintain the cozy, welcoming atmosphere</li>
+              {groupType === 'local-meetup' && (
+                <li>• Always suggest public meeting places for safety</li>
+              )}
             </ul>
           </div>
 
@@ -201,7 +278,12 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags }: CreateGroupMo
             </Button>
             <Button
               type="submit"
-              disabled={!name.trim() || !description.trim() || selectedTags.length < 3}
+              disabled={
+                !name.trim() || 
+                !description.trim() || 
+                selectedTags.length < 3 ||
+                (groupType === 'local-meetup' && !groupLocation)
+              }
               className="flex-1 bg-amber-600 hover:bg-amber-700"
             >
               Create Group

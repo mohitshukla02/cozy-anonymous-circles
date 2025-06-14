@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { Users, Heart, ArrowRight } from 'lucide-react';
+import { Users, Heart, ArrowRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/groups';
 import { Badge } from './ui/badge';
@@ -61,7 +61,27 @@ const GroupCard = ({ group, userTags, onJoin, isJoined }: GroupCardProps) => {
                   <span className="text-xs font-medium">{matchingTags.length}</span>
                 </div>
               )}
+              {/* Group Type Badge */}
+              <Badge 
+                variant="outline"
+                className={`text-xs px-2 py-0.5 border-0 font-medium ${
+                  group.type === 'local-meetup' 
+                    ? 'bg-green-50 text-green-700' 
+                    : 'bg-blue-50 text-blue-700'
+                }`}
+              >
+                {group.type === 'local-meetup' ? 'Local' : 'Global'}
+              </Badge>
             </div>
+            
+            {/* Location for local groups */}
+            {group.type === 'local-meetup' && group.location && (
+              <div className="flex items-center gap-1 mb-2 text-xs text-gray-500">
+                <MapPin size={12} />
+                <span>{group.location.city}, {group.location.region}</span>
+              </div>
+            )}
+            
             <p className="text-gray-600 text-xs leading-relaxed mb-3 line-clamp-2">
               {group.description}
             </p>
