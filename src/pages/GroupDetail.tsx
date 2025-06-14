@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Settings, Plus } from 'lucide-react';
+import { ArrowLeft, Users, Settings, Plus, TrendingUp, MessageCircle, Heart } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
 import { Group, Post, Comment } from '../types/groups';
 import { getGroups, getPosts, savePosts, getComments, saveComments, getUserGroups, generateAnonymousName } from '../utils/groupStorage';
@@ -175,119 +175,134 @@ const GroupDetail = () => {
   };
 
   if (!group) {
-    return <div>Loading...</div>;
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center">
+        <div className="animate-pulse">Loading...</div>
+      </div>
+    );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 px-4 py-8">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-6">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+      <div className="max-w-2xl mx-auto px-4 py-6">
+        {/* Modern Header */}
+        <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => navigate('/groups')}
-            className="text-gray-600 hover:text-gray-800 transition-colors"
+            className="p-2 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-900 hover:bg-white transition-all duration-200 hover:shadow-sm"
           >
-            <ArrowLeft size={24} />
+            <ArrowLeft size={18} />
           </button>
-          <h1 className="text-2xl font-heading font-bold text-gray-800">
-            {group.name}
-          </h1>
+          <div className="flex-1">
+            <h1 className="text-lg font-semibold text-gray-900 leading-tight">
+              {group.name}
+            </h1>
+            <p className="text-xs text-gray-500 mt-0.5">
+              {group.memberIds.length} members • {getSortedPosts().length} posts
+            </p>
+          </div>
         </div>
 
-        {/* Group Info */}
-        <div className="bg-white rounded-3xl p-6 shadow-soft mb-6">
-          <div className="flex justify-between items-start mb-4">
-            <div className="flex-1">
-              <p className="text-gray-600 mb-4">{group.description}</p>
-              
-              <div className="flex items-center gap-6 mb-4 text-sm text-gray-500">
-                <div className="flex items-center gap-1">
-                  <Users size={16} />
-                  <span>{group.memberIds.length}/{group.memberLimit} members</span>
-                </div>
-                <span>Created {new Date(group.createdDate).toLocaleDateString()}</span>
+        {/* Group Info Card */}
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-100/50 mb-6 relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+          <div className="relative">
+            <p className="text-gray-700 text-sm mb-4 leading-relaxed">{group.description}</p>
+            
+            <div className="flex items-center gap-4 mb-4 text-xs text-gray-500">
+              <div className="flex items-center gap-1.5">
+                <Users size={14} />
+                <span>{group.memberIds.length}/{group.memberLimit} members</span>
               </div>
-
-              <div className="flex flex-wrap gap-2">
-                {group.tags.map(tagId => (
-                  <Badge key={tagId} variant="outline" className="text-xs">
-                    {tagNames.get(tagId)}
-                  </Badge>
-                ))}
-              </div>
+              <div className="w-1 h-1 bg-gray-300 rounded-full" />
+              <span>Created {new Date(group.createdDate).toLocaleDateString()}</span>
             </div>
 
-            <div className="flex gap-2">
-              {isJoined && (
-                <button className="text-gray-600 hover:text-gray-800 transition-colors">
-                  <Settings size={20} />
-                </button>
-              )}
+            <div className="flex flex-wrap gap-2">
+              {group.tags.map(tagId => (
+                <Badge 
+                  key={tagId} 
+                  variant="outline" 
+                  className="text-xs px-2 py-1 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-0 font-medium"
+                >
+                  {tagNames.get(tagId)}
+                </Badge>
+              ))}
             </div>
           </div>
         </div>
 
         {isJoined ? (
           <>
-            {/* Create Post */}
-            <div className="bg-white rounded-3xl p-6 shadow-soft mb-6">
-              <form onSubmit={handleCreatePost}>
-                <textarea
-                  value={newPostContent}
-                  onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
-                  placeholder="Share your thoughts with the group..."
-                  maxLength={500}
-                  rows={3}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-amber-500"
-                />
-                <div className="flex justify-between items-center mt-3">
-                  <span className="text-xs text-gray-500">
-                    {newPostContent.length}/500 characters
-                  </span>
-                  <button
-                    type="submit"
-                    disabled={!newPostContent.trim()}
-                    className="bg-amber-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-amber-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-                  >
-                    <Plus size={16} />
-                    Post
-                  </button>
-                </div>
-              </form>
+            {/* Create Post Card */}
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-5 border border-gray-100/50 mb-6 relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+              <div className="relative">
+                <form onSubmit={handleCreatePost}>
+                  <textarea
+                    value={newPostContent}
+                    onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
+                    placeholder="Share your thoughts..."
+                    maxLength={500}
+                    rows={3}
+                    className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                  />
+                  <div className="flex justify-between items-center mt-3">
+                    <span className="text-xs text-gray-400">
+                      {newPostContent.length}/500
+                    </span>
+                    <button
+                      type="submit"
+                      disabled={!newPostContent.trim()}
+                      className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-700 disabled:from-gray-300 disabled:to-gray-400 disabled:cursor-not-allowed transition-all duration-200 flex items-center gap-2 shadow-sm hover:shadow-md"
+                    >
+                      <Plus size={14} />
+                      Post
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
 
             {/* Sort Options */}
             <div className="flex gap-2 mb-6">
               {[
-                { key: 'recent', label: 'Recent' },
-                { key: 'liked', label: 'Most Liked' },
-                { key: 'discussed', label: 'Most Discussed' }
-              ].map(({ key, label }) => (
+                { key: 'recent', label: 'Recent', icon: TrendingUp },
+                { key: 'liked', label: 'Liked', icon: Heart },
+                { key: 'discussed', label: 'Discussed', icon: MessageCircle }
+              ].map(({ key, label, icon: Icon }) => (
                 <button
                   key={key}
                   onClick={() => setSortBy(key as any)}
-                  className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                  className={`px-3 py-2 rounded-lg text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
                     sortBy === key
-                      ? 'bg-amber-600 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-50 border border-gray-200'
+                      ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-sm'
+                      : 'bg-white/80 text-gray-600 hover:bg-white border border-gray-200/50 hover:shadow-sm'
                   }`}
                 >
+                  <Icon size={12} />
                   {label}
                 </button>
               ))}
             </div>
 
             {/* Posts */}
-            <div className="space-y-6">
+            <div className="space-y-4">
               {getSortedPosts().length === 0 ? (
                 <div className="text-center py-12">
-                  <div className="bg-white rounded-3xl p-8 shadow-soft">
-                    <h3 className="font-heading font-semibold text-gray-800 mb-2">
-                      No posts yet
-                    </h3>
-                    <p className="text-gray-600 text-sm">
-                      Be the first to start a conversation in this group!
-                    </p>
+                  <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-100/50 relative overflow-hidden">
+                    <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+                    <div className="relative">
+                      <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <MessageCircle size={24} className="text-blue-600" />
+                      </div>
+                      <h3 className="font-semibold text-gray-900 mb-2 text-sm">
+                        No posts yet
+                      </h3>
+                      <p className="text-gray-600 text-xs">
+                        Be the first to start a conversation!
+                      </p>
+                    </div>
                   </div>
                 </div>
               ) : (
@@ -312,19 +327,25 @@ const GroupDetail = () => {
           </>
         ) : (
           <div className="text-center py-12">
-            <div className="bg-white rounded-3xl p-8 shadow-soft max-w-md mx-auto">
-              <h3 className="font-heading font-semibold text-gray-800 mb-2">
-                Join this group to participate
-              </h3>
-              <p className="text-gray-600 text-sm mb-4">
-                You need to be a member to view posts and join discussions.
-              </p>
-              <button
-                onClick={() => navigate('/groups')}
-                className="bg-amber-600 text-white px-6 py-2 rounded-full text-sm font-medium hover:bg-amber-700 transition-colors"
-              >
-                Back to Groups
-              </button>
+            <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-8 border border-gray-100/50 max-w-sm mx-auto relative overflow-hidden">
+              <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent pointer-events-none" />
+              <div className="relative">
+                <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Users size={24} className="text-blue-600" />
+                </div>
+                <h3 className="font-semibold text-gray-900 mb-2 text-sm">
+                  Join to participate
+                </h3>
+                <p className="text-gray-600 text-xs mb-4">
+                  Become a member to view posts and join discussions.
+                </p>
+                <button
+                  onClick={() => navigate('/groups')}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:from-blue-600 hover:to-purple-700 transition-all duration-200 shadow-sm hover:shadow-md"
+                >
+                  Back to Groups
+                </button>
+              </div>
             </div>
           </div>
         )}
