@@ -4,15 +4,14 @@ import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-reac
 import { useAuth } from '@/contexts/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import UserAvatar from '@/components/UserAvatar';
+import { useUserProfile } from '@/hooks/useUserProfile';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
-  const {
-    user,
-    signOut
-  } = useAuth();
+  const { user, signOut } = useAuth();
+  const { profile } = useUserProfile();
   const location = useLocation();
   const isMobile = useIsMobile();
 
@@ -20,13 +19,15 @@ const Header = () => {
   const [hasNewNotifications] = useState(true);
   const [hasNewMessages] = useState(false);
   const isActive = (path: string) => location.pathname === path;
+  
   if (!user) return null;
+
   const handleLogout = async () => {
     await signOut();
   };
 
-  // Get username from user metadata or email
-  const username = user.user_metadata?.username || user.email?.split('@')[0] || 'User';
+  // Get username from profile or user metadata
+  const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'User';
 
   // Mock notifications - replace with real data later
   const notifications = [{
@@ -103,12 +104,7 @@ const Header = () => {
   const ProfileContent = () => (
     <div className="p-4">
       <div className="flex items-center space-x-3 mb-4">
-        <Avatar className="h-12 w-12">
-          <AvatarImage src={user.user_metadata?.avatar_url} />
-          <AvatarFallback className="bg-amber-100 text-amber-700">
-            {username.charAt(0).toUpperCase()}
-          </AvatarFallback>
-        </Avatar>
+        <UserAvatar size="lg" />
         <div>
           <div className="font-medium text-sm">{username}</div>
           <div className="text-xs text-gray-500">{user.email}</div>
@@ -209,12 +205,7 @@ const Header = () => {
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
                 <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url} />
-                    <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
-                      {username.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar size="md" />
                 </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-64 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
@@ -269,12 +260,7 @@ const Header = () => {
             <Popover>
               <PopoverTrigger asChild>
                 <button className="p-1 rounded-full">
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src={user.user_metadata?.avatar_url} />
-                    <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
-                      {username.charAt(0).toUpperCase()}
-                    </AvatarFallback>
-                  </Avatar>
+                  <UserAvatar size="md" />
                 </button>
               </PopoverTrigger>
               <PopoverContent align="end" side="top" sideOffset={12} className="w-[calc(100vw-2rem)] max-w-xs p-0 mb-2 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl">
