@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3 } from 'lucide-react';
 import { useUser } from '../contexts/UserContext';
@@ -12,6 +11,11 @@ const Profile = () => {
   const navigate = useNavigate();
 
   if (!user) return null;
+
+  // Debug logging
+  console.log('User data in Profile:', user);
+  console.log('Selected tags:', user.selectedTags);
+  console.log('Tag categories:', TAG_CATEGORIES);
 
   const joinDate = new Date(user.joinDate).toLocaleDateString('en-US', {
     year: 'numeric',
@@ -28,10 +32,15 @@ const Profile = () => {
   };
 
   const getTagName = (tagId: string) => {
+    console.log('Looking for tag ID:', tagId);
     for (const category of TAG_CATEGORIES) {
       const tag = category.tags.find(t => t.id === tagId);
-      if (tag) return tag.name;
+      if (tag) {
+        console.log('Found tag:', tag.name);
+        return tag.name;
+      }
     }
+    console.log('Tag not found for ID:', tagId);
     return tagId;
   };
 
@@ -70,13 +79,25 @@ const Profile = () => {
             </button>
           </div>
 
+          {/* Debug info - temporary */}
+          <div className="mb-4 p-4 bg-gray-100 rounded-lg text-sm">
+            <p><strong>Debug Info:</strong></p>
+            <p>Has selectedTags: {user.selectedTags ? 'Yes' : 'No'}</p>
+            <p>selectedTags type: {typeof user.selectedTags}</p>
+            <p>selectedTags length: {user.selectedTags?.length || 0}</p>
+            <p>selectedTags content: {JSON.stringify(user.selectedTags)}</p>
+          </div>
+
           {user.selectedTags && user.selectedTags.length > 0 ? (
             <div className="flex flex-wrap gap-3">
-              {user.selectedTags.map((tagId) => (
-                <Badge key={tagId} variant="secondary" className="px-3 py-1 text-sm">
-                  {getTagName(tagId)}
-                </Badge>
-              ))}
+              {user.selectedTags.map((tagId) => {
+                const tagName = getTagName(tagId);
+                return (
+                  <Badge key={tagId} variant="secondary" className="px-3 py-1 text-sm">
+                    {tagName}
+                  </Badge>
+                );
+              })}
             </div>
           ) : (
             <div className="text-center py-8">
