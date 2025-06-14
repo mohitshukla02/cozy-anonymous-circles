@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { TrendingUp, Clock, Heart, MessageCircle, MapPin, Star, ArrowRight, Plus } from 'lucide-react';
@@ -6,72 +5,64 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import AnonymousJourneyModal from '../components/AnonymousJourneyModal';
 import MeetupMap from '../components/MeetupMap';
-
 const Dashboard = () => {
-  const { user } = useAuth();
-  const { profile } = useUserProfile();
+  const {
+    user
+  } = useAuth();
+  const {
+    profile
+  } = useUserProfile();
   const [showAnonymousModal, setShowAnonymousModal] = useState(false);
-
   useEffect(() => {
     const hasSeenModal = localStorage.getItem('hasSeenAnonymousJourney');
     if (!hasSeenModal) {
       setShowAnonymousModal(true);
     }
   }, []);
-
   const handleCloseAnonymousModal = () => {
     setShowAnonymousModal(false);
     localStorage.setItem('hasSeenAnonymousJourney', 'true');
   };
-
-  const featuredGroups = [
-    {
-      id: 1,
-      name: "Local Photographers",
-      description: "Capturing moments around the city",
-      members: 127,
-      category: "Creative Arts",
-      isLocal: true,
-      trending: true,
-      image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=300&fit=crop"
-    },
-    {
-      id: 2,
-      name: "Weekend Hikers",
-      description: "Exploring trails every Saturday",
-      members: 89,
-      category: "Sports & Outdoors",
-      isLocal: true,
-      trending: false,
-      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop"
-    },
-    {
-      id: 3,
-      name: "Book Club Enthusiasts",
-      description: "Monthly discussions on great reads",
-      members: 156,
-      category: "Intellectual",
-      isLocal: false,
-      trending: true,
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
-    },
-    {
-      id: 4,
-      name: "Coffee & Conversations",
-      description: "Weekly meetups at local cafes",
-      members: 203,
-      category: "Lifestyle",
-      isLocal: true,
-      trending: false,
-      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
-    }
-  ];
-
+  const featuredGroups = [{
+    id: 1,
+    name: "Local Photographers",
+    description: "Capturing moments around the city",
+    members: 127,
+    category: "Creative Arts",
+    isLocal: true,
+    trending: true,
+    image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=300&fit=crop"
+  }, {
+    id: 2,
+    name: "Weekend Hikers",
+    description: "Exploring trails every Saturday",
+    members: 89,
+    category: "Sports & Outdoors",
+    isLocal: true,
+    trending: false,
+    image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop"
+  }, {
+    id: 3,
+    name: "Book Club Enthusiasts",
+    description: "Monthly discussions on great reads",
+    members: 156,
+    category: "Intellectual",
+    isLocal: false,
+    trending: true,
+    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
+  }, {
+    id: 4,
+    name: "Coffee & Conversations",
+    description: "Weekly meetups at local cafes",
+    members: 203,
+    category: "Lifestyle",
+    isLocal: true,
+    trending: false,
+    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
+  }];
   const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const hasSelectedInterests = profile?.selected_tags && profile.selected_tags.length > 0;
-
-  return (
-    <div className="min-h-screen bg-white pt-20">
+  return <div className="min-h-screen bg-white pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Header */}
         <div className="mb-12">
@@ -84,23 +75,18 @@ const Dashboard = () => {
         </div>
 
         {/* Onboarding Banner */}
-        {!hasSelectedInterests && (
-          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-12">
+        {!hasSelectedInterests && <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-12">
             <div className="max-w-2xl">
               <h2 className="text-xl font-medium mb-2">Complete your profile</h2>
               <p className="text-gray-600 mb-4">
                 Tell us about your interests to get personalized group recommendations
               </p>
-              <Link
-                to="/tag-onboarding"
-                className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
-              >
+              <Link to="/tag-onboarding" className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors">
                 Get started
                 <ArrowRight className="ml-2" size={16} />
               </Link>
             </div>
-          </div>
-        )}
+          </div>}
 
         {/* Meetup Map */}
         <div className="mb-16">
@@ -114,41 +100,26 @@ const Dashboard = () => {
               <h2 className="text-xl font-medium text-gray-900 mb-1">Featured groups</h2>
               <p className="text-gray-600 text-sm">Popular communities in your area</p>
             </div>
-            <Link
-              to="/groups"
-              className="text-gray-900 font-medium hover:underline flex items-center text-sm"
-            >
+            <Link to="/groups" className="text-gray-900 font-medium hover:underline flex items-center text-sm">
               Show all
               <ArrowRight className="ml-1" size={16} />
             </Link>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {featuredGroups.map((group) => (
-              <div
-                key={group.id}
-                className="group cursor-pointer"
-              >
+            {featuredGroups.map(group => <div key={group.id} className="group cursor-pointer">
                 <div className="aspect-[4/3] bg-gray-100 rounded-xl mb-3 overflow-hidden">
-                  <img 
-                    src={group.image} 
-                    alt={group.name}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
-                  />
+                  <img src={group.image} alt={group.name} className="w-full h-full group-hover:scale-105 transition-transform duration-200 object-cover" />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
                     <h3 className="font-medium text-gray-900 group-hover:underline text-sm">
                       {group.name}
                     </h3>
-                    {group.trending && (
-                      <span className="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full font-medium">
+                    {group.trending && <span className="bg-red-100 text-red-800 text-xs px-2 py-0.5 rounded-full font-medium">
                         Trending
-                      </span>
-                    )}
-                    {group.isLocal && (
-                      <MapPin className="text-gray-400" size={12} />
-                    )}
+                      </span>}
+                    {group.isLocal && <MapPin className="text-gray-400" size={12} />}
                   </div>
                   <p className="text-gray-600 text-xs">{group.description}</p>
                   <div className="flex items-center justify-between text-xs">
@@ -156,8 +127,7 @@ const Dashboard = () => {
                     <span className="text-gray-500">{group.category}</span>
                   </div>
                 </div>
-              </div>
-            ))}
+              </div>)}
           </div>
         </div>
 
@@ -220,12 +190,7 @@ const Dashboard = () => {
         </div>
       </div>
 
-      <AnonymousJourneyModal 
-        open={showAnonymousModal} 
-        onClose={handleCloseAnonymousModal} 
-      />
-    </div>
-  );
+      <AnonymousJourneyModal open={showAnonymousModal} onClose={handleCloseAnonymousModal} />
+    </div>;
 };
-
 export default Dashboard;
