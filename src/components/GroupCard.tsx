@@ -78,7 +78,7 @@ const GroupCard = ({ group, userTags = [], onJoin, onViewGroup, isJoined = false
         </div>
       )}
 
-      <div className="p-6 space-y-4">
+      <div className="p-6 space-y-4 flex flex-col">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
@@ -100,14 +100,17 @@ const GroupCard = ({ group, userTags = [], onJoin, onViewGroup, isJoined = false
                 <span>{group.locationCity}, {group.locationRegion}</span>
               </div>
             )}
-            
-            <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-              {group.description}
-            </p>
           </div>
           {isJoined && (
             <ArrowRight size={16} className="text-gray-400 group-hover:text-gray-600 transition-colors ml-3 flex-shrink-0" />
           )}
+        </div>
+
+        {/* Description - Fixed 2 lines */}
+        <div className="h-10 flex items-start">
+          <p className="text-gray-600 text-sm leading-5 line-clamp-2">
+            {group.description}
+          </p>
         </div>
 
         <div className="flex items-center gap-4 text-sm text-gray-500">
@@ -119,28 +122,31 @@ const GroupCard = ({ group, userTags = [], onJoin, onViewGroup, isJoined = false
           <span>Created {new Date(group.createdDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
         </div>
 
-        <div className="flex flex-wrap gap-2">
-          {group.tags.slice(0, 3).map(tagId => (
-            <Badge 
-              key={tagId}
-              variant="outline"
-              className={`text-sm px-3 py-1 border-0 font-medium ${
-                userTags.includes(tagId) 
-                  ? 'bg-purple-100 text-purple-700' 
-                  : 'bg-gray-100 text-gray-600'
-              }`}
-            >
-              {tagNames.get(tagId) || capitalizeWords(tagId)}
-            </Badge>
-          ))}
-          {group.tags.length > 3 && (
-            <span className="text-sm text-gray-400 px-3 py-1">+{group.tags.length - 3}</span>
-          )}
+        {/* Tags - Fixed 2 lines */}
+        <div className="h-16 flex flex-col justify-start">
+          <div className="flex flex-wrap gap-2">
+            {group.tags.slice(0, 3).map(tagId => (
+              <Badge 
+                key={tagId}
+                variant="outline"
+                className={`text-sm px-3 py-1 border-0 font-medium ${
+                  userTags.includes(tagId) 
+                    ? 'bg-purple-100 text-purple-700' 
+                    : 'bg-gray-100 text-gray-600'
+                }`}
+              >
+                {tagNames.get(tagId) || capitalizeWords(tagId)}
+              </Badge>
+            ))}
+            {group.tags.length > 3 && (
+              <span className="text-sm text-gray-400 px-3 py-1">+{group.tags.length - 3}</span>
+            )}
+          </div>
         </div>
 
         <button
           onClick={handleViewClick}
-          className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg"
+          className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg mt-auto"
         >
           View Group
         </button>
