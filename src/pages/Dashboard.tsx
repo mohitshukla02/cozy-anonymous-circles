@@ -1,0 +1,159 @@
+
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { Users, MessageCircle, Rss, Heart, TrendingUp, Clock } from 'lucide-react';
+import { useUser } from '../contexts/UserContext';
+
+const Dashboard = () => {
+  const { user } = useUser();
+
+  const quickStats = [
+    { label: 'Groups Joined', value: '0', icon: Users, color: 'bg-blue-500' },
+    { label: 'Messages', value: '0', icon: MessageCircle, color: 'bg-green-500' },
+    { label: 'Posts', value: '0', icon: Rss, color: 'bg-purple-500' },
+    { label: 'Connections', value: '0', icon: Heart, color: 'bg-pink-500' }
+  ];
+
+  const upcomingFeatures = [
+    {
+      title: 'Interest Groups',
+      description: 'Join groups based on your hobbies and passions',
+      status: 'Coming Soon',
+      link: '/groups'
+    },
+    {
+      title: 'Personal Feed',
+      description: 'See updates from your groups and connections',
+      status: 'Coming Soon',
+      link: '/feed'
+    },
+    {
+      title: 'Direct Messages',
+      description: 'Have private conversations with connections',
+      status: 'Coming Soon',
+      link: '/messages'
+    }
+  ];
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Welcome Section */}
+        <div className="bg-white rounded-3xl shadow-sm p-8 mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-800 mb-2">
+                Welcome back, {user?.username}!
+              </h1>
+              <p className="text-gray-600">
+                Ready to make some authentic connections today?
+              </p>
+            </div>
+            <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-500">
+              <Clock size={16} />
+              <span>Joined {user?.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'Today'}</span>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            {quickStats.map((stat, index) => (
+              <div key={index} className="bg-gray-50 rounded-2xl p-4 text-center">
+                <div className={`w-12 h-12 ${stat.color} rounded-full flex items-center justify-center mx-auto mb-3`}>
+                  <stat.icon className="text-white" size={20} />
+                </div>
+                <div className="text-2xl font-bold text-gray-800 mb-1">{stat.value}</div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Getting Started */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+          <div className="bg-white rounded-3xl shadow-sm p-8">
+            <h2 className="text-2xl font-bold text-gray-800 mb-4">Getting Started</h2>
+            <div className="space-y-4">
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-amber-600 font-semibold text-sm">1</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">Explore Interest Groups</h3>
+                  <p className="text-gray-600 text-sm">Find communities that match your hobbies and interests.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-amber-600 font-semibold text-sm">2</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">Join Conversations</h3>
+                  <p className="text-gray-600 text-sm">Share your thoughts and connect with like-minded people.</p>
+                </div>
+              </div>
+              
+              <div className="flex items-start space-x-4">
+                <div className="w-8 h-8 bg-amber-100 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                  <span className="text-amber-600 font-semibold text-sm">3</span>
+                </div>
+                <div>
+                  <h3 className="font-semibold text-gray-800 mb-1">Build Connections</h3>
+                  <p className="text-gray-600 text-sm">Form meaningful relationships through authentic dialogue.</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-gradient-to-br from-amber-600 to-orange-600 rounded-3xl shadow-sm p-8 text-white">
+            <h2 className="text-2xl font-bold mb-4">Your Anonymous Journey</h2>
+            <p className="mb-6 text-amber-100">
+              Remember, in Cozy Circles, you're valued for your thoughts and authenticity, 
+              not your appearance or status. Be yourself, be kind, and enjoy meaningful connections.
+            </p>
+            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+              <h3 className="font-semibold mb-2">Community Guidelines</h3>
+              <ul className="text-sm text-amber-100 space-y-1">
+                <li>• Be respectful and kind</li>
+                <li>• Keep conversations meaningful</li>
+                <li>• Respect others' anonymity</li>
+                <li>• Report inappropriate behavior</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        {/* Upcoming Features */}
+        <div className="bg-white rounded-3xl shadow-sm p-8">
+          <div className="flex items-center space-x-2 mb-6">
+            <TrendingUp className="text-amber-600" size={24} />
+            <h2 className="text-2xl font-bold text-gray-800">Explore Platform Features</h2>
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {upcomingFeatures.map((feature, index) => (
+              <Link 
+                key={index}
+                to={feature.link}
+                className="group p-6 border border-gray-200 rounded-2xl hover:border-amber-300 hover:bg-amber-50 transition-all"
+              >
+                <div className="flex justify-between items-start mb-4">
+                  <h3 className="font-semibold text-gray-800 group-hover:text-amber-800 transition-colors">
+                    {feature.title}
+                  </h3>
+                  <span className="text-xs bg-amber-100 text-amber-600 px-2 py-1 rounded-full">
+                    {feature.status}
+                  </span>
+                </div>
+                <p className="text-gray-600 text-sm">{feature.description}</p>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default Dashboard;
