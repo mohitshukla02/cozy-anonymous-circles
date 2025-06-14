@@ -32,7 +32,7 @@ const Dashboard = () => {
     category: "Creative Arts",
     isLocal: true,
     trending: true,
-    image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=300&fit=crop"
+    image: "/lovable-uploads/512e664e-f0ea-41a9-8dcf-c6d80845a703.png"
   }, {
     id: 2,
     name: "Weekend Hikers",
