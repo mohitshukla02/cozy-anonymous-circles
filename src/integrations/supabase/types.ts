@@ -9,7 +9,342 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      comments: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          id: string
+          likes: string[]
+          parent_comment_id: string | null
+          post_id: string
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          id?: string
+          likes?: string[]
+          parent_comment_id?: string | null
+          post_id: string
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          id?: string
+          likes?: string[]
+          parent_comment_id?: string | null
+          post_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "comments_parent_comment_id_fkey"
+            columns: ["parent_comment_id"]
+            isOneToOne: false
+            referencedRelation: "comments"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "comments_post_id_fkey"
+            columns: ["post_id"]
+            isOneToOne: false
+            referencedRelation: "posts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      groups: {
+        Row: {
+          admin_id: string
+          avatar: string | null
+          created_date: string
+          description: string
+          id: string
+          last_activity: string | null
+          location_city: string | null
+          location_lat: number | null
+          location_lng: number | null
+          location_region: string | null
+          meetup_deadline: string | null
+          member_ids: string[]
+          member_limit: number
+          name: string
+          pinned_post_id: string | null
+          privacy: string
+          status: string | null
+          tags: string[]
+          type: string
+        }
+        Insert: {
+          admin_id: string
+          avatar?: string | null
+          created_date?: string
+          description: string
+          id?: string
+          last_activity?: string | null
+          location_city?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_region?: string | null
+          meetup_deadline?: string | null
+          member_ids?: string[]
+          member_limit?: number
+          name: string
+          pinned_post_id?: string | null
+          privacy?: string
+          status?: string | null
+          tags?: string[]
+          type: string
+        }
+        Update: {
+          admin_id?: string
+          avatar?: string | null
+          created_date?: string
+          description?: string
+          id?: string
+          last_activity?: string | null
+          location_city?: string | null
+          location_lat?: number | null
+          location_lng?: number | null
+          location_region?: string | null
+          meetup_deadline?: string | null
+          member_ids?: string[]
+          member_limit?: number
+          name?: string
+          pinned_post_id?: string | null
+          privacy?: string
+          status?: string | null
+          tags?: string[]
+          type?: string
+        }
+        Relationships: []
+      }
+      meetup_rsvps: {
+        Row: {
+          checked_in: boolean | null
+          created_at: string
+          id: string
+          meetup_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          checked_in?: boolean | null
+          created_at?: string
+          id?: string
+          meetup_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          checked_in?: boolean | null
+          created_at?: string
+          id?: string
+          meetup_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetup_rsvps_meetup_id_fkey"
+            columns: ["meetup_id"]
+            isOneToOne: false
+            referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meetups: {
+        Row: {
+          created_at: string
+          created_by: string
+          date_time: string
+          description: string | null
+          group_id: string
+          id: string
+          location: string
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          date_time: string
+          description?: string | null
+          group_id: string
+          id?: string
+          location: string
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          date_time?: string
+          description?: string | null
+          group_id?: string
+          id?: string
+          location?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetups_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          content: string
+          created_at: string
+          group_context_id: string
+          id: string
+          read_at: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          group_context_id: string
+          id?: string
+          read_at?: string | null
+          recipient_id: string
+          sender_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          group_context_id?: string
+          id?: string
+          read_at?: string | null
+          recipient_id?: string
+          sender_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_group_context_id_fkey"
+            columns: ["group_context_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string
+          content: string
+          created_at: string
+          edited_at: string | null
+          group_id: string
+          id: string
+          likes: string[]
+        }
+        Insert: {
+          author_id: string
+          content: string
+          created_at?: string
+          edited_at?: string | null
+          group_id: string
+          id?: string
+          likes?: string[]
+        }
+        Update: {
+          author_id?: string
+          content?: string
+          created_at?: string
+          edited_at?: string | null
+          group_id?: string
+          id?: string
+          likes?: string[]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_groups: {
+        Row: {
+          anonymous_name: string
+          group_id: string
+          id: string
+          join_date: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          anonymous_name: string
+          group_id: string
+          id?: string
+          join_date?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          anonymous_name?: string
+          group_id?: string
+          id?: string
+          join_date?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_groups_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      user_interactions: {
+        Row: {
+          created_at: string
+          group_id: string
+          id: string
+          interaction_type: string
+          user1_id: string
+          user2_id: string
+        }
+        Insert: {
+          created_at?: string
+          group_id: string
+          id?: string
+          interaction_type: string
+          user1_id: string
+          user2_id: string
+        }
+        Update: {
+          created_at?: string
+          group_id?: string
+          id?: string
+          interaction_type?: string
+          user1_id?: string
+          user2_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_interactions_group_id_fkey"
+            columns: ["group_id"]
+            isOneToOne: false
+            referencedRelation: "groups"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
