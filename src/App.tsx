@@ -56,7 +56,7 @@ const AppContent = () => {
     <UserProvider>
       <div className="min-h-screen flex flex-col">
         {user && <Header />}
-        <main className="flex-grow pt-28 md:pt-20">
+        <main className={user ? "flex-grow pt-28 md:pt-20" : "flex-grow"}>
           <Routes>
             <Route path="/" element={
               <PublicRoute>
@@ -106,7 +106,7 @@ const AppContent = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </main>
-        {user && <Footer />}
+        <Footer />
       </div>
     </UserProvider>
   );
