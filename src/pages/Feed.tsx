@@ -152,7 +152,7 @@ const Feed = () => {
     }
   };
 
-  const getUserName = (userId: string, groupId: string) => {
+  const getUserName = (authorId: string) => {
     // For now, return a placeholder. In a real app, you'd get this from user_groups table
     return 'Anonymous User';
   };
@@ -339,7 +339,7 @@ const Feed = () => {
             {filteredPosts.map(post => {
               const group = groups.find(g => g.id === post.groupId);
               const postComments = comments.filter(c => c.postId === post.id);
-              const authorName = getUserName(post.authorId, post.groupId);
+              const authorName = getUserName(post.authorId);
               const isLiked = post.likes.includes(user.id);
 
               return (

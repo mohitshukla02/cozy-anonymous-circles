@@ -2,9 +2,9 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft, Users, Settings, Plus, TrendingUp, MessageCircle, Heart } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import { Group, Post, Comment } from '../types/groups';
-import { getGroups, getPosts, savePosts, getComments, saveComments, getUserGroups, generateAnonymousName } from '../utils/groupStorage';
+import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups } from '../utils/supabaseStorage';
 import PostCard from '../components/PostCard';
 import { Badge } from '../components/ui/badge';
 import { TAG_CATEGORIES } from '../types/tags';
@@ -12,7 +12,7 @@ import { TAG_CATEGORIES } from '../types/tags';
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
   const navigate = useNavigate();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [group, setGroup] = useState<Group | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
@@ -33,125 +33,104 @@ const GroupDetail = () => {
       return;
     }
 
-    const groups = getGroups();
-    const foundGroup = groups.find(g => g.id === groupId);
-    
-    if (!foundGroup) {
-      navigate('/groups');
-      return;
-    }
-
-    setGroup(foundGroup);
-    setIsJoined(foundGroup.memberIds.includes(user.username));
-
-    const allPosts = getPosts().filter(p => p.groupId === groupId);
-    const allComments = getComments();
-    
-    setPosts(allPosts);
-    setComments(allComments);
+    loadGroupData();
   }, [user, groupId, navigate]);
 
-  const getUserName = (userId: string, groupId: string): string => {
-    const userGroups = getUserGroups();
-    const userGroup = userGroups.find(ug => ug.userId === userId && ug.groupId === groupId);
-    return userGroup?.anonymousName || generateAnonymousName(userId, groupId);
+  const loadGroupData = async () => {
+    if (!groupId || !user) return;
+
+    try {
+      const foundGroup = await getGroupById(groupId);
+      
+      if (!foundGroup) {
+        navigate('/groups');
+        return;
+      }
+
+      setGroup(foundGroup);
+      
+      // Check if user is a member
+      const userGroups = await getUserGroups(user.id);
+      const isMember = userGroups.some(ug => ug.groupId === groupId);
+      setIsJoined(isMember);
+
+      if (isMember) {
+        const allPosts = await getPostsByGroup(groupId);
+        const allComments: Comment[] = [];
+        
+        for (const post of allPosts) {
+          const postComments = await getCommentsByPost(post.id);
+          allComments.push(...postComments);
+        }
+        
+        setPosts(allPosts);
+        setComments(allComments);
+      }
+    } catch (error) {
+      console.error('Error loading group data:', error);
+      navigate('/groups');
+    }
   };
 
-  const handleCreatePost = (e: React.FormEvent) => {
+  const getUserName = (userId: string): string => {
+    // For now return a placeholder - in a real app you'd get this from user_groups table
+    return 'Anonymous User';
+  };
+
+  const handleCreatePost = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!user || !group || !newPostContent.trim()) return;
 
-    const newPost: Post = {
-      id: Date.now().toString(),
-      groupId: group.id,
-      authorId: user.username,
-      content: newPostContent.trim(),
-      timestamp: new Date().toISOString(),
-      likes: []
-    };
+    try {
+      await createPost({
+        groupId: group.id,
+        authorId: user.id,
+        content: newPostContent.trim(),
+        editedAt: undefined
+      });
 
-    const updatedPosts = [...posts, newPost];
-    setPosts(updatedPosts);
-    savePosts([...getPosts().filter(p => p.groupId !== group.id), ...updatedPosts]);
-    setNewPostContent('');
+      setNewPostContent('');
+      loadGroupData(); // Reload data
+    } catch (error) {
+      console.error('Error creating post:', error);
+    }
   };
 
-  const handleLikePost = (postId: string) => {
+  const handleLikePost = async (postId: string) => {
     if (!user) return;
 
-    const updatedPosts = posts.map(post => {
-      if (post.id === postId) {
-        const isLiked = post.likes.includes(user.username);
-        return {
-          ...post,
-          likes: isLiked 
-            ? post.likes.filter(id => id !== user.username)
-            : [...post.likes, user.username]
-        };
-      }
-      return post;
-    });
-
-    setPosts(updatedPosts);
-    savePosts([...getPosts().filter(p => p.groupId !== group?.id), ...updatedPosts]);
+    try {
+      await likePost(postId);
+      loadGroupData(); // Reload data
+    } catch (error) {
+      console.error('Error liking post:', error);
+    }
   };
 
-  const handleComment = (postId: string, content: string) => {
+  const handleComment = async (postId: string, content: string) => {
     if (!user || !group) return;
 
-    const newComment: Comment = {
-      id: Date.now().toString(),
-      postId,
-      authorId: user.username,
-      content,
-      timestamp: new Date().toISOString(),
-      likes: []
-    };
-
-    const updatedComments = [...comments, newComment];
-    setComments(updatedComments);
-    saveComments(updatedComments);
+    try {
+      await createComment({
+        postId,
+        authorId: user.id,
+        content
+      });
+      loadGroupData(); // Reload data
+    } catch (error) {
+      console.error('Error creating comment:', error);
+    }
   };
 
-  const handleLikeComment = (commentId: string) => {
+  const handleLikeComment = async (commentId: string) => {
     if (!user) return;
 
-    const updatedComments = comments.map(comment => {
-      if (comment.id === commentId) {
-        const isLiked = comment.likes.includes(user.username);
-        return {
-          ...comment,
-          likes: isLiked 
-            ? comment.likes.filter(id => id !== user.username)
-            : [...comment.likes, user.username]
-        };
-      }
-      return comment;
-    });
-
-    setComments(updatedComments);
-    saveComments(updatedComments);
-  };
-
-  const handleReply = (parentCommentId: string, content: string) => {
-    if (!user || !group) return;
-
-    const parentComment = comments.find(c => c.id === parentCommentId);
-    if (!parentComment) return;
-
-    const newReply: Comment = {
-      id: Date.now().toString(),
-      postId: parentComment.postId,
-      authorId: user.username,
-      content,
-      timestamp: new Date().toISOString(),
-      likes: [],
-      parentCommentId
-    };
-
-    const updatedComments = [...comments, newReply];
-    setComments(updatedComments);
-    saveComments(updatedComments);
+    try {
+      await likeComment(commentId);
+      loadGroupData(); // Reload data
+    } catch (error) {
+      console.error('Error liking comment:', error);
+    }
   };
 
   const getSortedPosts = () => {
@@ -169,7 +148,7 @@ const GroupDetail = () => {
       case 'recent':
       default:
         return sortedPosts.sort((a, b) => 
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         );
     }
   };
@@ -310,16 +289,19 @@ const GroupDetail = () => {
                   <PostCard
                     key={post.id}
                     post={post}
-                    authorName={getUserName(post.authorId, group.id)}
+                    authorName={getUserName(post.authorId)}
                     comments={comments.filter(c => c.postId === post.id)}
                     onLike={handleLikePost}
                     onComment={handleComment}
                     onLikeComment={handleLikeComment}
-                    onReply={handleReply}
-                    currentUserId={user.username}
-                    getUserName={getUserName}
+                    currentUserId={user.id}
+                    getAuthorName={getUserName}
                     groupId={group.id}
-                    isLiked={post.likes.includes(user.username)}
+                    isLiked={post.likes.includes(user.id)}
+                    getCommentLikeStatus={(commentId) => {
+                      const comment = comments.find(c => c.id === commentId);
+                      return comment?.likes.includes(user.id) || false;
+                    }}
                   />
                 ))
               )}

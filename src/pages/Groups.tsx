@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Plus, MapPin, Users, Clock, Search, Filter } from 'lucide-react';
 import { Group } from '@/types/groups';
-import { getGroups } from '@/utils/supabaseStorage';
+import { getGroups, createGroup } from '@/utils/supabaseStorage';
 import { formatDistanceToNow } from 'date-fns';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupCard from '@/components/GroupCard';
@@ -32,9 +32,39 @@ const Groups = () => {
     }
   };
 
-  const handleGroupCreated = (newGroup: Group) => {
-    setGroups(prev => [newGroup, ...prev]);
-    setShowCreateModal(false);
+  const handleGroupCreated = async (groupData: {
+    name: string;
+    description: string;
+    tags: string[];
+    memberLimit: number;
+    privacy: 'open' | 'invitation';
+    type: 'interest' | 'local-meetup';
+    location?: {
+      city: string;
+      region: string;
+      coordinates?: { lat: number; lng: number };
+    };
+  }) => {
+    try {
+      const newGroup = await createGroup({
+        name: groupData.name,
+        description: groupData.description,
+        tags: groupData.tags,
+        memberLimit: groupData.memberLimit,
+        privacy: groupData.privacy,
+        adminId: '', // This will be set by the createGroup function
+        type: groupData.type,
+        locationCity: groupData.location?.city,
+        locationRegion: groupData.location?.region,
+        lastMeetupDate: undefined,
+        meetupDeadline: undefined
+      });
+      
+      setGroups(prev => [newGroup, ...prev]);
+      setShowCreateModal(false);
+    } catch (error) {
+      console.error('Error creating group:', error);
+    }
   };
 
   // Filter groups based on search and filters
@@ -185,8 +215,11 @@ const Groups = () => {
       {/* Create Group Modal */}
       {showCreateModal && (
         <CreateGroupModal
+          isOpen={showCreateModal}
           onClose={() => setShowCreateModal(false)}
-          onGroupCreated={handleGroupCreated}
+          onCreate={handleGroupCreated}
+          userTags={[]} // You would pass user's selected tags here
+          userLocation={undefined} // You would pass user's location here
         />
       )}
     </div>

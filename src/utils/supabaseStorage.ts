@@ -260,22 +260,54 @@ export const likePost = async (postId: string): Promise<void> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase.rpc('toggle_post_like', {
-    post_id: postId,
-    user_id: user.id
-  });
+  // Get current post likes
+  const { data: post } = await supabase
+    .from('posts')
+    .select('likes')
+    .eq('id', postId)
+    .single();
 
-  if (error) throw error;
+  if (post) {
+    const currentLikes = post.likes || [];
+    const isLiked = currentLikes.includes(user.id);
+    
+    const updatedLikes = isLiked 
+      ? currentLikes.filter((id: string) => id !== user.id)
+      : [...currentLikes, user.id];
+
+    const { error } = await supabase
+      .from('posts')
+      .update({ likes: updatedLikes })
+      .eq('id', postId);
+
+    if (error) throw error;
+  }
 };
 
 export const likeComment = async (commentId: string): Promise<void> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
-  const { error } = await supabase.rpc('toggle_comment_like', {
-    comment_id: commentId,
-    user_id: user.id
-  });
+  // Get current comment likes
+  const { data: comment } = await supabase
+    .from('comments')
+    .select('likes')
+    .eq('id', commentId)
+    .single();
 
-  if (error) throw error;
+  if (comment) {
+    const currentLikes = comment.likes || [];
+    const isLiked = currentLikes.includes(user.id);
+    
+    const updatedLikes = isLiked 
+      ? currentLikes.filter((id: string) => id !== user.id)
+      : [...currentLikes, user.id];
+
+    const { error } = await supabase
+      .from('comments')
+      .update({ likes: updatedLikes })
+      .eq('id', commentId);
+
+    if (error) throw error;
+  }
 };
