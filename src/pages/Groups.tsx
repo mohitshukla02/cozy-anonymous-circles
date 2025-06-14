@@ -131,7 +131,7 @@ const Groups = () => {
 
   if (loading || profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+      <div className="min-h-screen">
         <div className="max-w-6xl mx-auto px-4 pt-20 pb-8">
           <div className="animate-pulse space-y-6">
             <div className="h-16 bg-white/80 rounded-xl shadow-sm"></div>
@@ -148,7 +148,7 @@ const Groups = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+    <div className="min-h-screen">
       <div className="max-w-6xl mx-auto px-4 pt-20 pb-8">
         {/* Header */}
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8">
@@ -160,7 +160,7 @@ const Groups = () => {
           </div>
           <button
             onClick={() => setShowCreateModal(true)}
-            className="mt-6 sm:mt-0 bg-gradient-to-r from-amber-500 to-orange-600 text-white px-6 py-3 rounded-xl hover:from-amber-600 hover:to-orange-700 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+            className="mt-6 sm:mt-0 bg-amber-500 text-white px-6 py-3 rounded-xl hover:bg-amber-600 transition-all duration-200 flex items-center space-x-2 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
           >
             <Plus size={20} />
             <span className="font-medium">Create Group</span>
@@ -170,7 +170,7 @@ const Groups = () => {
         {/* Search and Filters */}
         <div className="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg border border-white/20 mb-8">
           <div className="flex items-center gap-2 mb-6">
-            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg">
+            <div className="p-2 bg-blue-500 rounded-lg">
               <Filter className="text-white" size={20} />
             </div>
             <h3 className="text-lg font-semibold text-gray-800">Filter Groups</h3>
@@ -237,7 +237,7 @@ const Groups = () => {
         {groupType === 'all' || groupType === 'interest' ? (
           <div className="mb-12">
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+              <div className="p-3 bg-blue-500 rounded-xl shadow-lg">
                 <Globe className="text-white" size={24} />
               </div>
               <div>
@@ -271,7 +271,7 @@ const Groups = () => {
         {groupType === 'all' || groupType === 'local-meetup' ? (
           <div>
             <div className="flex items-center gap-3 mb-6">
-              <div className="p-3 bg-gradient-to-br from-green-500 to-emerald-600 rounded-xl shadow-lg">
+              <div className="p-3 bg-green-500 rounded-xl shadow-lg">
                 <MapPin className="text-white" size={24} />
               </div>
               <div>

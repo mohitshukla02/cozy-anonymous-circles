@@ -127,7 +127,7 @@ const Header = () => {
         <div className="flex justify-between items-center h-14">
           <div className="flex items-center space-x-6">
             <Link to="/dashboard" className="flex items-center space-x-2 text-gray-800 hover:text-amber-600 transition-colors">
-              <div className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
+              <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
                 <span className="text-white font-bold text-xs">C</span>
               </div>
               <span className="font-semibold text-base">Circles</span>

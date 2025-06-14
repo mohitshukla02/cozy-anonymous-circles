@@ -14,7 +14,7 @@ const TagSelector = ({ tag, isSelected, onToggle }: TagSelectorProps) => {
     <button
       onClick={() => onToggle(tag.id)}
       className={`
-        relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+        relative px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200
         border-2 hover:scale-105 shadow-sm hover:shadow-md
         ${isSelected 
           ? 'bg-amber-100 border-amber-300 text-amber-800' 

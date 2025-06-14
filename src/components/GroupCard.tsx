@@ -109,7 +109,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
               variant="outline"
               className={`text-xs px-2 py-0.5 border-0 font-medium ${
                 userTags.includes(tagId) 
-                  ? 'bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700' 
+                  ? 'bg-purple-100 text-purple-700' 
                   : 'bg-gray-50 text-gray-600'
               }`}
             >
@@ -126,12 +126,12 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
             onClick={handleJoinClick}
             disabled={group.memberIds.length >= group.memberLimit}
             className={`
-              w-full py-2 px-3 rounded-lg text-xs font-medium transition-all duration-200 relative overflow-hidden
+              w-full py-2 px-3 rounded-xl text-xs font-medium transition-all duration-200 relative overflow-hidden
               ${isJoined 
-                ? 'bg-gradient-to-r from-green-50 to-emerald-50 text-green-700 hover:from-green-100 hover:to-emerald-100 border border-green-200/50' 
+                ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200/50' 
                 : group.memberIds.length >= group.memberLimit
                 ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                : 'bg-gradient-to-r from-blue-500 to-purple-600 text-white hover:from-blue-600 hover:to-purple-700 shadow-sm hover:shadow-md'
+                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-sm hover:shadow-md'
               }
             `}
           >
