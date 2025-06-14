@@ -9,6 +9,13 @@ interface TagSelectorProps {
   onToggle: (tagId: string) => void;
 }
 
+// Helper function to capitalize first letter of each word
+const capitalizeWords = (str: string) => {
+  return str.split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+};
+
 const TagSelector = ({ tag, isSelected, onToggle }: TagSelectorProps) => {
   return (
     <button
@@ -23,7 +30,7 @@ const TagSelector = ({ tag, isSelected, onToggle }: TagSelectorProps) => {
       `}
     >
       <span className="flex items-center gap-2">
-        {tag.name}
+        {capitalizeWords(tag.name)}
         {isSelected && <Check size={14} className="text-amber-600" />}
       </span>
     </button>

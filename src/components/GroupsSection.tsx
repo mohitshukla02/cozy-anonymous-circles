@@ -32,7 +32,7 @@ const GroupsSection = ({
   emptySubMessage
 }: GroupsSectionProps) => {
   return (
-    <div className="mb-16">
+    <div className="mb-12">
       <div className="flex items-center justify-between mb-6">
         <div>
           <h2 className="text-xl font-medium text-gray-900 mb-1">{title}</h2>
@@ -50,7 +50,7 @@ const GroupsSection = ({
       </div>
       
       {groups.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {groups.map(group => (
             <GroupCard 
               key={group.id} 

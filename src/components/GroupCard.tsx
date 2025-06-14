@@ -4,6 +4,7 @@ import { Users, Heart, ArrowRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/groups';
 import { Badge } from './ui/badge';
+import { ProgressiveBlurCard } from './ui/progressive-blur-card';
 import { TAG_CATEGORIES } from '../types/tags';
 
 interface GroupCardProps {
@@ -13,13 +14,20 @@ interface GroupCardProps {
   isJoined?: boolean;
 }
 
+// Helper function to capitalize first letter of each word
+const capitalizeWords = (str: string) => {
+  return str.split(' ').map(word => 
+    word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()
+  ).join(' ');
+};
+
 const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCardProps) => {
   const navigate = useNavigate();
   const matchingTags = group.tags.filter(tag => userTags.includes(tag));
   const tagNames = new Map();
   TAG_CATEGORIES.forEach(category => {
     category.tags.forEach(tag => {
-      tagNames.set(tag.id, tag.name);
+      tagNames.set(tag.id, capitalizeWords(tag.name));
     });
   });
 
@@ -41,8 +49,8 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
   };
 
   return (
-    <div 
-      className={`group relative bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200 hover:shadow-lg hover:shadow-gray-100/50 hover:-translate-y-0.5 ${
+    <ProgressiveBlurCard 
+      className={`group border-gray-100/50 hover:border-gray-200/80 hover:shadow-gray-100/50 ${
         isJoined ? 'cursor-pointer' : ''
       }`}
       onClick={handleCardClick}
@@ -70,8 +78,8 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
         </div>
       )}
 
-      <div className="p-4">
-        <div className="flex justify-between items-start mb-3">
+      <div className="p-4 space-y-3">
+        <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
               <h3 className="font-semibold text-gray-900 text-sm leading-tight">
@@ -93,7 +101,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
               </div>
             )}
             
-            <p className="text-gray-600 text-xs leading-relaxed mb-3 line-clamp-2">
+            <p className="text-gray-600 text-xs leading-relaxed line-clamp-2">
               {group.description}
             </p>
           </div>
@@ -102,7 +110,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
           )}
         </div>
 
-        <div className="flex items-center gap-3 mb-3 text-xs text-gray-500">
+        <div className="flex items-center gap-3 text-xs text-gray-500">
           <div className="flex items-center gap-1">
             <Users size={12} />
             <span>{group.memberIds.length}/{group.memberLimit}</span>
@@ -111,7 +119,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
           <span>Created {new Date(group.createdDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
         </div>
 
-        <div className="flex flex-wrap gap-1.5 mb-3">
+        <div className="flex flex-wrap gap-1.5">
           {group.tags.slice(0, 3).map(tagId => (
             <Badge 
               key={tagId}
@@ -122,7 +130,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
                   : 'bg-gray-50 text-gray-600'
               }`}
             >
-              {tagNames.get(tagId) || tagId}
+              {tagNames.get(tagId) || capitalizeWords(tagId)}
             </Badge>
           ))}
           {group.tags.length > 3 && (
@@ -148,7 +156,7 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
           </button>
         )}
       </div>
-    </div>
+    </ProgressiveBlurCard>
   );
 };
 
