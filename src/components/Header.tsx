@@ -7,6 +7,7 @@ import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/h
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
+
 const Header = () => {
   const {
     user,
@@ -57,37 +58,50 @@ const Header = () => {
     message: 'Thanks for the book recommendation!',
     time: '2 hours ago'
   }];
-  const NotificationsContent = () => <div className="p-4">
+  const NotificationsContent = () => (
+    <div className="p-4">
       <h3 className="font-semibold text-sm mb-3">Notifications</h3>
       <div className="space-y-3">
-        {notifications.map(notification => <div key={notification.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+        {notifications.map((notification) => (
+          <div key={notification.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
             <div className="font-medium text-sm">{notification.title}</div>
             <div className="text-xs text-gray-600 mt-1">{notification.message}</div>
             <div className="text-xs text-gray-400 mt-1">{notification.time}</div>
-          </div>)}
+          </div>
+        ))}
       </div>
       <div className="mt-3 pt-3 border-t border-gray-200">
         <button className="text-xs text-amber-600 hover:text-amber-700 font-medium">
           View all notifications
         </button>
       </div>
-    </div>;
-  const MessagesContent = () => <div className="p-4">
+    </div>
+  );
+  const MessagesContent = () => (
+    <div className="p-4">
       <h3 className="font-semibold text-sm mb-3">Messages</h3>
       <div className="space-y-3">
-        {messages.length > 0 ? messages.map(message => <div key={message.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
+        {messages.length > 0 ? (
+          messages.map((message) => (
+            <div key={message.id} className="p-3 rounded-lg bg-gray-50/50 hover:bg-gray-100/50 transition-colors cursor-pointer">
               <div className="font-medium text-sm">{message.sender}</div>
               <div className="text-xs text-gray-600 mt-1 line-clamp-2">{message.message}</div>
               <div className="text-xs text-gray-400 mt-1">{message.time}</div>
-            </div>) : <div className="text-xs text-gray-500 text-center py-4">No new messages</div>}
+            </div>
+          ))
+        ) : (
+          <div className="text-xs text-gray-500 text-center py-4">No new messages</div>
+        )}
       </div>
       <div className="mt-3 pt-3 border-t border-gray-200">
         <Link to="/messages" className="text-xs text-amber-600 hover:text-amber-700 font-medium">
           View all messages
         </Link>
       </div>
-    </div>;
-  const ProfileContent = () => <div className="p-4">
+    </div>
+  );
+  const ProfileContent = () => (
+    <div className="p-4">
       <div className="flex items-center space-x-3 mb-4">
         <Avatar className="h-12 w-12">
           <AvatarImage src={user.user_metadata?.avatar_url} />
@@ -112,35 +126,47 @@ const Header = () => {
           <span>Sign Out</span>
         </button>
       </div>
-    </div>;
-  return <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
+    </div>
+  );
+  return (
+    <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-20">
+        <div className="flex justify-between items-center h-24">
           <div className="flex items-center space-x-8">
             <Link to="/dashboard" className="flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-colors">
-              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
-                <Globe size={18} className="text-white bg-slate-600" />
+              <div className="w-8 h-8 rounded-full flex items-center justify-center">
+                <Globe size={32} className="text-gray-800" />
               </div>
               <span className="font-bold text-xl">Circles</span>
             </Link>
             
-            <nav className="hidden md:flex">
-              <div className="bg-gray-100 rounded-full p-1 flex space-x-1 px-[4px] mx-0">
-                <Link to="/dashboard" className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${isActive('/dashboard') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}>
-                  <Home size={16} />
-                  <span>Home</span>
-                </Link>
-                
-                <Link to="/groups" className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${isActive('/groups') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}>
-                  <Users size={16} />
-                  <span>Groups</span>
-                </Link>
-                
-                <Link to="/feed" className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${isActive('/feed') ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}>
-                  <Rss size={16} />
-                  <span>Feed</span>
-                </Link>
-              </div>
+            <nav className="hidden md:flex space-x-1">
+              <Link to="/dashboard" className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                isActive('/dashboard') 
+                  ? 'bg-gray-100 text-gray-900' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}>
+                <Home size={16} />
+                <span>Home</span>
+              </Link>
+              
+              <Link to="/groups" className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                isActive('/groups') 
+                  ? 'bg-gray-100 text-gray-900' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}>
+                <Users size={16} />
+                <span>Groups</span>
+              </Link>
+              
+              <Link to="/feed" className={`flex items-center space-x-2 px-4 py-2 rounded-lg transition-all text-sm font-medium ${
+                isActive('/feed') 
+                  ? 'bg-gray-100 text-gray-900' 
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50'
+              }`}>
+                <Rss size={16} />
+                <span>Feed</span>
+              </Link>
             </nav>
           </div>
 
@@ -150,7 +176,9 @@ const Header = () => {
               <HoverCardTrigger asChild>
                 <button className="relative p-3 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors" title="Notifications">
                   <Bell size={18} />
-                  {hasNewNotifications && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>}
+                  {hasNewNotifications && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
                 </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
@@ -161,9 +189,15 @@ const Header = () => {
             {/* Messages */}
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
-                <Link to="/messages" className={`relative p-3 rounded-full transition-colors ${isActive('/messages') ? 'text-gray-700 bg-gray-100' : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'}`} title="Messages">
+                <Link to="/messages" className={`relative p-3 rounded-full transition-colors ${
+                  isActive('/messages') 
+                    ? 'text-gray-700 bg-gray-100' 
+                    : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
+                }`} title="Messages">
                   <MessageCircle size={18} />
-                  {hasNewMessages && <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>}
+                  {hasNewMessages && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+                  )}
                 </Link>
               </HoverCardTrigger>
               <HoverCardContent className="w-80 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
@@ -193,13 +227,19 @@ const Header = () => {
         {/* Mobile Navigation */}
         <div className="md:hidden border-t border-gray-200 py-3">
           <nav className="flex justify-around items-center">
-            <Link to="/dashboard" className={`p-3 rounded-full transition-colors ${isActive('/dashboard') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
+            <Link to="/dashboard" className={`p-3 rounded-full transition-colors ${
+              isActive('/dashboard') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'
+            }`}>
               <Home size={20} />
             </Link>
-            <Link to="/groups" className={`p-3 rounded-full transition-colors ${isActive('/groups') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
+            <Link to="/groups" className={`p-3 rounded-full transition-colors ${
+              isActive('/groups') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'
+            }`}>
               <Users size={20} />
             </Link>
-            <Link to="/feed" className={`p-3 rounded-full transition-colors ${isActive('/feed') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
+            <Link to="/feed" className={`p-3 rounded-full transition-colors ${
+              isActive('/feed') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'
+            }`}>
               <Rss size={20} />
             </Link>
             
@@ -207,7 +247,9 @@ const Header = () => {
               <PopoverTrigger asChild>
                 <button className="p-3 rounded-full text-gray-500 relative">
                   <Bell size={20} />
-                  {hasNewNotifications && <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>}
+                  {hasNewNotifications && (
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
+                  )}
                 </button>
               </PopoverTrigger>
               <PopoverContent align="center" side="top" sideOffset={12} className="w-[calc(100vw-2rem)] max-w-sm p-0 mb-2 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl">
@@ -215,30 +257,35 @@ const Header = () => {
               </PopoverContent>
             </Popover>
 
-            <Link to="/messages" className={`p-3 rounded-full transition-colors relative ${isActive('/messages') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
+            <Link to="/messages" className={`p-3 rounded-full transition-colors relative ${
+              isActive('/messages') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'
+            }`}>
               <MessageCircle size={20} />
-              {hasNewMessages && <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>}
+              {hasNewMessages && (
+                <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>
+              )}
             </Link>
 
             <Popover>
               <PopoverTrigger asChild>
-                 <button className="p-1 rounded-full">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
-                        {username.charAt(0).toUpperCase()}
-                      </AvatarFallback>
-                    </Avatar>
-                  </button>
+                <button className="p-1 rounded-full">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.user_metadata?.avatar_url} />
+                    <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
+                      {username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
+                </button>
               </PopoverTrigger>
               <PopoverContent align="end" side="top" sideOffset={12} className="w-[calc(100vw-2rem)] max-w-xs p-0 mb-2 bg-white/95 backdrop-blur-md border border-gray-200 rounded-xl">
                 <ProfileContent />
               </PopoverContent>
             </Popover>
-
           </nav>
         </div>
       </div>
-    </header>;
+    </header>
+  );
 };
+
 export default Header;
