@@ -162,8 +162,8 @@ const CreateGroupModal = ({ isOpen, onClose, onCreate, userTags, userLocation }:
                     : 'bg-gray-50 border-gray-200 text-gray-600 hover:bg-gray-100'
                 }`}
               >
-                <div className="font-medium">Interest Community</div>
-                <div className="text-xs mt-1">Global discussions</div>
+                <div className="font-medium">Global Community</div>
+                <div className="text-xs mt-1">Online discussions</div>
               </button>
               <button
                 type="button"
