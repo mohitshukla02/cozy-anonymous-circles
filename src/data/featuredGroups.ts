@@ -3,7 +3,7 @@ export const featuredGroups = [
   {
     id: 'featured-1',
     name: "Local Photographers",
-    description: "Capturing moments around the city",
+    description: "Capture Hyderabad's iconic heritage sites, bustling markets, and modern skyline. Weekly photo walks through Old City, Banjara Hills, and HITEC City.",
     members: 127,
     category: "Creative Arts",
     isLocal: true,
@@ -17,7 +17,7 @@ export const featuredGroups = [
   {
     id: 'featured-2',
     name: "Weekend Hikers",
-    description: "Exploring trails every Saturday",
+    description: "Explore the rocky terrain around Hyderabad. Trek to Ananthagiri Hills, Bhongir Fort, and hidden gems in the Deccan plateau every Saturday morning.",
     members: 89,
     category: "Sports & Outdoors",
     isLocal: true,
@@ -31,7 +31,7 @@ export const featuredGroups = [
   {
     id: 'featured-3',
     name: "Book Club Enthusiasts",
-    description: "Monthly discussions on great reads",
+    description: "Monthly deep dives into contemporary fiction, classic literature, and regional authors. Virtual discussions with members worldwide sharing diverse perspectives.",
     members: 156,
     category: "Intellectual",
     isLocal: false,
@@ -43,7 +43,7 @@ export const featuredGroups = [
   {
     id: 'featured-4',
     name: "Chai & Conversations",
-    description: "Weekly meetups at local cafes",
+    description: "Connect over steaming cups of Irani chai at iconic spots like Nimrah Cafe and Shadab Hotel. Weekly meetups for meaningful conversations and networking.",
     members: 203,
     category: "Lifestyle",
     isLocal: true,
@@ -57,7 +57,7 @@ export const featuredGroups = [
   {
     id: 'featured-5',
     name: "Startup Founders",
-    description: "Building the future together",
+    description: "Global community of entrepreneurs building the next big thing. Share insights, find co-founders, and navigate the startup journey together through virtual meetups.",
     members: 84,
     category: "Business",
     isLocal: false,
@@ -69,7 +69,7 @@ export const featuredGroups = [
   {
     id: 'featured-6',
     name: "Robotics Enthusiasts",
-    description: "Building and programming robots",
+    description: "Build, program, and tinker with robots. Share projects, learn new techniques, and collaborate on innovative automation solutions with fellow makers worldwide.",
     members: 67,
     category: "Technology",
     isLocal: false,
@@ -81,7 +81,7 @@ export const featuredGroups = [
   {
     id: 'featured-7',
     name: "Urban Gardeners",
-    description: "Growing green spaces in the city",
+    description: "Transform Hyderabad's concrete jungle into green oases. Learn terrace gardening, organic farming techniques, and sustainable living practices in our city's climate.",
     members: 142,
     category: "Lifestyle",
     isLocal: true,
@@ -95,7 +95,7 @@ export const featuredGroups = [
   {
     id: 'featured-8',
     name: "Golden Years Circle",
-    description: "Active community for seniors",
+    description: "Active seniors discovering Hyderabad's cultural richness. Heritage walks, cultural programs at Ravindra Bharathi, and health-focused activities for 50+ community.",
     members: 95,
     category: "Community",
     isLocal: true,
@@ -109,7 +109,7 @@ export const featuredGroups = [
   {
     id: 'featured-9',
     name: "Literary Society",
-    description: "Writers and literature lovers unite",
+    description: "Writers, poets, and literature lovers unite across borders. Share original works, provide feedback, and explore diverse literary traditions through virtual workshops.",
     members: 118,
     category: "Arts & Culture",
     isLocal: false,
@@ -121,7 +121,7 @@ export const featuredGroups = [
   {
     id: 'featured-10',
     name: "Jam Session Collective",
-    description: "Musicians jamming together",
+    description: "Musicians jamming across genres in Hyderabad's vibrant music scene. Meet at local studios, cafes in Jubilee Hills, and outdoor venues for collaborative sessions.",
     members: 76,
     category: "Music",
     isLocal: true,
