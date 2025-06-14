@@ -26,6 +26,13 @@ const Profile = () => {
   const [activityVisible, setActivityVisible] = useState(true);
   const navigate = useNavigate();
 
+  const userBio = profile?.bio || '';
+
+  // Move useEffect BEFORE the early return to ensure hooks are called consistently
+  React.useEffect(() => {
+    setBioText(userBio);
+  }, [userBio]);
+
   // Move the early return AFTER all hooks
   if (!user) {
     return (
@@ -80,11 +87,6 @@ const Profile = () => {
   }
 
   const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'Anonymous';
-  const userBio = profile?.bio || '';
-
-  React.useEffect(() => {
-    setBioText(userBio);
-  }, [userBio]);
 
   return (
     <div className="min-h-screen bg-gray-50 pt-20">
