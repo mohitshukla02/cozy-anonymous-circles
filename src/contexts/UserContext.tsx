@@ -4,6 +4,8 @@ import React, { createContext, useContext, useState, useEffect, ReactNode } from
 interface User {
   username: string;
   joinDate: string;
+  selectedTags: string[];
+  hasCompletedOnboarding: boolean;
   preferences: {
     theme: 'light' | 'dark';
   };
@@ -14,6 +16,8 @@ interface UserContextType {
   login: (user: User) => void;
   logout: () => void;
   updatePreferences: (preferences: Partial<User['preferences']>) => void;
+  updateTags: (tags: string[]) => void;
+  completeOnboarding: () => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -49,8 +53,37 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const updateTags = (tags: string[]) => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        selectedTags: tags
+      };
+      setUser(updatedUser);
+      localStorage.setItem('cozyUser', JSON.stringify(updatedUser));
+    }
+  };
+
+  const completeOnboarding = () => {
+    if (user) {
+      const updatedUser = {
+        ...user,
+        hasCompletedOnboarding: true
+      };
+      setUser(updatedUser);
+      localStorage.setItem('cozyUser', JSON.stringify(updatedUser));
+    }
+  };
+
   return (
-    <UserContext.Provider value={{ user, login, logout, updatePreferences }}>
+    <UserContext.Provider value={{ 
+      user, 
+      login, 
+      logout, 
+      updatePreferences, 
+      updateTags, 
+      completeOnboarding 
+    }}>
       {children}
     </UserContext.Provider>
   );

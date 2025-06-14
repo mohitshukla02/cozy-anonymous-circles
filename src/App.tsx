@@ -9,6 +9,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import Landing from "./pages/Landing";
 import Signup from "./pages/Signup";
+import TagOnboarding from "./pages/TagOnboarding";
 import Dashboard from "./pages/Dashboard";
 import Profile from "./pages/Profile";
 import Groups from "./pages/Groups";
@@ -28,12 +29,18 @@ const PublicRoute = ({ children }: { children: React.ReactNode }) => {
   return !user ? <>{children}</> : <Navigate to="/dashboard" replace />;
 };
 
+const OnboardingRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useUser();
+  if (!user) return <Navigate to="/" replace />;
+  return <>{children}</>;
+};
+
 const AppContent = () => {
   const { user } = useUser();
 
   return (
     <div className="min-h-screen flex flex-col">
-      {user && <Header />}
+      {user && user.hasCompletedOnboarding && <Header />}
       <main className="flex-grow">
         <Routes>
           <Route path="/" element={
@@ -45,6 +52,11 @@ const AppContent = () => {
             <PublicRoute>
               <Signup />
             </PublicRoute>
+          } />
+          <Route path="/tag-onboarding" element={
+            <OnboardingRoute>
+              <TagOnboarding />
+            </OnboardingRoute>
           } />
           <Route path="/dashboard" element={
             <ProtectedRoute>
@@ -74,7 +86,7 @@ const AppContent = () => {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
-      {user && <Footer />}
+      {user && user.hasCompletedOnboarding && <Footer />}
     </div>
   );
 };

@@ -1,0 +1,33 @@
+
+import React from 'react';
+import { Check } from 'lucide-react';
+import { Tag } from '../types/tags';
+
+interface TagSelectorProps {
+  tag: Tag;
+  isSelected: boolean;
+  onToggle: (tagId: string) => void;
+}
+
+const TagSelector = ({ tag, isSelected, onToggle }: TagSelectorProps) => {
+  return (
+    <button
+      onClick={() => onToggle(tag.id)}
+      className={`
+        relative px-4 py-2 rounded-full text-sm font-medium transition-all duration-200
+        border-2 hover:scale-105 shadow-sm hover:shadow-md
+        ${isSelected 
+          ? 'bg-amber-100 border-amber-300 text-amber-800' 
+          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+        }
+      `}
+    >
+      <span className="flex items-center gap-2">
+        {tag.name}
+        {isSelected && <Check size={14} className="text-amber-600" />}
+      </span>
+    </button>
+  );
+};
+
+export default TagSelector;

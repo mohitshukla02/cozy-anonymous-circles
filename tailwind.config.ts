@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -18,6 +19,20 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				'heading': ['PP Neue', 'Inter', 'system-ui', 'sans-serif'],
+				'body': ['Inter', 'system-ui', 'sans-serif'],
+			},
+			fontSize: {
+				'xs': '0.8rem',
+				'sm': '0.9rem',
+				'base': '1rem',
+				'lg': '1.125rem',
+				'xl': '1.25rem',
+				'2xl': '1.5rem',
+				'3xl': '1.875rem',
+				'4xl': '2rem',
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -61,7 +76,11 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
-				}
+				},
+				'pastel-blue': '#E0F2FE',
+				'pastel-green': '#F0FDF4',
+				'pastel-pink': '#FDF2F8',
+				'pastel-beige': '#FEF7ED',
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
@@ -89,6 +108,10 @@ export default {
 			animation: {
 				'accordion-down': 'accordion-down 0.2s ease-out',
 				'accordion-up': 'accordion-up 0.2s ease-out'
+			},
+			boxShadow: {
+				'soft': '0 4px 20px -4px rgba(0, 0, 0, 0.1)',
+				'soft-md': '0 8px 30px -8px rgba(0, 0, 0, 0.12)',
 			}
 		}
 	},
