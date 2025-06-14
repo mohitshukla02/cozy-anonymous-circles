@@ -6,6 +6,7 @@ import { getGroups, createGroup, getUserGroups, joinGroup } from '@/utils/supaba
 import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupsFilters from '@/components/GroupsFilters';
 import GroupsSection from '@/components/GroupsSection';
+import GroupDetailDialog from '@/components/GroupDetailDialog';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { generateRandomUsername } from '@/utils/usernameGenerator';
@@ -21,6 +22,8 @@ const Groups = () => {
   const [userGroups, setUserGroups] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const [showGroupDialog, setShowGroupDialog] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [groupType, setGroupType] = useState<'all' | 'interest' | 'local-meetup'>('all');
@@ -109,6 +112,16 @@ const Groups = () => {
     }
   };
 
+  const handleViewGroup = (group: Group) => {
+    setSelectedGroup(group);
+    setShowGroupDialog(true);
+  };
+
+  const handleCloseGroupDialog = () => {
+    setShowGroupDialog(false);
+    setSelectedGroup(null);
+  };
+
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-white pt-20">
@@ -176,6 +189,7 @@ const Groups = () => {
             userTags={profile?.selected_tags || []}
             userGroups={userGroups}
             onJoin={handleJoinGroup}
+            onViewGroup={handleViewGroup}
             showViewAll={groupType === 'all'}
             onViewAll={() => setGroupType('interest')}
             emptyIcon={<Globe size={48} className="mx-auto text-gray-400 mb-4" />}
@@ -193,6 +207,7 @@ const Groups = () => {
             userTags={profile?.selected_tags || []}
             userGroups={userGroups}
             onJoin={handleJoinGroup}
+            onViewGroup={handleViewGroup}
             showViewAll={groupType === 'all'}
             onViewAll={() => setGroupType('local-meetup')}
             emptyIcon={<MapPin size={48} className="mx-auto text-gray-400 mb-4" />}
@@ -215,6 +230,16 @@ const Groups = () => {
             } : undefined}
           />
         )}
+
+        {/* Group Detail Dialog */}
+        <GroupDetailDialog
+          group={selectedGroup}
+          isOpen={showGroupDialog}
+          onClose={handleCloseGroupDialog}
+          onJoin={handleJoinGroup}
+          userTags={profile?.selected_tags || []}
+          isJoined={selectedGroup ? userGroups.includes(selectedGroup.id) : false}
+        />
       </div>
     </div>
   );

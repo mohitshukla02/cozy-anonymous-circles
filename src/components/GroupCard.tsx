@@ -4,13 +4,13 @@ import { Users, Heart, ArrowRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Group } from '../types/groups';
 import { Badge } from './ui/badge';
-import { ProgressiveBlurCard } from './ui/progressive-blur-card';
 import { TAG_CATEGORIES } from '../types/tags';
 
 interface GroupCardProps {
   group: Group;
   userTags?: string[];
   onJoin?: (groupId: string) => void;
+  onViewGroup?: (group: Group) => void;
   isJoined?: boolean;
 }
 
@@ -21,7 +21,7 @@ const capitalizeWords = (str: string) => {
   ).join(' ');
 };
 
-const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCardProps) => {
+const GroupCard = ({ group, userTags = [], onJoin, onViewGroup, isJoined = false }: GroupCardProps) => {
   const navigate = useNavigate();
   const matchingTags = group.tags.filter(tag => userTags.includes(tag));
   const tagNames = new Map();
@@ -38,26 +38,26 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
     
     if (isJoined) {
       navigate(`/groups/${group.id}`);
+    } else if (onViewGroup) {
+      onViewGroup(group);
     }
   };
 
-  const handleJoinClick = (e: React.MouseEvent) => {
+  const handleViewClick = (e: React.MouseEvent) => {
     e.stopPropagation();
-    if (onJoin) {
-      onJoin(group.id);
+    if (onViewGroup) {
+      onViewGroup(group);
     }
   };
 
   return (
-    <ProgressiveBlurCard 
-      className={`group hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${
-        isJoined ? 'cursor-pointer' : ''
-      }`}
+    <div 
+      className={`group relative overflow-hidden rounded-xl border bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer`}
       onClick={handleCardClick}
     >
       {/* Group Image */}
       {group.image && (
-        <div className="relative h-48 overflow-hidden rounded-t-xl">
+        <div className="relative h-48 overflow-hidden">
           <img 
             src={group.image} 
             alt={group.name}
@@ -138,25 +138,14 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
           )}
         </div>
 
-        {onJoin && (
-          <button
-            onClick={handleJoinClick}
-            disabled={group.memberIds.length >= group.memberLimit}
-            className={`
-              w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 relative overflow-hidden
-              ${isJoined 
-                ? 'bg-green-100 text-green-700 hover:bg-green-200 border border-green-200/50' 
-                : group.memberIds.length >= group.memberLimit
-                ? 'bg-gray-50 text-gray-400 cursor-not-allowed border border-gray-200'
-                : 'bg-blue-600 text-white hover:bg-blue-700 shadow-md hover:shadow-lg'
-              }
-            `}
-          >
-            {isJoined ? 'View Group' : group.memberIds.length >= group.memberLimit ? 'Full' : 'Join Group'}
-          </button>
-        )}
+        <button
+          onClick={handleViewClick}
+          className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg"
+        >
+          View Group
+        </button>
       </div>
-    </ProgressiveBlurCard>
+    </div>
   );
 };
 

@@ -11,6 +11,7 @@ interface GroupsSectionProps {
   userTags: string[];
   userGroups: string[];
   onJoin: (groupId: string) => void;
+  onViewGroup: (group: Group) => void;
   showViewAll?: boolean;
   onViewAll?: () => void;
   emptyIcon?: React.ReactNode;
@@ -25,6 +26,7 @@ const GroupsSection = ({
   userTags,
   userGroups,
   onJoin,
+  onViewGroup,
   showViewAll = false,
   onViewAll,
   emptyIcon,
@@ -57,6 +59,7 @@ const GroupsSection = ({
               group={group} 
               userTags={userTags}
               onJoin={onJoin}
+              onViewGroup={onViewGroup}
               isJoined={userGroups.includes(group.id)}
             />
           ))}
