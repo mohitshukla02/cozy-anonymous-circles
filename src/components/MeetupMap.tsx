@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -28,11 +27,11 @@ const MeetupMap = () => {
 
   // Generate meetups based on user's location or default to NYC
   const getUserLocation = () => {
-    if (profile?.location?.coordinates) {
+    if (profile?.location_coordinates) {
       return {
-        center: [profile.location.coordinates.lng, profile.location.coordinates.lat] as [number, number],
-        city: profile.location.city,
-        region: profile.location.region
+        center: [profile.location_coordinates.lng, profile.location_coordinates.lat] as [number, number],
+        city: profile.location_city || 'Unknown City',
+        region: profile.location_region || 'Unknown Region'
       };
     } else if (user?.location?.coordinates) {
       return {
