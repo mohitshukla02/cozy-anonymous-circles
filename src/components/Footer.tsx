@@ -9,8 +9,8 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div>
             <div className="flex items-center space-x-2 mb-4">
-              <div className="w-6 h-6 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">C</span>
+              <div className="w-6 h-6 flex items-center justify-center">
+                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-6 h-6" />
               </div>
               <span className="font-semibold text-gray-800">Cozy Circles</span>
             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LogOut, User, Home, Users, Rss, Bell, MessageCircle, Globe } from 'lucide-react';
+import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -135,7 +135,7 @@ const Header = () => {
           <div className="flex items-center space-x-8">
             <Link to="/dashboard" className="flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-colors">
               <div className="w-8 h-8 rounded-full flex items-center justify-center">
-                <Globe size={32} className="text-gray-800" />
+                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-8 h-8" />
               </div>
               <span className="font-bold text-xl">Circles</span>
             </Link>
