@@ -1,187 +1,117 @@
 
-import React, { useState, useEffect } from 'react';
-import { ArrowRight, Check } from 'lucide-react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TAG_CATEGORIES } from '../types/tags';
-import TagSelector from '../components/TagSelector';
-import { useUserProfile } from '@/hooks/useUserProfile';
-import { updateUserTags } from '@/utils/userProfileStorage';
 import { useAuth } from '@/contexts/AuthContext';
+import { TAG_CATEGORIES } from '@/types/tags';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { useUserProfile } from '@/hooks/useUserProfile';
 
 const TagOnboarding = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { profile, loading, refreshProfile } = useUserProfile();
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const { profile, updateProfile, loading } = useUserProfile();
+  const [selectedTags, setSelectedTags] = useState<string[]>(profile?.selected_tags || []);
 
-  // Load existing tags when profile is available
-  useEffect(() => {
-    if (profile?.selected_tags) {
-      console.log('Loading existing tags:', profile.selected_tags);
-      setSelectedTags(profile.selected_tags);
+  console.log('TagOnboarding - Profile:', profile);
+  console.log('TagOnboarding - Selected tags:', selectedTags);
+
+  const handleTagToggle = (tagId: string) => {
+    setSelectedTags(prev => 
+      prev.includes(tagId) 
+        ? prev.filter(id => id !== tagId)
+        : [...prev, tagId]
+    );
+  };
+
+  const handleSubmit = async () => {
+    if (!user) {
+      console.error('No user found');
+      return;
     }
-  }, [profile]);
 
-  const toggleTag = (tagId: string) => {
-    console.log('Toggling tag:', tagId);
-    if (selectedTags.includes(tagId)) {
-      setSelectedTags(selectedTags.filter(id => id !== tagId));
-    } else if (selectedTags.length < 10) {
-      setSelectedTags([...selectedTags, tagId]);
+    console.log('Submitting tags:', selectedTags);
+    
+    try {
+      const success = await updateProfile({ selected_tags: selectedTags });
+      if (success) {
+        console.log('Tags updated successfully');
+        navigate('/dashboard');
+      } else {
+        console.error('Failed to update tags');
+      }
+    } catch (error) {
+      console.error('Error updating tags:', error);
     }
   };
 
-  const handleContinue = async () => {
-    if (!user || selectedTags.length < 3) return;
-    
-    setIsLoading(true);
-    console.log('Saving tags:', selectedTags);
-    
-    try {
-      const success = await updateUserTags(user.id, selectedTags);
-      
-      if (success) {
-        console.log('Tags saved successfully');
-        await refreshProfile(); // Refresh the profile to get updated data
-        navigate('/dashboard');
-      } else {
-        console.error('Failed to save tags');
-        alert('Failed to save your interests. Please try again.');
-      }
-    } catch (error) {
-      console.error('Error saving tags:', error);
-      alert('An error occurred while saving your interests. Please try again.');
-    } finally {
-      setIsLoading(false);
-    }
+  const handleSkip = () => {
+    navigate('/dashboard');
   };
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 flex items-center justify-center">
+      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
         <div className="animate-pulse">
-          <div className="bg-gray-200 h-8 w-64 rounded mb-4"></div>
-          <div className="bg-gray-200 h-4 w-96 rounded"></div>
+          <div className="bg-gray-200 h-32 w-96 rounded-lg"></div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Header */}
-        <div className="text-center mb-12">
-          <h1 className="text-3xl sm:text-4xl font-heading font-bold text-gray-900 mb-4">
-            What interests you?
-          </h1>
-          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-            Choose topics you're passionate about to find your perfect communities. 
-            Select at least 3 interests to get started.
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 py-12 px-4">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-4">Choose Your Interests</h1>
+          <p className="text-gray-600 text-lg">
+            Select topics you're passionate about to find relevant groups and connect with like-minded people.
           </p>
         </div>
 
-        {/* Progress indicator */}
-        <div className="flex justify-center mb-8">
-          <div className="flex items-center space-x-2">
-            <div className="w-3 h-3 bg-amber-500 rounded-full"></div>
-            <div className="w-8 h-1 bg-amber-500 rounded"></div>
-            <div className="w-3 h-3 bg-amber-200 rounded-full"></div>
-          </div>
-        </div>
-
-        {/* Tag Categories */}
-        <div className="space-y-8 mb-12">
+        <div className="space-y-8">
           {TAG_CATEGORIES.map((category) => (
-            <div key={category.id} className="bg-white rounded-2xl p-6 shadow-soft">
-              <h2 className="text-xl font-heading font-semibold text-gray-800 mb-4 flex items-center">
-                <span className="text-2xl mr-3">{category.emoji}</span>
-                {category.name}
-              </h2>
-              <div className="flex flex-wrap gap-3">
+            <div key={category.id} className="bg-white rounded-2xl shadow-sm p-6">
+              <div className="flex items-center space-x-3 mb-4">
+                <span className="text-2xl">{category.icon}</span>
+                <h2 className="text-xl font-semibold text-gray-900">{category.name}</h2>
+              </div>
+              <div className="flex flex-wrap gap-2">
                 {category.tags.map((tag) => (
-                  <TagSelector
+                  <Badge
                     key={tag.id}
-                    tag={tag}
-                    isSelected={selectedTags.includes(tag.id)}
-                    onToggle={toggleTag}
-                  />
+                    variant={selectedTags.includes(tag.id) ? "default" : "secondary"}
+                    className={`cursor-pointer transition-all hover:scale-105 ${
+                      selectedTags.includes(tag.id)
+                        ? 'bg-amber-600 hover:bg-amber-700 text-white'
+                        : 'bg-gray-100 hover:bg-gray-200 text-gray-700'
+                    }`}
+                    onClick={() => handleTagToggle(tag.id)}
+                  >
+                    <span className="mr-1">{tag.icon}</span>
+                    {tag.name}
+                  </Badge>
                 ))}
               </div>
             </div>
           ))}
         </div>
 
-        {/* Selection summary and continue button */}
-        <div className="bg-white rounded-2xl p-6 shadow-soft">
-          <div className="flex items-center justify-between">
-            <div>
-              <h3 className="text-lg font-semibold text-gray-800 mb-2">
-                Your Interests ({selectedTags.length}/10)
-              </h3>
-              <p className="text-gray-600 text-sm">
-                {selectedTags.length < 3 
-                  ? `Select ${3 - selectedTags.length} more to continue`
-                  : 'Great! You can add more or continue to your dashboard.'
-                }
-              </p>
-            </div>
-            <button
-              onClick={handleContinue}
-              disabled={selectedTags.length < 3 || isLoading}
-              className={`
-                flex items-center space-x-2 px-6 py-3 rounded-full font-medium transition-all
-                ${selectedTags.length >= 3 && !isLoading
-                  ? 'bg-amber-600 text-white hover:bg-amber-700 shadow-lg hover:shadow-xl'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                }
-              `}
-            >
-              {isLoading ? (
-                <>
-                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  <span>Saving...</span>
-                </>
-              ) : (
-                <>
-                  <span>{profile?.selected_tags?.length ? 'Update' : 'Continue'}</span>
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </div>
-
-          {selectedTags.length > 0 && (
-            <div className="mt-4 pt-4 border-t border-gray-200">
-              <div className="flex flex-wrap gap-2">
-                {selectedTags.map((tagId) => {
-                  const tag = TAG_CATEGORIES
-                    .flatMap(cat => cat.tags)
-                    .find(t => t.id === tagId);
-                  return tag ? (
-                    <span
-                      key={tagId}
-                      className="inline-flex items-center px-3 py-1 rounded-full text-sm bg-amber-100 text-amber-800"
-                    >
-                      <Check size={14} className="mr-1" />
-                      {tag.name}
-                    </span>
-                  ) : null;
-                })}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Skip option */}
-        <div className="text-center mt-8">
-          <button
-            onClick={() => navigate('/dashboard')}
-            className="text-gray-500 hover:text-gray-700 transition-colors text-sm"
+        <div className="flex justify-center space-x-4 mt-8">
+          <Button
+            variant="outline"
+            onClick={handleSkip}
+            className="px-8 py-2"
           >
             Skip for now
-          </button>
+          </Button>
+          <Button
+            onClick={handleSubmit}
+            disabled={selectedTags.length === 0}
+            className="px-8 py-2 bg-amber-600 hover:bg-amber-700"
+          >
+            Continue with {selectedTags.length} interest{selectedTags.length !== 1 ? 's' : ''}
+          </Button>
         </div>
       </div>
     </div>

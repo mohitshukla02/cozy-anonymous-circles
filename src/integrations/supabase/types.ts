@@ -345,6 +345,42 @@ export type Database = {
           },
         ]
       }
+      user_profiles: {
+        Row: {
+          created_at: string
+          id: string
+          location_city: string | null
+          location_coordinates: Json | null
+          location_region: string | null
+          selected_tags: string[] | null
+          updated_at: string
+          user_id: string
+          username: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          location_city?: string | null
+          location_coordinates?: Json | null
+          location_region?: string | null
+          selected_tags?: string[] | null
+          updated_at?: string
+          user_id: string
+          username: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          location_city?: string | null
+          location_coordinates?: Json | null
+          location_region?: string | null
+          selected_tags?: string[] | null
+          updated_at?: string
+          user_id?: string
+          username?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

@@ -16,74 +16,94 @@ export interface UserProfile {
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   console.log('Getting user profile for:', userId);
   
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .select('*')
-    .eq('user_id', userId)
-    .single();
-  
-  if (error) {
-    console.error('Error getting user profile:', error);
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .select('*')
+      .eq('user_id', userId)
+      .single();
+    
+    if (error) {
+      console.error('Error getting user profile:', error);
+      return null;
+    }
+    
+    console.log('Retrieved user profile:', data);
+    return data as UserProfile;
+  } catch (error) {
+    console.error('Error in getUserProfile:', error);
     return null;
   }
-  
-  console.log('Retrieved user profile:', data);
-  return data;
 };
 
 export const createUserProfile = async (profile: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>): Promise<UserProfile | null> => {
   console.log('Creating user profile:', profile);
   
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .insert([profile])
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error creating user profile:', error);
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .insert([profile])
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error creating user profile:', error);
+      return null;
+    }
+    
+    console.log('Created user profile:', data);
+    return data as UserProfile;
+  } catch (error) {
+    console.error('Error in createUserProfile:', error);
     return null;
   }
-  
-  console.log('Created user profile:', data);
-  return data;
 };
 
 export const updateUserProfile = async (userId: string, updates: Partial<Omit<UserProfile, 'id' | 'user_id' | 'created_at'>>): Promise<UserProfile | null> => {
   console.log('Updating user profile for:', userId, 'with:', updates);
   
-  const { data, error } = await supabase
-    .from('user_profiles')
-    .update({ ...updates, updated_at: new Date().toISOString() })
-    .eq('user_id', userId)
-    .select()
-    .single();
-  
-  if (error) {
-    console.error('Error updating user profile:', error);
+  try {
+    const { data, error } = await supabase
+      .from('user_profiles')
+      .update({ ...updates, updated_at: new Date().toISOString() })
+      .eq('user_id', userId)
+      .select()
+      .single();
+    
+    if (error) {
+      console.error('Error updating user profile:', error);
+      return null;
+    }
+    
+    console.log('Updated user profile:', data);
+    return data as UserProfile;
+  } catch (error) {
+    console.error('Error in updateUserProfile:', error);
     return null;
   }
-  
-  console.log('Updated user profile:', data);
-  return data;
 };
 
 export const updateUserTags = async (userId: string, tags: string[]): Promise<boolean> => {
   console.log('Updating user tags for:', userId, 'tags:', tags);
   
-  const { error } = await supabase
-    .from('user_profiles')
-    .update({ 
-      selected_tags: tags,
-      updated_at: new Date().toISOString()
-    })
-    .eq('user_id', userId);
-  
-  if (error) {
-    console.error('Error updating user tags:', error);
+  try {
+    const { error } = await supabase
+      .from('user_profiles')
+      .update({ 
+        selected_tags: tags,
+        updated_at: new Date().toISOString()
+      })
+      .eq('user_id', userId);
+    
+    if (error) {
+      console.error('Error updating user tags:', error);
+      return false;
+    }
+    
+    console.log('Successfully updated user tags');
+    return true;
+  } catch (error) {
+    console.error('Error in updateUserTags:', error);
     return false;
   }
-  
-  console.log('Successfully updated user tags');
-  return true;
 };
