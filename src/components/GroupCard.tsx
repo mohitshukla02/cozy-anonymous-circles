@@ -42,15 +42,35 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
 
   return (
     <div 
-      className={`group relative bg-white/80 backdrop-blur-sm rounded-xl p-4 border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200 hover:shadow-lg hover:shadow-gray-100/50 hover:-translate-y-0.5 ${
+      className={`group relative bg-white/80 backdrop-blur-sm rounded-xl overflow-hidden border border-gray-100/50 hover:border-gray-200/80 transition-all duration-200 hover:shadow-lg hover:shadow-gray-100/50 hover:-translate-y-0.5 ${
         isJoined ? 'cursor-pointer' : ''
       }`}
       onClick={handleCardClick}
     >
-      {/* Subtle gradient overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-white/40 to-transparent rounded-xl pointer-events-none" />
-      
-      <div className="relative">
+      {/* Group Image */}
+      {group.image && (
+        <div className="relative h-32 overflow-hidden">
+          <img 
+            src={group.image} 
+            alt={group.name}
+            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+          {/* Group Type Badge */}
+          <Badge 
+            variant="outline"
+            className={`absolute top-2 right-2 text-xs px-2 py-0.5 border-0 font-medium backdrop-blur-sm ${
+              group.type === 'local-meetup' 
+                ? 'bg-green-100/90 text-green-700' 
+                : 'bg-blue-100/90 text-blue-700'
+            }`}
+          >
+            {group.type === 'local-meetup' ? 'Local' : 'Global'}
+          </Badge>
+        </div>
+      )}
+
+      <div className="p-4">
         <div className="flex justify-between items-start mb-3">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
@@ -63,17 +83,6 @@ const GroupCard = ({ group, userTags = [], onJoin, isJoined = false }: GroupCard
                   <span className="text-xs font-medium">{matchingTags.length}</span>
                 </div>
               )}
-              {/* Group Type Badge */}
-              <Badge 
-                variant="outline"
-                className={`text-xs px-2 py-0.5 border-0 font-medium ${
-                  group.type === 'local-meetup' 
-                    ? 'bg-green-50 text-green-700' 
-                    : 'bg-blue-50 text-blue-700'
-                }`}
-              >
-                {group.type === 'local-meetup' ? 'Local' : 'Global'}
-              </Badge>
             </div>
             
             {/* Location for local groups */}

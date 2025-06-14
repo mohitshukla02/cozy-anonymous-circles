@@ -1,4 +1,3 @@
-
 export interface Group {
   id: string;
   name: string;
@@ -15,6 +14,7 @@ export interface Group {
   isArchived: boolean;
   lastMeetupDate?: string;
   meetupDeadline?: string;
+  image?: string;
 }
 
 export interface Post {
