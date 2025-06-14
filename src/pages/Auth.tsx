@@ -1,7 +1,7 @@
 
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Eye, EyeOff, Loader2 } from 'lucide-react';
+import { Eye, EyeOff, Loader2, Check, X } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,8 +12,12 @@ const Auth = () => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [username, setUsername] = useState(generateRandomUsername());
+  const [useCustomUsername, setUseCustomUsername] = useState(false);
+  const [customUsername, setCustomUsername] = useState('');
   const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [redditLoading, setRedditLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
@@ -22,14 +26,28 @@ const Auth = () => {
   const { toast } = useToast();
   const navigate = useNavigate();
 
+  // Password validation functions
+  const hasUppercase = (str: string) => /[A-Z]/.test(str);
+  const hasLowercase = (str: string) => /[a-z]/.test(str);
+  const hasSpecialChar = (str: string) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(str);
+  const hasMinLength = (str: string) => str.length >= 8;
+  const passwordsMatch = password === confirmPassword && confirmPassword.length > 0;
+
+  const isPasswordValid = password && hasUppercase(password) && hasLowercase(password) && hasSpecialChar(password) && hasMinLength(password);
+  const canSubmit = isSignUp ? (email && isPasswordValid && passwordsMatch && (useCustomUsername ? customUsername.trim() : username)) : (email && password);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!canSubmit) return;
+
     setLoading(true);
 
     try {
       let result;
+      const finalUsername = useCustomUsername ? customUsername.trim() : username;
+      
       if (isSignUp) {
-        result = await signUp(email, password, username);
+        result = await signUp(email, password, finalUsername);
       } else {
         result = await signIn(email, password);
       }
@@ -109,14 +127,17 @@ const Auth = () => {
     setUsername(generateRandomUsername());
   };
 
+  const ValidationIndicator = ({ isValid, text }: { isValid: boolean; text: string }) => (
+    <div className={`flex items-center space-x-2 text-xs ${isValid ? 'text-green-600' : 'text-gray-400'}`}>
+      {isValid ? <Check size={12} /> : <X size={12} />}
+      <span>{text}</span>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 flex items-center justify-center px-4">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 flex items-center justify-center px-4 py-8">
       <div className="max-w-md w-full">
         <div className="text-center mb-8">
-          <Link to="/" className="inline-flex items-center space-x-2 text-amber-800 hover:text-amber-900 transition-colors mb-4">
-            <ArrowLeft size={20} />
-            <span className="text-sm">Back to Home</span>
-          </Link>
           <div className="flex items-center justify-center space-x-2 mb-4">
             <div className="w-12 h-12 bg-gradient-to-br from-amber-500 to-orange-600 rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">C</span>
@@ -191,23 +212,46 @@ const Auth = () => {
                 <label className="block text-sm font-medium text-gray-700 mb-2">
                   Username
                 </label>
-                <div className="flex gap-2">
+                
+                <div className="mb-3">
+                  <label className="flex items-center space-x-2 text-sm text-gray-600 mb-2">
+                    <input
+                      type="checkbox"
+                      checked={useCustomUsername}
+                      onChange={(e) => setUseCustomUsername(e.target.checked)}
+                      className="rounded border-gray-300"
+                    />
+                    <span>Use custom username</span>
+                  </label>
+                </div>
+
+                {useCustomUsername ? (
                   <Input
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Your anonymous username"
-                    className="flex-1"
+                    value={customUsername}
+                    onChange={(e) => setCustomUsername(e.target.value)}
+                    placeholder="Enter your custom username"
+                    className="w-full"
                     required
                   />
-                  <Button 
-                    type="button" 
-                    variant="outline" 
-                    onClick={generateNewUsername}
-                    className="whitespace-nowrap"
-                  >
-                    Generate
-                  </Button>
-                </div>
+                ) : (
+                  <div className="flex gap-2">
+                    <Input
+                      value={username}
+                      onChange={(e) => setUsername(e.target.value)}
+                      placeholder="Your anonymous username"
+                      className="flex-1"
+                      required
+                    />
+                    <Button 
+                      type="button" 
+                      variant="outline" 
+                      onClick={generateNewUsername}
+                      className="whitespace-nowrap"
+                    >
+                      Generate
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
 
@@ -245,12 +289,51 @@ const Auth = () => {
                   {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                 </button>
               </div>
+
+              {isSignUp && password && (
+                <div className="mt-2 space-y-1">
+                  <ValidationIndicator isValid={hasUppercase(password)} text="One uppercase letter" />
+                  <ValidationIndicator isValid={hasLowercase(password)} text="One lowercase letter" />
+                  <ValidationIndicator isValid={hasSpecialChar(password)} text="One special character" />
+                  <ValidationIndicator isValid={hasMinLength(password)} text="Minimum 8 characters" />
+                </div>
+              )}
             </div>
+
+            {isSignUp && (
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Confirm Password
+                </label>
+                <div className="relative">
+                  <Input
+                    type={showConfirmPassword ? 'text' : 'password'}
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    placeholder="Confirm your password"
+                    className={`pr-10 ${confirmPassword && (passwordsMatch ? 'border-green-500 focus:border-green-500' : 'border-red-500 focus:border-red-500')}`}
+                    required
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  >
+                    {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                  </button>
+                </div>
+                {confirmPassword && (
+                  <div className="mt-2">
+                    <ValidationIndicator isValid={passwordsMatch} text="Passwords match" />
+                  </div>
+                )}
+              </div>
+            )}
 
             <Button
               type="submit"
-              disabled={loading}
-              className="w-full bg-amber-600 hover:bg-amber-700"
+              disabled={loading || !canSubmit}
+              className="w-full bg-amber-600 hover:bg-amber-700 disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />

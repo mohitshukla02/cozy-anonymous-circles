@@ -85,7 +85,6 @@
 
   body {
     @apply bg-background text-foreground font-body text-sm;
-    padding-top: 56px; /* Account for fixed header */
     background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 50%, #f3e8ff 100%);
     min-height: 100vh;
   }
