@@ -7,7 +7,7 @@ export const getGroups = async (): Promise<Group[]> => {
   const { data, error } = await supabase
     .from('groups')
     .select('*')
-    .eq('is_archived', false);
+    .eq('archived', false);
   
   if (error) throw error;
   
@@ -23,10 +23,9 @@ export const getGroups = async (): Promise<Group[]> => {
     adminId: group.admin_id,
     type: group.type as 'interest' | 'local-meetup',
     locationCity: group.location_city,
-    locationState: group.location_state,
-    locationCountry: group.location_country,
-    isArchived: group.is_archived,
-    lastMeetupDate: group.last_meetup_date,
+    locationRegion: group.location_region,
+    isArchived: group.archived,
+    lastMeetupDate: group.last_activity,
     meetupDeadline: group.meetup_deadline
   }));
 };
@@ -53,10 +52,9 @@ export const getGroupById = async (groupId: string): Promise<Group | null> => {
     adminId: data.admin_id,
     type: data.type as 'interest' | 'local-meetup',
     locationCity: data.location_city,
-    locationState: data.location_state,
-    locationCountry: data.location_country,
-    isArchived: data.is_archived,
-    lastMeetupDate: data.last_meetup_date,
+    locationRegion: data.location_region,
+    isArchived: data.archived,
+    lastMeetupDate: data.last_activity,
     meetupDeadline: data.meetup_deadline
   };
 };
@@ -77,9 +75,8 @@ export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'mem
       admin_id: user.id,
       type: group.type,
       location_city: group.locationCity,
-      location_state: group.locationState,
-      location_country: group.locationCountry,
-      is_archived: false
+      location_region: group.locationRegion,
+      archived: false
     }])
     .select()
     .single();
@@ -98,10 +95,9 @@ export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'mem
     adminId: data.admin_id,
     type: data.type as 'interest' | 'local-meetup',
     locationCity: data.location_city,
-    locationState: data.location_state,
-    locationCountry: data.location_country,
-    isArchived: data.is_archived,
-    lastMeetupDate: data.last_meetup_date,
+    locationRegion: data.location_region,
+    isArchived: data.archived,
+    lastMeetupDate: data.last_activity,
     meetupDeadline: data.meetup_deadline
   };
 };
@@ -140,13 +136,20 @@ export const joinGroup = async (groupId: string, anonymousName: string): Promise
 
   if (error) throw error;
 
-  // Update group member count
-  const { error: updateError } = await supabase.rpc('add_member_to_group', {
-    group_id: groupId,
-    user_id: user.id
-  });
+  // Update group member count by adding user ID to member_ids array
+  const { data: group } = await supabase
+    .from('groups')
+    .select('member_ids')
+    .eq('id', groupId)
+    .single();
 
-  if (updateError) throw updateError;
+  if (group) {
+    const updatedMemberIds = [...(group.member_ids || []), user.id];
+    await supabase
+      .from('groups')
+      .update({ member_ids: updatedMemberIds })
+      .eq('id', groupId);
+  }
 };
 
 // Posts operations

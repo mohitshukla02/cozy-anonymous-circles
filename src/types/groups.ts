@@ -11,8 +11,7 @@ export interface Group {
   adminId: string;
   type: 'interest' | 'local-meetup';
   locationCity?: string;
-  locationState?: string;
-  locationCountry?: string;
+  locationRegion?: string;
   isArchived: boolean;
   lastMeetupDate?: string;
   meetupDeadline?: string;

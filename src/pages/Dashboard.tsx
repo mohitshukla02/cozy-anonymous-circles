@@ -1,11 +1,12 @@
+
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { Users, MessageCircle, Rss, Heart, TrendingUp, Clock } from 'lucide-react';
-import { useUser } from '../contexts/UserContext';
+import { useAuth } from '../contexts/AuthContext';
 import AnonymousJourneyModal from '../components/AnonymousJourneyModal';
 
 const Dashboard = () => {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [showAnonymousModal, setShowAnonymousModal] = useState(false);
 
   useEffect(() => {
@@ -32,32 +33,36 @@ const Dashboard = () => {
     {
       title: 'Interest Groups',
       description: 'Join groups based on your hobbies and passions',
-      status: 'Coming Soon',
+      status: 'Available',
       link: '/groups'
     },
     {
       title: 'Personal Feed',
       description: 'See updates from your groups and connections',
-      status: 'Coming Soon',
+      status: 'Available',
       link: '/feed'
     },
     {
       title: 'Direct Messages',
       description: 'Have private conversations with connections',
-      status: 'Coming Soon',
+      status: 'Available',
       link: '/messages'
     }
   ];
 
+  // Get username from user metadata or email
+  const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
+  const joinDate = user?.created_at ? new Date(user.created_at).toLocaleDateString() : 'Today';
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50">
+    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 pt-16">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Welcome Section */}
         <div className="bg-white rounded-3xl shadow-sm p-8 mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h1 className="text-3xl font-bold text-gray-800 mb-2">
-                Welcome back, {user?.username}!
+                Welcome back, {username}!
               </h1>
               <p className="text-gray-600">
                 Ready to make some authentic connections today?
@@ -65,7 +70,7 @@ const Dashboard = () => {
             </div>
             <div className="hidden sm:flex items-center space-x-2 text-sm text-gray-500">
               <Clock size={16} />
-              <span>Joined {user?.joinDate ? new Date(user.joinDate).toLocaleDateString() : 'Today'}</span>
+              <span>Joined {joinDate}</span>
             </div>
           </div>
 
@@ -119,7 +124,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Upcoming Features */}
+        {/* Platform Features */}
         <div className="bg-white rounded-3xl shadow-sm p-8">
           <div className="flex items-center space-x-2 mb-6">
             <TrendingUp className="text-amber-600" size={24} />
