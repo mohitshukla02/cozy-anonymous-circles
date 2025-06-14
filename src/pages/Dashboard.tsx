@@ -53,13 +53,13 @@ const Dashboard = () => {
     image: "/lovable-uploads/a4d455b6-8ac7-4a26-b964-a285922f9f53.png"
   }, {
     id: 4,
-    name: "Coffee & Conversations",
+    name: "Chai & Conversations",
     description: "Weekly meetups at local cafes",
     members: 203,
     category: "Lifestyle",
     isLocal: true,
     trending: false,
-    image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
+    image: "/lovable-uploads/f1943dbb-6789-48c9-bb11-8214c2c246b7.png"
   }];
   const username = user?.user_metadata?.username || user?.email?.split('@')[0] || 'User';
   const hasSelectedInterests = profile?.selected_tags && profile.selected_tags.length > 0;
