@@ -25,7 +25,7 @@ const TagSelector = ({ tag, isSelected, onToggle }: TagSelectorProps) => {
         border-2 hover:scale-105 shadow-sm hover:shadow-md
         ${isSelected 
           ? 'bg-amber-100 border-amber-300 text-amber-800' 
-          : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+          : 'bg-gray-100 border-gray-200 text-gray-700 hover:bg-gray-200'
         }
       `}
     >
