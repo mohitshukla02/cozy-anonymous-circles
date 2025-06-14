@@ -33,7 +33,7 @@ const Dashboard = () => {
       category: "Creative Arts",
       isLocal: true,
       trending: true,
-      image: "📸"
+      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop"
     },
     {
       id: 2,
@@ -43,7 +43,7 @@ const Dashboard = () => {
       category: "Sports & Outdoors",
       isLocal: true,
       trending: false,
-      image: "🥾"
+      image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?w=400&h=300&fit=crop"
     },
     {
       id: 3,
@@ -53,7 +53,7 @@ const Dashboard = () => {
       category: "Intellectual",
       isLocal: false,
       trending: true,
-      image: "📚"
+      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop"
     },
     {
       id: 4,
@@ -63,7 +63,7 @@ const Dashboard = () => {
       category: "Lifestyle",
       isLocal: true,
       trending: false,
-      image: "☕"
+      image: "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=400&h=300&fit=crop"
     }
   ];
 
@@ -72,28 +72,28 @@ const Dashboard = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Header */}
         <div className="mb-12">
-          <h1 className="text-4xl font-semibold text-gray-900 mb-2">
+          <h1 className="text-3xl font-medium text-gray-900 mb-2">
             Welcome back, {username}
           </h1>
-          <p className="text-lg text-gray-600">
+          <p className="text-gray-600">
             Discover groups and connect with people who share your interests
           </p>
         </div>
 
         {/* Onboarding Banner */}
         {!hasSelectedInterests && (
-          <div className="bg-black text-white rounded-2xl p-8 mb-12">
+          <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-12">
             <div className="max-w-2xl">
-              <h2 className="text-2xl font-semibold mb-3">Complete your profile</h2>
-              <p className="text-gray-300 mb-6 text-lg">
+              <h2 className="text-xl font-medium mb-2">Complete your profile</h2>
+              <p className="text-gray-600 mb-4">
                 Tell us about your interests to get personalized group recommendations
               </p>
               <Link
                 to="/tag-onboarding"
-                className="inline-flex items-center px-6 py-3 bg-white text-black rounded-lg font-medium hover:bg-gray-100 transition-colors"
+                className="inline-flex items-center px-4 py-2 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
                 Get started
                 <ArrowRight className="ml-2" size={16} />
@@ -109,32 +109,36 @@ const Dashboard = () => {
 
         {/* Featured Groups */}
         <div className="mb-16">
-          <div className="flex items-center justify-between mb-8">
+          <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 mb-2">Featured groups</h2>
-              <p className="text-gray-600">Popular communities in your area</p>
+              <h2 className="text-xl font-medium text-gray-900 mb-1">Featured groups</h2>
+              <p className="text-gray-600 text-sm">Popular communities in your area</p>
             </div>
             <Link
               to="/groups"
-              className="text-gray-900 font-medium hover:underline flex items-center"
+              className="text-gray-900 font-medium hover:underline flex items-center text-sm"
             >
               Show all
               <ArrowRight className="ml-1" size={16} />
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {featuredGroups.map((group) => (
               <div
                 key={group.id}
                 className="group cursor-pointer"
               >
-                <div className="aspect-square bg-gray-100 rounded-xl mb-3 flex items-center justify-center text-4xl hover:bg-gray-200 transition-colors">
-                  {group.image}
+                <div className="aspect-[4/3] bg-gray-100 rounded-xl mb-3 overflow-hidden">
+                  <img 
+                    src={group.image} 
+                    alt={group.name}
+                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
+                  />
                 </div>
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-medium text-gray-900 group-hover:underline">
+                    <h3 className="font-medium text-gray-900 group-hover:underline text-sm">
                       {group.name}
                     </h3>
                     {group.trending && (
@@ -143,11 +147,11 @@ const Dashboard = () => {
                       </span>
                     )}
                     {group.isLocal && (
-                      <MapPin className="text-gray-400" size={14} />
+                      <MapPin className="text-gray-400" size={12} />
                     )}
                   </div>
-                  <p className="text-gray-600 text-sm">{group.description}</p>
-                  <div className="flex items-center justify-between text-sm">
+                  <p className="text-gray-600 text-xs">{group.description}</p>
+                  <div className="flex items-center justify-between text-xs">
                     <span className="text-gray-500">{group.members} members</span>
                     <span className="text-gray-500">{group.category}</span>
                   </div>
@@ -159,28 +163,28 @@ const Dashboard = () => {
 
         {/* Getting Started */}
         <div className="border-t border-gray-200 pt-16">
-          <h2 className="text-2xl font-semibold text-gray-900 mb-8">Tips for authentic connections</h2>
+          <h2 className="text-xl font-medium text-gray-900 mb-8">Tips for authentic connections</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Heart className="text-gray-600" size={14} />
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                  <Heart className="text-red-500" size={16} fill="currentColor" />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 mb-1">Be genuine</h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     Share your real thoughts and experiences. Authenticity creates lasting connections.
                   </p>
                 </div>
               </div>
               
               <div className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MessageCircle className="text-gray-600" size={14} />
+                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="text-blue-500" size={16} />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 mb-1">Engage actively</h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     Comment, like, and participate in discussions. Engagement unlocks direct messaging.
                   </p>
                 </div>
@@ -189,24 +193,24 @@ const Dashboard = () => {
 
             <div className="space-y-6">
               <div className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <MapPin className="text-gray-600" size={14} />
+                <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="text-yellow-500" size={16} />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 mb-1">Join local groups</h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     Find people in your city for real-world meetups and activities.
                   </p>
                 </div>
               </div>
               
               <div className="flex gap-4">
-                <div className="w-6 h-6 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Clock className="text-gray-600" size={14} />
+                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
+                  <Clock className="text-green-500" size={16} />
                 </div>
                 <div>
                   <h3 className="font-medium text-gray-900 mb-1">Stay consistent</h3>
-                  <p className="text-gray-600">
+                  <p className="text-gray-600 text-sm">
                     Regular participation keeps communities active and relationships growing.
                   </p>
                 </div>
