@@ -33,7 +33,7 @@ const Dashboard = () => {
       category: "Creative Arts",
       isLocal: true,
       trending: true,
-      image: "https://images.unsplash.com/photo-1649972904349-6e44c42644a7?w=400&h=300&fit=crop"
+      image: "https://images.unsplash.com/photo-1606983340126-99ab4feaa64a?w=400&h=300&fit=crop"
     },
     {
       id: 2,
@@ -53,7 +53,7 @@ const Dashboard = () => {
       category: "Intellectual",
       isLocal: false,
       trending: true,
-      image: "https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=400&h=300&fit=crop"
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=300&fit=crop"
     },
     {
       id: 4,
@@ -71,7 +71,7 @@ const Dashboard = () => {
   const hasSelectedInterests = profile?.selected_tags && profile.selected_tags.length > 0;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-white pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Header */}
         <div className="mb-12">
@@ -166,11 +166,11 @@ const Dashboard = () => {
           <h2 className="text-xl font-medium text-gray-900 mb-8">Tips for authentic connections</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
-                  <Heart className="text-red-500" size={16} fill="currentColor" />
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-red-50 flex items-center justify-center flex-shrink-0">
+                  <Heart className="text-red-500" size={20} fill="currentColor" />
                 </div>
-                <div>
+                <div className="flex-1 min-h-[80px] flex flex-col justify-center">
                   <h3 className="font-medium text-gray-900 mb-1">Be genuine</h3>
                   <p className="text-gray-600 text-sm">
                     Share your real thoughts and experiences. Authenticity creates lasting connections.
@@ -178,11 +178,11 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                  <MessageCircle className="text-blue-500" size={16} />
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="text-blue-500" size={20} />
                 </div>
-                <div>
+                <div className="flex-1 min-h-[80px] flex flex-col justify-center">
                   <h3 className="font-medium text-gray-900 mb-1">Engage actively</h3>
                   <p className="text-gray-600 text-sm">
                     Comment, like, and participate in discussions. Engagement unlocks direct messaging.
@@ -192,11 +192,11 @@ const Dashboard = () => {
             </div>
 
             <div className="space-y-6">
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="text-yellow-500" size={16} />
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-yellow-50 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="text-yellow-500" size={20} />
                 </div>
-                <div>
+                <div className="flex-1 min-h-[80px] flex flex-col justify-center">
                   <h3 className="font-medium text-gray-900 mb-1">Join local groups</h3>
                   <p className="text-gray-600 text-sm">
                     Find people in your city for real-world meetups and activities.
@@ -204,11 +204,11 @@ const Dashboard = () => {
                 </div>
               </div>
               
-              <div className="flex gap-4">
-                <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center flex-shrink-0">
-                  <Clock className="text-green-500" size={16} />
+              <div className="flex gap-4 items-start">
+                <div className="w-10 h-10 rounded-full bg-green-50 flex items-center justify-center flex-shrink-0">
+                  <Clock className="text-green-500" size={20} />
                 </div>
-                <div>
+                <div className="flex-1 min-h-[80px] flex flex-col justify-center">
                   <h3 className="font-medium text-gray-900 mb-1">Stay consistent</h3>
                   <p className="text-gray-600 text-sm">
                     Regular participation keeps communities active and relationships growing.

@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -23,6 +22,14 @@ const MeetupMap = () => {
   const [selectedMeetup, setSelectedMeetup] = useState<Meetup | null>(null);
   const { profile } = useUserProfile();
   const { user } = useUser();
+
+  // Check for stored token on component mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem('mapboxToken');
+    if (storedToken) {
+      setMapboxToken(storedToken);
+    }
+  }, []);
 
   // Generate meetups based on user's location or default to NYC
   const getUserLocation = () => {
@@ -158,6 +165,8 @@ const MeetupMap = () => {
     const token = formData.get('token') as string;
     if (token) {
       setMapboxToken(token);
+      // Store token in localStorage for persistence
+      localStorage.setItem('mapboxToken', token);
     }
   };
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-react';
+import { LogOut, User, Home, Users, Rss, Bell, MessageCircle, Globe } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
@@ -120,69 +120,70 @@ const Header = () => {
     </div>
   );
 
-
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-white/90 backdrop-blur-md border-b border-gray-200">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex justify-between items-center h-14">
-          <div className="flex items-center space-x-6">
-            <Link to="/dashboard" className="flex items-center space-x-2 text-gray-800 hover:text-amber-600 transition-colors">
-              <div className="w-6 h-6 bg-amber-500 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-xs">C</span>
+        <div className="flex justify-between items-center h-20">
+          <div className="flex items-center space-x-8">
+            <Link to="/dashboard" className="flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-colors">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                <Globe className="text-white" size={18} />
               </div>
-              <span className="font-semibold text-base">Circles</span>
+              <span className="font-bold text-xl">Circles</span>
             </Link>
             
-            <nav className="hidden md:flex space-x-1">
-              <Link 
-                to="/dashboard" 
-                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-                  isActive('/dashboard') 
-                    ? 'bg-amber-50 text-amber-700' 
-                    : 'text-gray-600 hover:text-amber-700 hover:bg-amber-50/50'
-                }`}
-              >
-                <Home size={16} />
-                <span>Home</span>
-              </Link>
-              
-              <Link 
-                to="/groups" 
-                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-                  isActive('/groups') 
-                    ? 'bg-amber-50 text-amber-700' 
-                    : 'text-gray-600 hover:text-amber-700 hover:bg-amber-50/50'
-                }`}
-              >
-                <Users size={16} />
-                <span>Groups</span>
-              </Link>
-              
-              <Link 
-                to="/feed" 
-                className={`flex items-center space-x-1 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-                  isActive('/feed') 
-                    ? 'bg-amber-50 text-amber-700' 
-                    : 'text-gray-600 hover:text-amber-700 hover:bg-amber-50/50'
-                }`}
-              >
-                <Rss size={16} />
-                <span>Feed</span>
-              </Link>
+            <nav className="hidden md:flex">
+              <div className="bg-gray-100 rounded-full p-1 flex space-x-1">
+                <Link 
+                  to="/dashboard" 
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${
+                    isActive('/dashboard') 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Home size={16} />
+                  <span>Home</span>
+                </Link>
+                
+                <Link 
+                  to="/groups" 
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${
+                    isActive('/groups') 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Users size={16} />
+                  <span>Groups</span>
+                </Link>
+                
+                <Link 
+                  to="/feed" 
+                  className={`flex items-center space-x-2 px-4 py-2 rounded-full transition-all text-sm font-medium ${
+                    isActive('/feed') 
+                      ? 'bg-white text-gray-900 shadow-sm' 
+                      : 'text-gray-600 hover:text-gray-900'
+                  }`}
+                >
+                  <Rss size={16} />
+                  <span>Feed</span>
+                </Link>
+              </div>
             </nav>
           </div>
 
-          <div className="hidden md:flex items-center space-x-2">
+          <div className="hidden md:flex items-center space-x-3">
             {/* Notifications */}
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
                 <button
-                  className="relative p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors"
+                  className="relative p-3 rounded-full text-gray-500 hover:text-gray-700 hover:bg-gray-100 transition-colors"
                   title="Notifications"
                 >
                   <Bell size={18} />
                   {hasNewNotifications && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full"></span>
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
                 </button>
               </HoverCardTrigger>
@@ -196,16 +197,16 @@ const Header = () => {
               <HoverCardTrigger asChild>
                 <Link
                   to="/messages"
-                  className={`relative p-2 rounded-lg transition-colors ${
+                  className={`relative p-3 rounded-full transition-colors ${
                     isActive('/messages')
-                      ? 'text-amber-700 bg-amber-50'
-                      : 'text-gray-500 hover:text-amber-700 hover:bg-amber-50/50'
+                      ? 'text-gray-700 bg-gray-100'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-100'
                   }`}
                   title="Messages"
                 >
                   <MessageCircle size={18} />
                   {hasNewMessages && (
-                    <span className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full"></span>
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>
                   )}
                 </Link>
               </HoverCardTrigger>
@@ -217,8 +218,13 @@ const Header = () => {
             {/* User Profile */}
             <HoverCard openDelay={200} closeDelay={100}>
               <HoverCardTrigger asChild>
-                <button className="p-2 rounded-lg text-gray-500 hover:text-amber-700 hover:bg-amber-50/50 transition-colors">
-                  <User size={18} />
+                <button className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={user.user_metadata?.avatar_url} />
+                    <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
+                      {username.charAt(0).toUpperCase()}
+                    </AvatarFallback>
+                  </Avatar>
                 </button>
               </HoverCardTrigger>
               <HoverCardContent className="w-64 p-0 bg-white/95 backdrop-blur-md border border-gray-200">
@@ -229,24 +235,24 @@ const Header = () => {
         </div>
 
         {/* Mobile Navigation */}
-        <div className="md:hidden border-t border-gray-200 py-2">
+        <div className="md:hidden border-t border-gray-200 py-3">
           <nav className="flex justify-around items-center">
-            <Link to="/dashboard" className={`p-2 rounded-lg transition-colors ${isActive('/dashboard') ? 'text-amber-700' : 'text-gray-500'}`}>
+            <Link to="/dashboard" className={`p-3 rounded-full transition-colors ${isActive('/dashboard') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
               <Home size={20} />
             </Link>
-            <Link to="/groups" className={`p-2 rounded-lg transition-colors ${isActive('/groups') ? 'text-amber-700' : 'text-gray-500'}`}>
+            <Link to="/groups" className={`p-3 rounded-full transition-colors ${isActive('/groups') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
               <Users size={20} />
             </Link>
-            <Link to="/feed" className={`p-2 rounded-lg transition-colors ${isActive('/feed') ? 'text-amber-700' : 'text-gray-500'}`}>
+            <Link to="/feed" className={`p-3 rounded-full transition-colors ${isActive('/feed') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
               <Rss size={20} />
             </Link>
             
             <Popover>
               <PopoverTrigger asChild>
-                <button className="p-2 rounded-lg text-gray-500 relative">
+                <button className="p-3 rounded-full text-gray-500 relative">
                   <Bell size={20} />
                   {hasNewNotifications && (
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    <span className="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
                   )}
                 </button>
               </PopoverTrigger>
@@ -255,19 +261,19 @@ const Header = () => {
               </PopoverContent>
             </Popover>
 
-            <Link to="/messages" className={`p-2 rounded-lg transition-colors relative ${isActive('/messages') ? 'text-amber-700' : 'text-gray-500'}`}>
+            <Link to="/messages" className={`p-3 rounded-full transition-colors relative ${isActive('/messages') ? 'text-gray-900 bg-gray-100' : 'text-gray-500'}`}>
               <MessageCircle size={20} />
               {hasNewMessages && (
-                <span className="absolute top-1 right-1 w-2 h-2 bg-blue-500 rounded-full"></span>
+                <span className="absolute top-2 right-2 w-2 h-2 bg-blue-500 rounded-full"></span>
               )}
             </Link>
 
             <Popover>
               <PopoverTrigger asChild>
                  <button className="p-1 rounded-full">
-                    <Avatar className="h-7 w-7">
+                    <Avatar className="h-8 w-8">
                       <AvatarImage src={user.user_metadata?.avatar_url} />
-                      <AvatarFallback className="bg-amber-100 text-amber-700 text-xs">
+                      <AvatarFallback className="bg-gray-200 text-gray-700 text-sm">
                         {username.charAt(0).toUpperCase()}
                       </AvatarFallback>
                     </Avatar>
