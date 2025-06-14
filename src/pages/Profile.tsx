@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -29,7 +30,7 @@ const Profile = () => {
   };
 
   const handleEditTags = () => {
-    navigate('/tag-onboarding');
+    navigate('/tag-onboarding', { state: { from: 'profile' } });
   };
 
   const getTagName = (tagId: string) => {
