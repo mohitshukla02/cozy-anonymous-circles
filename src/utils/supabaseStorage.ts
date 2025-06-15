@@ -58,23 +58,49 @@ export const getGroupById = async (groupId: string): Promise<Group | null> => {
   };
 };
 
+// Improved sanitizeInput
+function sanitizeInput(content: string): string {
+  // Remove HTML tags, script tags, and potentially dangerous content
+  let clean = content
+    // Remove script tags and content between them
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    // Remove all other HTML tags
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    // Remove inline JS events
+    .replace(/on\w+=".*?"/gi, "")
+    // Remove non-printable characters
+    .replace(/[^\x20-\x7E\r\n]+/g, "");
+  clean = clean.substring(0, 500);
+  return clean.trim();
+}
+
 export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'memberIds' | 'isArchived'>): Promise<Group> => {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) throw new Error('User not authenticated');
 
+  // Sanitize text fields
+  const name = sanitizeInput(group.name);
+  const description = sanitizeInput(group.description);
+  // (tags allowed as-is since they're picked, not free-form user text)
+  const locationCity = group.locationCity ? sanitizeInput(group.locationCity) : undefined;
+  const locationRegion = group.locationRegion ? sanitizeInput(group.locationRegion) : undefined;
+
+  if (!name) throw new Error('Group name cannot be empty.');
+  if (!description) throw new Error('Group description cannot be empty.');
+
   const { data, error } = await supabase
     .from('groups')
     .insert([{
-      name: group.name,
-      description: group.description,
+      name,
+      description,
       tags: group.tags,
       member_ids: [user.id],
       member_limit: group.memberLimit,
       privacy: group.privacy,
       admin_id: user.id,
       type: group.type,
-      location_city: group.locationCity,
-      location_region: group.locationRegion,
+      location_city: locationCity,
+      location_region: locationRegion,
       status: 'active'
     }])
     .select()
@@ -185,15 +211,9 @@ export const getPostsByGroup = async (groupId: string): Promise<Post[]> => {
   return postsWithCommentCount;
 };
 
-function sanitizeInput(content: string): string {
-  // Basic sanitize: remove script tags and limit to 500 chars
-  let clean = content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
-  clean = clean.replace(/on\w+=".*?"/gi, ""); // remove inline JS
-  return clean.substring(0, 500);
-}
-
 export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'commentCount'>): Promise<Post> => {
   const sanitizedContent = sanitizeInput(post.content);
+  if (!sanitizedContent) throw new Error('Post content cannot be empty.');
 
   const { data, error } = await supabase
     .from('posts')
@@ -242,6 +262,7 @@ export const getCommentsByPost = async (postId: string): Promise<Comment[]> => {
 
 export const createComment = async (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>): Promise<Comment> => {
   const sanitizedContent = sanitizeInput(comment.content);
+  if (!sanitizedContent) throw new Error('Comment content cannot be empty.');
 
   const { data, error } = await supabase
     .from('comments')
