@@ -94,64 +94,76 @@ const Landing = () => {
           </div>
 
           {/* Features You'll Love */}
-          <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
-              <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Calendar className="text-red-600" size={32} />
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Calendar className="text-red-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 28‑Day Meetup Cycle
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-sm">
                 Keeps the energy alive—no abandoned chat threads.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
-              <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Users className="text-blue-600" size={32} />
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-blue-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Users className="text-blue-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Anonymous by Default
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-sm">
                 Share your interests first. Reveal yourself later.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
-              <div className="w-16 h-16 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <MapPin className="text-green-600" size={32} />
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-green-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <MapPin className="text-green-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Built‑In Planning Tools
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-sm">
                 Pick dates, venues, RSVP—all in a few taps.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
-              <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Heart className="text-purple-600" size={32} />
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Heart className="text-purple-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Streak Badges & Celebrations
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-sm">
                 Celebrate every successful meetup with your crew.
               </p>
             </div>
 
-            <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
-              <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
-                <Shield className="text-orange-600" size={32} />
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-orange-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <Shield className="text-orange-600" size={24} />
               </div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
                 Safety First
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-gray-600 leading-relaxed text-sm">
                 Meet in public spots; guidelines to keep things comfortable.
+              </p>
+            </div>
+
+            <div className="bg-white rounded-2xl p-6 text-center shadow-sm border border-gray-200">
+              <div className="w-12 h-12 bg-indigo-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                <MessageCircle className="text-indigo-600" size={24} />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-3">
+                Private Messaging
+              </h3>
+              <p className="text-gray-600 leading-relaxed text-sm">
+                Unlock direct messaging by engaging with group members.
               </p>
             </div>
           </div>
