@@ -28,7 +28,7 @@ const Landing = () => {
                 to="/auth"
                 className="bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
               >
-                Join Before It's Gone
+                Join a Group Near You
               </Link>
             </div>
           </div>
@@ -39,13 +39,12 @@ const Landing = () => {
       <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
         <div className="max-w-6xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6 leading-tight">
-            Meet in real life<br />
-            <span className="text-gray-600">or your group dies</span>
+            Real Connections.<br />
+            <span className="text-gray-600">Real Places.</span>
           </h1>
           
           <p className="text-xl text-gray-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            Every group has 4 weeks to organize a real-world meetup. No meetup? The group vanishes forever. 
-            This isn't another app for endless scrolling—it's a platform that forces online connections to become real friendships.
+            Join small, interest‑driven groups that live and breathe offline. Organize a meetup in 28 days—or the group quietly vanishes. No scrolling, no likes—just face‑to‑face friendship.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-16">
@@ -53,14 +52,14 @@ const Landing = () => {
               to="/auth"
               className="bg-gray-900 text-white px-8 py-4 rounded-xl font-medium hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
             >
-              <span>Join Before Groups Disappear</span>
+              <span>Join a Group Near You</span>
               <ArrowRight size={20} />
             </Link>
             <Link
               to="/auth"
               className="bg-white text-gray-700 px-8 py-4 rounded-xl font-medium hover:bg-gray-50 transition-all border border-gray-200 hover:border-gray-300 flex items-center justify-center space-x-2"
             >
-              <span>See What's Ending Soon</span>
+              <span>Start Your Own Meetup</span>
             </Link>
           </div>
 
@@ -68,43 +67,43 @@ const Landing = () => {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto">
             <div className="text-center">
               <div className="text-3xl font-semibold text-gray-900 mb-2">28 Days</div>
-              <div className="text-gray-600">To Meet or Disappear</div>
+              <div className="text-gray-600">To Meet or Fade Away</div>
             </div>
             <div className="text-center">
               <div className="text-3xl font-semibold text-gray-900 mb-2">Real Friends</div>
-              <div className="text-gray-600">Not Fake Followers</div>
+              <div className="text-gray-600">Not Digital Noise</div>
             </div>
             <div className="text-center">
-              <div className="text-3xl font-semibold text-gray-900 mb-2">No Lurking</div>
-              <div className="text-gray-600">Show Up or Get Out</div>
+              <div className="text-3xl font-semibold text-gray-900 mb-2">Face-to-Face</div>
+              <div className="text-gray-600">Where Friendship Lives</div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Features Section */}
+      {/* Why This Matters Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-              This isn't social media
+              From Digital Chatter to Genuine Bonds
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              We've built the anti-app. No infinite feeds, no fake likes, no digital zombies. 
-              Either you meet in person, or you don't belong here.
+              Social media gave us noise. We give you real moments. Here, every conversation leads somewhere tangible—a coffee, a hike, a shared bookshelf. Because friendship isn't something you like. It's something you live.
             </p>
           </div>
 
+          {/* Features You'll Love */}
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-white rounded-2xl p-8 text-center shadow-sm border border-gray-200">
               <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center mx-auto mb-6">
                 <Calendar className="text-red-600" size={32} />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                The Countdown Is Real
+                28‑Day Meetup Cycle
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Every group gets exactly 28 days to organize a meetup. Miss the deadline and the group—along with all its conversations—disappears forever. No extensions, no excuses.
+                Keeps the energy alive—no abandoned chat threads.
               </p>
             </div>
 
@@ -113,10 +112,10 @@ const Landing = () => {
                 <Users className="text-blue-600" size={32} />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Anonymous Until You're Ready
+                Anonymous by Default
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Start with complete privacy—no photos, no real names. Connect through genuine interests and conversations. Reveal yourself only when trust is earned.
+                Share your interests first. Reveal yourself later.
               </p>
             </div>
 
@@ -125,10 +124,10 @@ const Landing = () => {
                 <MapPin className="text-green-600" size={32} />
               </div>
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                Real Places, Real People
+                Built‑In Planning Tools
               </h3>
               <p className="text-gray-600 leading-relaxed">
-                Coffee shops, hiking trails, bookstores, parks—every connection leads to a real place where real people meet. Digital relationships that refuse to stay digital.
+                Pick dates, venues, RSVP—all in a few taps.
               </p>
             </div>
           </div>
@@ -140,12 +139,8 @@ const Landing = () => {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-              How the clock works
+              Three Steps to Your Next Friend
             </h2>
-            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Simple rules that force authentic connection. No hacks, no workarounds, no fake engagement. 
-              Meet in person or watch your community disappear.
-            </p>
           </div>
           
           <div className="grid md:grid-cols-2 gap-12">
@@ -155,9 +150,9 @@ const Landing = () => {
                   <span className="text-white font-semibold">1</span>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Find Your People, Fast</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Find Your Tribe</h4>
                   <p className="text-gray-600">
-                    Join interest-based groups with a ticking clock. Photography, hiking, cooking, books—every group has one goal: meet in real life before time runs out.
+                    Explore local groups around your passions—photography, cooking, board games, you name it.
                   </p>
                 </div>
               </div>
@@ -167,104 +162,68 @@ const Landing = () => {
                   <span className="text-white font-semibold">2</span>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Plan or Perish</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Plan Together</h4>
                   <p className="text-gray-600">
-                    No endless chatter. Every conversation should lead to planning a meetup. Suggest a coffee walk, organize a hiking trip, plan a book club—but plan something real.
+                    Chat anonymously, then schedule a public meetup with ease.
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-gray-900 rounded-full flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
                   <span className="text-white font-semibold">3</span>
                 </div>
                 <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Show Up or Disappear</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Meet IRL or Move On</h4>
                   <p className="text-gray-600">
-                    The meetup happens or the group dies. No rescheduling forever, no "maybe next time." Either you care enough to show up, or you don't deserve the connection.
+                    When three people check in at your meetup, the clock resets. Skip it, and the group fades away.
                   </p>
                 </div>
               </div>
             </div>
 
             <div className="space-y-8">
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold">4</span>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Tick, Tick, Tick...</h4>
-                  <p className="text-gray-600">
-                    Watch the countdown. 28 days, 20 days, 10 days, 3 days... The pressure builds. This isn't comfortable, and it's not supposed to be. Real friendship requires real effort.
-                  </p>
-                </div>
+              <div className="bg-white rounded-2xl p-8 border border-gray-200">
+                <Heart className="text-gray-700 mb-4" size={24} />
+                <h4 className="font-semibold text-gray-900 mb-2">Streak Badges & Celebrations</h4>
+                <p className="text-sm text-gray-600">Celebrate every successful meetup with your crew.</p>
               </div>
 
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold">5</span>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">The Meetup Moment</h4>
-                  <p className="text-gray-600">
-                    Coffee in hand, face to face, no screens between you. This is where digital strangers become real friends. The group survives, resets the clock, and earns another 28 days.
-                  </p>
-                </div>
-              </div>
-
-              <div className="flex items-start space-x-4">
-                <div className="w-10 h-10 bg-red-600 rounded-full flex items-center justify-center flex-shrink-0">
-                  <span className="text-white font-semibold">6</span>
-                </div>
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 mb-2">Build Something That Lasts</h4>
-                  <p className="text-gray-600">
-                    Groups that meet regularly don't just survive—they thrive. Real friendships, regular meetups, genuine community. This is what social connection was supposed to be.
-                  </p>
-                </div>
+              <div className="bg-white rounded-2xl p-8 border border-gray-200">
+                <Shield className="text-gray-700 mb-4" size={24} />
+                <h4 className="font-semibold text-gray-900 mb-2">Safety First</h4>
+                <p className="text-sm text-gray-600">Meet in public spots; guidelines to keep things comfortable.</p>
               </div>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Benefits Section */}
+      {/* The Promise Section */}
       <section className="py-20 bg-gray-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
             <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-              Why this works when everything else fails
+              More Than an App—it's a Movement
             </h2>
             <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-              Traditional social media keeps you scrolling forever. We give you 28 days to make a real friend. 
-              The time pressure changes everything.
+              We're done watching good conversations die online. Here, your time turns into memories. Your group isn't just another forum—it's a living community that thrives on real‑world connection.
             </p>
           </div>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <Calendar className="text-gray-700 mb-4" size={24} />
-              <h4 className="font-semibold text-gray-900 mb-2">Urgency Creates Action</h4>
-              <p className="text-sm text-gray-600">Dead groups disappear. Surviving groups prove their worth. No ghost towns, no abandoned communities.</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <Heart className="text-gray-700 mb-4" size={24} />
-              <h4 className="font-semibold text-gray-900 mb-2">Quality Over Noise</h4>
-              <p className="text-sm text-gray-600">Every member has skin in the game. No lurkers, no time-wasters, no people who never show up.</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <Shield className="text-gray-700 mb-4" size={24} />
-              <h4 className="font-semibold text-gray-900 mb-2">Safe, Then Real</h4>
-              <p className="text-sm text-gray-600">Start completely anonymous. Build trust through genuine interaction. Reveal yourself when you choose.</p>
-            </div>
-
-            <div className="bg-white rounded-xl p-6 border border-gray-200">
-              <Zap className="text-gray-700 mb-4" size={24} />
-              <h4 className="font-semibold text-gray-900 mb-2">No Infinite Scroll</h4>
-              <p className="text-sm text-gray-600">Purposeful interactions only. Every conversation should lead somewhere real, not nowhere digital.</p>
-            </div>
+          <div className="text-center">
+            <h3 className="text-2xl font-semibold text-gray-900 mb-4">
+              Clock's Ticking—But You're in Control
+            </h3>
+            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
+              You have four weeks to make it count. That's plenty of time to turn "hello" into "see you Saturday." And once you do, you're not starting over—you're one meetup stronger.
+            </p>
+            <Link
+              to="/auth"
+              className="bg-white text-gray-700 px-8 py-4 rounded-xl font-medium hover:bg-gray-50 transition-all border border-gray-200 hover:border-gray-300 inline-flex items-center space-x-2"
+            >
+              <span>See Groups Ending Soon</span>
+            </Link>
           </div>
         </div>
       </section>
@@ -274,25 +233,18 @@ const Landing = () => {
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-3xl p-12 border border-gray-200">
             <h3 className="text-3xl font-semibold text-gray-900 mb-4">
-              The clock is already ticking
+              Stop Collecting Followers. Start Making Friends.
             </h3>
             <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
-              Right now, groups are forming, planning meetups, and racing against time. 
-              Some will make it. Others will disappear forever. Don't miss your chance to find your people.
+              Join a community that demands you show up—in person, heart first. Your next best friend awaits.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Link
                 to="/auth"
                 className="bg-gray-900 text-white px-8 py-4 rounded-xl font-medium hover:bg-gray-800 transition-all shadow-lg hover:shadow-xl flex items-center justify-center space-x-2"
               >
-                <span>Join Before It's Too Late</span>
+                <span>Find Your People Today</span>
                 <ArrowRight size={20} />
-              </Link>
-              <Link
-                to="/auth"
-                className="bg-white text-gray-700 px-8 py-4 rounded-xl font-medium hover:bg-gray-50 transition-all border border-gray-200 hover:border-gray-300 flex items-center justify-center"
-              >
-                See Groups Ending Soon
               </Link>
             </div>
           </div>
