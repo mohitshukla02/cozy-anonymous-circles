@@ -25,8 +25,11 @@ const Header = () => {
   return (
     <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b dark:border-neutral-800 py-4">
       <div className="container mx-auto px-4 flex items-center justify-between">
-        <Link to="/" className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
-          ConnectSphere
+        <Link to="/" className="flex items-center space-x-3">
+          <div className="w-8 h-8 flex items-center justify-center">
+            <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Convene Logo" className="w-8 h-8" />
+          </div>
+          <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">Convene</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-8">
           <Link to="/groups" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
