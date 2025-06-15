@@ -69,7 +69,7 @@ const InviteUserModal = ({ trigger, remainingInvites, onInviteSent }: InviteUser
       <DialogTrigger asChild>
         {trigger || defaultTrigger}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md rounded-xl">
         <DialogHeader>
           <DialogTitle className="flex items-center space-x-2">
             <UserPlus className="w-5 h-5" />
@@ -114,7 +114,7 @@ const InviteUserModal = ({ trigger, remainingInvites, onInviteSent }: InviteUser
                 />
               </div>
 
-              <div className="p-4 bg-blue-50 rounded-lg border border-blue-200">
+              <div className="p-4 bg-blue-50 rounded-xl border border-blue-200">
                 <h4 className="font-medium text-blue-800 mb-2">What happens next?</h4>
                 <ul className="text-sm text-blue-700 space-y-1">
                   <li>• Your friend receives an email with a signup link</li>

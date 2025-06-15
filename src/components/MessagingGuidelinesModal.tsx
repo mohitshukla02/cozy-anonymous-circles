@@ -33,7 +33,7 @@ const MessagingGuidelinesModal = ({ open, onClose }: MessagingGuidelinesModalPro
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-lg mx-4 rounded-3xl bg-gradient-to-br from-blue-600 to-blue-700 text-white border-0 p-0 overflow-hidden">
+      <DialogContent className="max-w-lg mx-4 rounded-xl bg-gradient-to-br from-blue-600 to-blue-700 text-white border-0 p-0 overflow-hidden">
         <div className="p-8">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-white mb-2">
@@ -77,7 +77,7 @@ const MessagingGuidelinesModal = ({ open, onClose }: MessagingGuidelinesModalPro
 
           <Button
             onClick={onClose}
-            className="w-full bg-white text-blue-600 hover:bg-blue-50 transition-colors font-semibold py-3 px-6 rounded-2xl"
+            className="w-full bg-white text-blue-600 hover:bg-blue-50 transition-colors font-semibold py-3 px-6 rounded-xl"
           >
             I understand. Accept
           </Button>

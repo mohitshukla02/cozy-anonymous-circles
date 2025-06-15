@@ -11,7 +11,7 @@ interface AnonymousJourneyModalProps {
 const AnonymousJourneyModal = ({ open, onClose }: AnonymousJourneyModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onClose}>
-      <DialogContent className="max-w-md mx-4 rounded-3xl bg-gradient-to-br from-amber-600 to-orange-600 text-white border-0 p-0 overflow-hidden">
+      <DialogContent className="max-w-md mx-4 rounded-xl bg-gradient-to-br from-amber-600 to-orange-600 text-white border-0 p-0 overflow-hidden">
         <div className="p-8">
           <DialogHeader className="space-y-4">
             <DialogTitle className="text-2xl font-bold text-white">
@@ -25,7 +25,7 @@ const AnonymousJourneyModal = ({ open, onClose }: AnonymousJourneyModalProps) =>
               not your appearance or status. Be yourself, be kind, and enjoy meaningful connections.
             </p>
             
-            <div className="bg-white/20 backdrop-blur-sm rounded-2xl p-4">
+            <div className="bg-white/20 backdrop-blur-sm rounded-xl p-4">
               <h3 className="font-semibold mb-3 text-white">Community Guidelines</h3>
               <ul className="text-sm text-amber-100 space-y-2">
                 <li className="flex items-start space-x-2">
@@ -50,7 +50,7 @@ const AnonymousJourneyModal = ({ open, onClose }: AnonymousJourneyModalProps) =>
           
           <button
             onClick={onClose}
-            className="w-full mt-6 bg-white text-amber-600 hover:bg-amber-50 transition-colors font-semibold py-3 px-6 rounded-2xl"
+            className="w-full mt-6 bg-white text-amber-600 hover:bg-amber-50 transition-colors font-semibold py-3 px-6 rounded-xl"
           >
             I understand. Accept
           </button>

@@ -63,10 +63,10 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl">
         {/* Group Image */}
         {group.image && (
-          <div className="relative h-48 -m-6 mb-0 overflow-hidden rounded-t-lg">
+          <div className="relative h-48 -m-6 mb-0 overflow-hidden rounded-t-xl">
             <img 
               src={group.image} 
               alt={group.name}
@@ -116,7 +116,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
         <div className="space-y-6">
           {/* Group Stats */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
                 <Users size={16} />
               </div>
@@ -124,7 +124,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
               <div className="text-xs text-gray-500">Members</div>
             </div>
             
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
                 <Activity size={16} />
               </div>
@@ -132,7 +132,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
               <div className="text-xs text-gray-500">Health</div>
             </div>
             
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-gray-50 rounded-xl">
               <div className="flex items-center justify-center gap-1 text-gray-600 mb-1">
                 <Calendar size={16} />
               </div>
@@ -140,7 +140,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
               <div className="text-xs text-gray-500">Per Month</div>
             </div>
             
-            <div className="text-center p-3 bg-gray-50 rounded-lg">
+            <div className="text-center p-3 bg-gray-50 rounded-xl">
               <div className="text-xs text-gray-500 mb-1">Created</div>
               <div className="font-semibold text-gray-900 text-sm">
                 {new Date(group.createdDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
