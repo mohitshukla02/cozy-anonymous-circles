@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -102,20 +101,12 @@ const GroupDetail = () => {
     if (!user || !group) return;
 
     try {
-      const success = await joinGroup(user.id, group.id);
-      if (success) {
-        await loadGroupData(); // Reload to get updated member status
-        toast({
-          title: "Success",
-          description: "You've joined the group!",
-        });
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to join group. It may be at capacity.",
-          variant: "destructive",
-        });
-      }
+      await joinGroup(user.id, group.id);
+      await loadGroupData(); // Reload to get updated member status
+      toast({
+        title: "Success",
+        description: "You've joined the group!",
+      });
     } catch (error) {
       console.error('Error joining group:', error);
       toast({
