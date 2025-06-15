@@ -1,14 +1,16 @@
+
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search, MapPin, Users, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { Post, Comment, UserGroup } from '../types/groups';
-import { getUserGroups, getPostsByGroup, getCommentsByPost, likePost, likeComment } from '../utils/supabaseStorage';
+import { Post, Comment, UserGroup, Group } from '../types/groups';
+import { getUserGroups, getPostsByGroup, getCommentsByPost, likePost, likeComment, getGroupById } from '../utils/supabaseStorage';
 import { Button } from '../components/ui/button';
 import PostCard from '../components/PostCard';
 
 const Feed = () => {
   const { user } = useAuth();
   const [userGroups, setUserGroups] = useState<UserGroup[]>([]);
+  const [groups, setGroups] = useState<Group[]>([]);
   const [allPosts, setAllPosts] = useState<Post[]>([]);
   const [allComments, setAllComments] = useState<Comment[]>([]);
   const [loading, setLoading] = useState(true);
@@ -22,13 +24,27 @@ const Feed = () => {
     const loadData = async () => {
       try {
         setLoading(true);
-        const groups = await getUserGroups(user.id);
-        setUserGroups(groups);
+        const userGroupsData = await getUserGroups(user.id);
+        setUserGroups(userGroupsData);
+
+        // Fetch group details for each user group
+        const groupsData: Group[] = [];
+        for (const userGroup of userGroupsData) {
+          try {
+            const group = await getGroupById(userGroup.groupId);
+            if (group) {
+              groupsData.push(group);
+            }
+          } catch (error) {
+            console.error(`Error fetching group ${userGroup.groupId}:`, error);
+          }
+        }
+        setGroups(groupsData);
 
         const posts: Post[] = [];
         const comments: Comment[] = [];
 
-        for (const userGroup of groups) {
+        for (const userGroup of userGroupsData) {
           const groupPosts = await getPostsByGroup(userGroup.groupId);
           posts.push(...groupPosts);
 
@@ -129,17 +145,17 @@ const Feed = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 pt-20">
         <div className="max-w-6xl mx-auto px-4 py-6">
           <div className="animate-pulse space-y-8">
-            <div className="h-12 bg-gray-200 rounded-lg w-1/3"></div>
+            <div className="h-12 bg-gray-200 dark:bg-gray-700 rounded-lg w-1/3"></div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-32 bg-gray-200 rounded-lg"></div>
+                <div key={i} className="h-32 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
               ))}
             </div>
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-64 bg-gray-200 rounded-lg"></div>
+              <div key={i} className="h-64 bg-gray-200 dark:bg-gray-700 rounded-lg"></div>
             ))}
           </div>
         </div>
@@ -150,7 +166,7 @@ const Feed = () => {
   const sortedAndFilteredPosts = allPosts
     .filter(post => {
       if (!selectedLocation) return true;
-      const group = userGroups.find(ug => ug.groupId === post.groupId)?.group;
+      const group = groups.find(g => g.id === post.groupId);
       return group?.locationCity === selectedLocation;
     })
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
@@ -230,7 +246,7 @@ const Feed = () => {
           <div className="mb-6 p-4 bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 shadow-sm">
             <h3 className="font-medium text-gray-900 dark:text-gray-100 mb-3">Filter by Location</h3>
             <div className="flex flex-wrap gap-2">
-              {Array.from(new Set(userGroups.map(ug => ug.group.locationCity).filter(Boolean))).map(city => (
+              {Array.from(new Set(groups.map(g => g.locationCity).filter(Boolean))).map(city => (
                 <Button
                   key={city}
                   variant={selectedLocation === city ? "default" : "outline"}
@@ -269,7 +285,7 @@ const Feed = () => {
             </div>
           ) : (
             sortedAndFilteredPosts.map(post => {
-              const group = userGroups.find(ug => ug.groupId === post.groupId)?.group;
+              const group = groups.find(g => g.id === post.groupId);
               const postComments = allComments.filter(c => c.postId === post.id);
               
               return (
@@ -292,6 +308,7 @@ const Feed = () => {
                   <div className="p-4">
                     <PostCard
                       post={post}
+                      authorName="Anonymous"
                       comments={postComments}
                       onLike={handleLikePost}
                       onComment={handleComment}

@@ -130,19 +130,21 @@ const GroupDetail = () => {
     if (!user || !group) return;
 
     try {
-      await createPost({
+      const result = await createPost({
         groupId: group.id,
         authorId: user.id,
         content,
         editedAt: undefined
       });
 
-      loadGroupData();
-      
-      toast({
-        title: "Success",
-        description: "Post created successfully",
-      });
+      if (result) {
+        loadGroupData();
+        
+        toast({
+          title: "Success",
+          description: "Post created successfully",
+        });
+      }
     } catch (error) {
       console.error('Error creating post:', error);
       toast({
