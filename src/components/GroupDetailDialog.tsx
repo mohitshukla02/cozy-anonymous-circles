@@ -83,9 +83,14 @@ const GroupDetailDialog = ({
   const groupHealth = getGroupHealth(group);
   const meetupFrequency = getMeetupFrequency(group);
   const nextMeetupDate = getNextMeetupDate(group);
+  
+  // Check if this is a featured/mock group
+  const isFeaturedGroup = group.id.startsWith('featured-');
 
   const handleJoinClick = () => {
-    onJoin(group.id);
+    if (!isFeaturedGroup) {
+      onJoin(group.id);
+    }
     onClose();
   };
 
@@ -112,6 +117,14 @@ const GroupDetailDialog = ({
             >
               {group.type === 'local-meetup' ? 'Local' : 'Global'}
             </Badge>
+            {isFeaturedGroup && (
+              <Badge 
+                variant="outline" 
+                className="absolute top-4 left-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md bg-orange-500/90 text-white shadow-lg"
+              >
+                Demo Group
+              </Badge>
+            )}
           </div>
         )}
 
@@ -197,6 +210,11 @@ const GroupDetailDialog = ({
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">About this group</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{group.description}</p>
+            {isFeaturedGroup && (
+              <p className="text-orange-600 dark:text-orange-400 text-sm mt-2 font-medium">
+                This is a demo group to showcase the platform. You cannot join or interact with demo groups.
+              </p>
+            )}
           </div>
 
           {/* Tags */}
@@ -226,7 +244,7 @@ const GroupDetailDialog = ({
               Go Back
             </Button>
             
-            {!isJoined && (
+            {!isJoined && !isFeaturedGroup && (
               <Button 
                 onClick={handleJoinClick} 
                 disabled={group.memberIds.length >= group.memberLimit} 
@@ -236,9 +254,15 @@ const GroupDetailDialog = ({
               </Button>
             )}
             
-            {isJoined && (
+            {isJoined && !isFeaturedGroup && (
               <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
                 Already Joined
+              </Button>
+            )}
+
+            {isFeaturedGroup && (
+              <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
+                Demo Group Only
               </Button>
             )}
           </div>

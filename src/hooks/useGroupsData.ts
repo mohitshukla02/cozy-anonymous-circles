@@ -83,6 +83,15 @@ export const useGroupsData = () => {
   const handleJoinGroup = async (groupId: string) => {
     if (!user) return;
     
+    // Check if this is a featured/mock group (has non-UUID format)
+    const isFeaturedGroup = groupId.startsWith('featured-');
+    
+    if (isFeaturedGroup) {
+      // For featured groups, just update local state without database operations
+      console.log('Cannot join featured/mock groups - these are demo groups only');
+      return;
+    }
+    
     try {
       const anonymousName = generateRandomUsername();
       await joinGroup(groupId, anonymousName);
