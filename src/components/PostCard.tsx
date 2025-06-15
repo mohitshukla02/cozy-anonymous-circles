@@ -73,14 +73,14 @@ const PostCard = ({
   };
 
   return (
-    <Card>
+    <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
       <CardContent className="p-6">
         {/* Post Header */}
         <div className="flex items-start justify-between mb-4">
           <UserAvatarWithName userId={post.authorId} groupId={groupId} />
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <span>{formatDate(post.createdAt)}</span>
-            <Button variant="ghost" size="sm" className="h-auto p-1">
+            <Button variant="ghost" size="sm" className="h-auto p-1 rounded-lg">
               <MoreVertical size={14} />
             </Button>
           </div>
@@ -104,7 +104,7 @@ const PostCard = ({
             variant="ghost"
             size="sm"
             onClick={handleLike}
-            className={`h-auto p-2 gap-2 ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
+            className={`h-auto p-2 gap-2 rounded-xl ${isLiked ? 'text-red-500' : 'text-gray-500'}`}
           >
             <Heart size={16} fill={isLiked ? 'currentColor' : 'none'} />
             <span className="text-xs">{post.likes.length}</span>
@@ -114,7 +114,7 @@ const PostCard = ({
             variant="ghost"
             size="sm"
             onClick={() => setShowComments(!showComments)}
-            className="h-auto p-2 gap-2 text-gray-500"
+            className="h-auto p-2 gap-2 text-gray-500 rounded-xl"
           >
             <MessageCircle size={16} />
             <span className="text-xs">{comments.length}</span>
@@ -137,7 +137,7 @@ const PostCard = ({
                     placeholder="Write a comment..."
                     maxLength={250}
                     rows={2}
-                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                    className="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
                   />
                   <div className="flex justify-between items-center mt-2">
                     <span className="text-xs text-gray-400">
@@ -147,6 +147,7 @@ const PostCard = ({
                       type="submit"
                       disabled={!newComment.trim()}
                       size="sm"
+                      className="rounded-xl"
                     >
                       Reply
                     </Button>
@@ -161,7 +162,7 @@ const PostCard = ({
                 <div key={comment.id} className="flex items-start gap-3">
                   <UserAvatarWithName userId={comment.authorId} groupId={groupId} showName={false} />
                   <div className="flex-1">
-                    <div className="bg-gray-50 rounded-lg p-3">
+                    <div className="bg-gray-50 rounded-2xl p-3">
                       <div className="flex items-center gap-2 mb-1">
                         <UserAvatarWithName userId={comment.authorId} groupId={groupId} showName={true} className="text-xs" />
                         <span className="text-xs text-gray-500">
@@ -177,7 +178,7 @@ const PostCard = ({
                         variant="ghost"
                         size="sm"
                         onClick={() => handleCommentLike(comment.id, comment.authorId)}
-                        className={`h-auto p-1 gap-1 text-xs ${
+                        className={`h-auto p-1 gap-1 text-xs rounded-lg ${
                           getCommentLikeStatus(comment.id) ? 'text-red-500' : 'text-gray-500'
                         }`}
                       >

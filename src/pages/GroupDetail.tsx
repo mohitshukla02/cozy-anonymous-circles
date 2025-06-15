@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Settings, Plus, TrendingUp, MessageCircle, Heart, Shield, UserX, Crown } from 'lucide-react';
+import { ArrowLeft, Users, Plus, TrendingUp, MessageCircle, Heart } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Group, Post, Comment } from '../types/groups';
 import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups } from '../utils/supabaseStorage';
@@ -9,7 +9,7 @@ import PostCard from '../components/PostCard';
 import UserAvatarWithName from '../components/UserAvatarWithName';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
-import { Card, CardContent, CardHeader } from '../components/ui/card';
+import { Card, CardContent } from '../components/ui/card';
 import { TAG_CATEGORIES } from '../types/tags';
 import { useToast } from '../hooks/use-toast';
 
@@ -24,7 +24,6 @@ const GroupDetail = () => {
   const [newPostContent, setNewPostContent] = useState('');
   const [sortBy, setSortBy] = useState<'recent' | 'liked' | 'discussed'>('recent');
   const [isJoined, setIsJoined] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
 
   const tagNames = new Map();
   TAG_CATEGORIES.forEach(category => {
@@ -54,9 +53,6 @@ const GroupDetail = () => {
       }
 
       setGroup(foundGroup);
-      
-      // Check if user is admin
-      setIsAdmin(foundGroup.adminId === user.id);
       
       // Check if user is a member
       const userGroups = await getUserGroups(user.id);
@@ -167,14 +163,6 @@ const GroupDetail = () => {
     }
   };
 
-  const handleRemoveMember = async (memberId: string) => {
-    // TODO: Implement remove member functionality
-    toast({
-      title: "Feature coming soon",
-      description: "Member management features will be available soon",
-    });
-  };
-
   if (!group) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center">
@@ -190,30 +178,24 @@ const GroupDetail = () => {
         <div className="flex items-center gap-3 mb-6">
           <button
             onClick={() => navigate('/groups')}
-            className="p-2 rounded-full bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-900 hover:bg-white transition-all duration-200 hover:shadow-sm"
+            className="p-3 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-900 hover:bg-white transition-all duration-200 hover:shadow-md"
           >
-            <ArrowLeft size={18} />
+            <ArrowLeft size={20} />
           </button>
           <div className="flex-1">
-            <h1 className="text-xl font-semibold text-gray-900 leading-tight">
+            <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
               {group.name}
             </h1>
-            <p className="text-sm text-gray-500 mt-0.5">
+            <p className="text-sm text-gray-500 mt-1">
               {group.memberIds.length} members • {getSortedPosts().length} posts
             </p>
           </div>
-          {isAdmin && (
-            <Button variant="outline" size="sm">
-              <Settings size={16} className="mr-2" />
-              Manage
-            </Button>
-          )}
         </div>
 
         {/* Group Info Card */}
-        <Card className="mb-6">
+        <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
           {group.image && (
-            <div className="relative h-48 overflow-hidden rounded-t-lg">
+            <div className="relative h-48 overflow-hidden rounded-t-2xl">
               <img 
                 src={group.image} 
                 alt={group.name}
@@ -222,11 +204,7 @@ const GroupDetail = () => {
               <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
               <Badge 
                 variant="outline"
-                className={`absolute top-4 right-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md ${
-                  group.type === 'local-meetup' 
-                    ? 'bg-green-500/90 text-white shadow-lg' 
-                    : 'bg-blue-500/90 text-white shadow-lg'
-                }`}
+                className="absolute top-4 right-4 text-xs px-3 py-1.5 border-0 font-medium backdrop-blur-md bg-white/90 text-gray-700 shadow-sm rounded-full"
               >
                 {group.type === 'local-meetup' ? 'Local' : 'Global'}
               </Badge>
@@ -242,71 +220,38 @@ const GroupDetail = () => {
               </div>
               <div className="w-1 h-1 bg-gray-300 rounded-full" />
               <span>Created {new Date(group.createdDate).toLocaleDateString()}</span>
-              {isAdmin && (
-                <>
-                  <div className="w-1 h-1 bg-gray-300 rounded-full" />
-                  <div className="flex items-center gap-1 text-amber-600">
-                    <Crown size={12} />
-                    <span>Admin</span>
-                  </div>
-                </>
-              )}
             </div>
 
-            <div className="flex flex-wrap gap-2 mb-4">
+            <div className="flex flex-wrap gap-2">
               {group.tags.map(tagId => (
                 <Badge 
                   key={tagId} 
                   variant="outline" 
-                  className="text-xs px-2 py-1 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-0 font-medium"
+                  className="text-xs px-3 py-1 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-0 font-medium rounded-full"
                 >
                   {tagNames.get(tagId)}
                 </Badge>
               ))}
             </div>
-
-            {/* Admin Controls */}
-            {isAdmin && (
-              <Card className="bg-amber-50 border-amber-200">
-                <CardHeader className="pb-3">
-                  <div className="flex items-center gap-2">
-                    <Shield size={16} className="text-amber-600" />
-                    <h4 className="font-medium text-amber-900">Admin Controls</h4>
-                  </div>
-                </CardHeader>
-                <CardContent className="pt-0">
-                  <div className="flex flex-wrap gap-2">
-                    <Button variant="outline" size="sm">
-                      <UserX size={14} className="mr-1" />
-                      Manage Members
-                    </Button>
-                    <Button variant="outline" size="sm">
-                      <Settings size={14} className="mr-1" />
-                      Edit Group
-                    </Button>
-                  </div>
-                </CardContent>
-              </Card>
-            )}
           </CardContent>
         </Card>
 
         {isJoined ? (
           <>
             {/* Create Post Card */}
-            <Card className="mb-6">
+            <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
               <CardContent className="p-6">
                 <form onSubmit={handleCreatePost}>
-                  <div className="flex items-start gap-3">
+                  <div className="flex items-start gap-4">
                     <UserAvatarWithName userId={user.id} groupId={group.id} showName={false} />
                     <div className="flex-1">
                       <textarea
                         value={newPostContent}
                         onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
-                        placeholder="Share your thoughts..."
+                        placeholder="Share your thoughts with the group..."
                         maxLength={500}
                         rows={3}
-                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
                       />
                       <div className="flex justify-between items-center mt-3">
                         <span className="text-xs text-gray-400">
@@ -316,6 +261,7 @@ const GroupDetail = () => {
                           type="submit"
                           disabled={!newPostContent.trim()}
                           size="sm"
+                          className="rounded-xl"
                         >
                           <Plus size={14} className="mr-1" />
                           Post
@@ -339,6 +285,7 @@ const GroupDetail = () => {
                   variant={sortBy === key ? "default" : "outline"}
                   size="sm"
                   onClick={() => setSortBy(key as any)}
+                  className="rounded-xl"
                 >
                   <Icon size={12} className="mr-1" />
                   {label}
@@ -349,9 +296,9 @@ const GroupDetail = () => {
             {/* Posts */}
             <div className="space-y-4">
               {getSortedPosts().length === 0 ? (
-                <Card>
+                <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
                   <CardContent className="text-center py-12">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                       <MessageCircle size={24} className="text-blue-600" />
                     </div>
                     <h3 className="font-semibold text-gray-900 mb-2 text-sm">
@@ -386,9 +333,9 @@ const GroupDetail = () => {
             </div>
           </>
         ) : (
-          <Card>
+          <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
             <CardContent className="text-center py-12">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
                 <Users size={24} className="text-blue-600" />
               </div>
               <h3 className="font-semibold text-gray-900 mb-2 text-sm">
@@ -397,7 +344,7 @@ const GroupDetail = () => {
               <p className="text-gray-600 text-xs mb-4">
                 Become a member to view posts and join discussions.
               </p>
-              <Button onClick={() => navigate('/groups')}>
+              <Button onClick={() => navigate('/groups')} className="rounded-xl">
                 Back to Groups
               </Button>
             </CardContent>
