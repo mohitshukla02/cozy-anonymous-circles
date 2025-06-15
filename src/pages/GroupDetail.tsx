@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -202,8 +203,8 @@ const GroupDetail = () => {
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center">
-        <div className="animate-pulse">Loading...</div>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 flex items-center justify-center">
+        <div className="animate-pulse dark:text-gray-300">Loading...</div>
       </div>
     );
   }
@@ -211,7 +212,7 @@ const GroupDetail = () => {
   const isArchived = group.isArchived || group.status === 'archived';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
         <GroupHeader

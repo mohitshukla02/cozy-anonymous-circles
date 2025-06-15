@@ -112,6 +112,8 @@ export default {
 			boxShadow: {
 				'soft': '0 4px 20px -4px rgba(0, 0, 0, 0.1)',
 				'soft-md': '0 8px 30px -8px rgba(0, 0, 0, 0.12)',
+				'dark-soft': '0 4px 20px -4px rgba(0, 0, 0, 0.3)',
+				'dark-soft-md': '0 8px 30px -8px rgba(0, 0, 0, 0.4)',
 			}
 		}
 	},
