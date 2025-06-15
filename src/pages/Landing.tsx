@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Users, MessageCircle, Heart, Globe, MapPin, Shield, Zap, Lock, Calendar } from 'lucide-react';
@@ -36,8 +35,8 @@ const Landing = () => {
       </header>
 
       {/* Hero Section */}
-      <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-6xl mx-auto text-center">
+      <section className="min-h-screen flex flex-col justify-center pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+        <div className="max-w-6xl mx-auto text-center flex flex-col flex-1 justify-center">
           <h1 className="text-5xl md:text-6xl font-semibold text-gray-900 mb-6 leading-tight">
             Real Connections.<br />
             <span className="text-gray-600">Real Places.</span>
