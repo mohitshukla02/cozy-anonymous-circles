@@ -15,6 +15,27 @@ export interface UserProfile {
   updated_at: string;
 }
 
+// --- Sanitization helper ---
+function sanitizeInput(str: string): string {
+  let clean = str
+    // remove script tags
+    .replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "")
+    // remove HTML tags
+    .replace(/<\/?[^>]+(>|$)/g, "")
+    // remove on* attributes
+    .replace(/on\w+=["'][^"']*["']/gi, "")
+    // remove non-printable characters
+    .replace(/[^\x20-\x7E\r\n]+/g, "");
+  // Enforce a max length (username: 40, bio: 300, generic: 300)
+  return clean.trim().slice(0, 300);
+}
+
+// Separate strict username sanitizer!
+function sanitizeUsername(username: string): string {
+  const clean = username.replace(/[^a-zA-Z0-9_\- ]/g, '').trim();
+  return clean.slice(0, 40) || 'Anonymous';
+}
+
 export const getUserProfile = async (userId: string): Promise<UserProfile | null> => {
   console.log('Getting user profile for:', userId);
   
@@ -39,20 +60,28 @@ export const getUserProfile = async (userId: string): Promise<UserProfile | null
 };
 
 export const createUserProfile = async (profile: Omit<UserProfile, 'id' | 'created_at' | 'updated_at'>): Promise<UserProfile | null> => {
-  console.log('Creating user profile:', profile);
-  
+  // Sanitize user-provided fields!
+  const sanitized: any = {
+    ...profile,
+    username: sanitizeUsername(profile.username),
+    bio: profile.bio ? sanitizeInput(profile.bio) : undefined,
+    location_city: profile.location_city ? sanitizeInput(profile.location_city) : undefined,
+    location_region: profile.location_region ? sanitizeInput(profile.location_region) : undefined,
+  };
+  console.log('Creating user profile:', sanitized);
+
   try {
     const { data, error } = await supabase
       .from('user_profiles')
-      .insert([profile])
+      .insert([sanitized])
       .select()
       .single();
-    
+
     if (error) {
       console.error('Error creating user profile:', error);
       return null;
     }
-    
+
     console.log('Created user profile:', data);
     return data as UserProfile;
   } catch (error) {
@@ -62,21 +91,28 @@ export const createUserProfile = async (profile: Omit<UserProfile, 'id' | 'creat
 };
 
 export const updateUserProfile = async (userId: string, updates: Partial<Omit<UserProfile, 'id' | 'user_id' | 'created_at'>>): Promise<UserProfile | null> => {
-  console.log('Updating user profile for:', userId, 'with:', updates);
-  
+  // Defensive: sanitize every string field!
+  const sanitizedUpdates: any = { ...updates };
+  if (sanitizedUpdates.username) sanitizedUpdates.username = sanitizeUsername(sanitizedUpdates.username);
+  if (sanitizedUpdates.bio) sanitizedUpdates.bio = sanitizeInput(sanitizedUpdates.bio);
+  if (sanitizedUpdates.location_city) sanitizedUpdates.location_city = sanitizeInput(sanitizedUpdates.location_city);
+  if (sanitizedUpdates.location_region) sanitizedUpdates.location_region = sanitizeInput(sanitizedUpdates.location_region);
+  sanitizedUpdates.updated_at = new Date().toISOString();
+
+  console.log('Updating user profile for:', userId, 'with:', sanitizedUpdates);
+
   try {
     const { data, error } = await supabase
       .from('user_profiles')
-      .update({ ...updates, updated_at: new Date().toISOString() })
+      .update(sanitizedUpdates)
       .eq('user_id', userId)
       .select()
       .single();
-    
+
     if (error) {
       console.error('Error updating user profile:', error);
       return null;
     }
-    
     console.log('Updated user profile:', data);
     return data as UserProfile;
   } catch (error) {
