@@ -34,7 +34,13 @@ export const useInvitations = () => {
         return;
       }
 
-      setInvitations(invitationsData || []);
+      // Cast the data to match our Invitation interface
+      const typedInvitations: Invitation[] = (invitationsData || []).map(invitation => ({
+        ...invitation,
+        status: invitation.status as 'pending' | 'accepted' | 'expired'
+      }));
+
+      setInvitations(typedInvitations);
 
       // Fetch remaining invites count
       const { data: remainingData, error: remainingError } = await supabase
