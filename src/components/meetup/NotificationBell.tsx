@@ -32,7 +32,7 @@ const NotificationBell = () => {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="relative">
+        <Button variant="ghost" size="sm" className="relative hover:bg-neutral-100 dark:hover:bg-neutral-800">
           <Bell size={18} />
           {unreadCount > 0 && (
             <Badge 
@@ -50,7 +50,7 @@ const NotificationBell = () => {
         </div>
         <div className="max-h-96 overflow-y-auto">
           {notifications.length === 0 ? (
-            <div className="p-4 text-center text-gray-500">
+            <div className="p-4 text-center text-muted-foreground">
               No notifications yet
             </div>
           ) : (
@@ -58,18 +58,18 @@ const NotificationBell = () => {
               <div
                 key={notification.id}
                 onClick={() => handleNotificationClick(notification.id)}
-                className={`p-3 border-b cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-800 ${
+                className={`p-3 border-b cursor-pointer hover:bg-accent ${
                   !notification.read_at ? 'bg-blue-50 dark:bg-blue-900/20' : ''
                 }`}
               >
                 <div className="flex justify-between items-start gap-2">
                   <div className="flex-1">
                     <p className="font-medium text-sm">{notification.title}</p>
-                    <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+                    <p className="text-xs text-muted-foreground mt-1">
                       {notification.message}
                     </p>
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="text-xs text-muted-foreground">
                     {formatTime(notification.created_at)}
                   </div>
                 </div>

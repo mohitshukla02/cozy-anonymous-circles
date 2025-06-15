@@ -23,7 +23,7 @@ const Header = () => {
   const { profile } = useUserProfile();
 
   return (
-    <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b dark:border-neutral-800 py-4">
+    <header className="sticky top-0 z-50 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md border-b border-neutral-200/50 dark:border-neutral-800/50 py-4">
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-3">
           <div className="w-8 h-8 flex items-center justify-center">
@@ -31,26 +31,28 @@ const Header = () => {
           </div>
           <span className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">Convene</span>
         </Link>
-        <nav className="hidden md:flex items-center space-x-8">
+        <nav className="hidden md:flex items-center space-x-6">
           <Link to="/groups" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
             Groups
           </Link>
           <Link to="/feed" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
             Feed
           </Link>
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/messages" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
-              <MessageSquare size={18} />
-            </Link>
-          </Button>
           
-          {/* Add notification bell before user profile */}
-          <NotificationBell />
+          <div className="flex items-center space-x-4">
+            <Button variant="ghost" size="sm" asChild className="hover:bg-neutral-100 dark:hover:bg-neutral-800">
+              <Link to="/messages">
+                <MessageSquare size={18} />
+              </Link>
+            </Button>
+            
+            <NotificationBell />
+          </div>
           
           {user ? (
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
+                <Button variant="ghost" className="h-8 w-8 p-0 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800">
                   <Avatar className="h-8 w-8">
                     <AvatarImage src={user?.user_metadata?.avatar_url} />
                     <AvatarFallback>{profile?.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
