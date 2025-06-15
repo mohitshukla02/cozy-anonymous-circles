@@ -7,7 +7,7 @@ import { useUserLocation } from '@/hooks/useUserLocation';
 import { generateLocalMeetups } from '@/utils/meetupGenerator';
 import { Meetup } from '@/types/meetup';
 import MapboxTokenForm from '@/components/meetup/MapboxTokenForm';
-import MeetupList from '@/components/meetup/MeetupList';
+import MapMeetupList from '@/components/meetup/MapMeetupList';
 import SelectedMeetupDetails from '@/components/meetup/SelectedMeetupDetails';
 
 const MeetupMap = () => {
@@ -122,7 +122,7 @@ const MeetupMap = () => {
         </div>
         
         {/* Meetup List */}
-        <MeetupList 
+        <MapMeetupList 
           meetups={upcomingMeetups}
           selectedMeetup={selectedMeetup}
           onMeetupSelect={setSelectedMeetup}
