@@ -1,9 +1,8 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { Group, Post, Comment } from '../types/groups';
-import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups } from '../utils/supabaseStorage';
+import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups, joinGroup } from '../utils/supabaseStorage';
 import GroupHeader from '../components/group-detail/GroupHeader';
 import GroupInfoCard from '../components/group-detail/GroupInfoCard';
 import CreatePostCard from '../components/group-detail/CreatePostCard';
@@ -70,7 +69,7 @@ const GroupDetail = () => {
         isArchived: groupData.status === 'archived',
         meetupDeadline: groupData.next_meetup_deadline,
         warning_level: groupData.warning_level as 'none' | 'week2' | 'week1' | 'final',
-        status: groupData.status
+        status: groupData.status as 'active' | 'warning' | 'final_warning' | 'archived'
       };
 
       setGroup(transformedGroup);
@@ -95,6 +94,34 @@ const GroupDetail = () => {
     } catch (error) {
       console.error('Error loading group data:', error);
       navigate('/groups');
+    }
+  };
+
+  const handleJoinGroup = async () => {
+    if (!user || !group) return;
+
+    try {
+      const success = await joinGroup(user.id, group.id);
+      if (success) {
+        await loadGroupData(); // Reload to get updated member status
+        toast({
+          title: "Success",
+          description: "You've joined the group!",
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to join group. It may be at capacity.",
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Error joining group:', error);
+      toast({
+        title: "Error",
+        description: "Failed to join group",
+        variant: "destructive",
+      });
     }
   };
 
@@ -247,7 +274,7 @@ const GroupDetail = () => {
             />
           </>
         ) : (
-          <NotMemberCard />
+          <NotMemberCard onJoin={handleJoinGroup} />
         )}
 
         {/* Plan Meetup Modal */}

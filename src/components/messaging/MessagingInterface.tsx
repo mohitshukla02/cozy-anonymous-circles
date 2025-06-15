@@ -7,6 +7,7 @@ import { Badge } from '../ui/badge';
 import { MessageSquare, Send, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
 import { getUserConversations, sendMessage, markMessageAsRead, canUsersMessage } from '../../utils/messaging';
+import { getUserProfile } from '../../utils/userProfileStorage';
 import { useToast } from '../../hooks/use-toast';
 
 interface Conversation {
@@ -31,6 +32,7 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
   const [newMessage, setNewMessage] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [canMessage, setCanMessage] = useState(false);
+  const [userProfiles, setUserProfiles] = useState<{[key: string]: any}>({});
 
   useEffect(() => {
     if (user) {
@@ -44,12 +46,34 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
     }
   }, [selectedPartnerId, groupContextId, user]);
 
+  const loadUserProfile = async (userId: string) => {
+    if (userProfiles[userId]) return userProfiles[userId];
+    
+    const profile = await getUserProfile(userId);
+    if (profile) {
+      setUserProfiles(prev => ({ ...prev, [userId]: profile }));
+      return profile;
+    }
+    return null;
+  };
+
+  const getDisplayName = (userId: string) => {
+    const profile = userProfiles[userId];
+    return profile?.username || 'Anonymous User';
+  };
+
   const loadConversations = async () => {
     if (!user) return;
     
     try {
       const convs = await getUserConversations(user.id);
       setConversations(convs);
+      
+      // Load user profiles for all conversation partners
+      const partnerIds = convs.map(c => c.partnerId);
+      for (const partnerId of partnerIds) {
+        await loadUserProfile(partnerId);
+      }
       
       // Auto-select conversation if partnerId is provided
       if (selectedPartnerId) {
@@ -226,7 +250,10 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
                   <div className="flex justify-between items-start">
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-sm truncate">
-                        Partner in {conv.groupName}
+                        {getDisplayName(conv.partnerId)}
+                      </p>
+                      <p className="text-xs text-gray-500 truncate">
+                        in {conv.groupName}
                       </p>
                       <p className="text-xs text-gray-500 truncate">
                         {conv.lastMessage?.content || 'Start conversation'}
@@ -251,8 +278,9 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
           <>
             <CardHeader>
               <CardTitle className="text-sm">
-                Conversation in {activeConversation.groupName}
+                Conversation with {getDisplayName(activeConversation.partnerId)}
               </CardTitle>
+              <p className="text-xs text-gray-500">in {activeConversation.groupName}</p>
             </CardHeader>
             <CardContent className="flex flex-col h-[500px]">
               {/* Messages */}

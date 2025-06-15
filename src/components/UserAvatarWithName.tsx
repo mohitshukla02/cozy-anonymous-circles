@@ -1,15 +1,27 @@
 
 import React from 'react';
 import { generateAnonymousName } from '@/utils/groupStorage';
+import { formatDistanceToNow } from 'date-fns';
 
 interface UserAvatarWithNameProps {
   userId: string;
   groupId: string;
   className?: string;
   showName?: boolean;
+  size?: 'sm' | 'md' | 'lg';
+  showTime?: boolean;
+  timestamp?: string;
 }
 
-const UserAvatarWithName = ({ userId, groupId, className = "", showName = true }: UserAvatarWithNameProps) => {
+const UserAvatarWithName = ({ 
+  userId, 
+  groupId, 
+  className = "", 
+  showName = true,
+  size = 'md',
+  showTime = false,
+  timestamp
+}: UserAvatarWithNameProps) => {
   const anonymousName = generateAnonymousName(userId, groupId);
   
   // Generate a consistent color based on the user ID
@@ -30,13 +42,24 @@ const UserAvatarWithName = ({ userId, groupId, className = "", showName = true }
 
   const initials = anonymousName.split(' ').map(n => n[0]).join('').toUpperCase();
   
+  const avatarSize = size === 'sm' ? 'w-6 h-6' : size === 'lg' ? 'w-12 h-12' : 'w-8 h-8';
+  const textSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-base' : 'text-sm';
+  const initialsSize = size === 'sm' ? 'text-xs' : size === 'lg' ? 'text-sm' : 'text-xs';
+  
   return (
     <div className={`flex items-center gap-2 ${className}`}>
-      <div className={`w-8 h-8 rounded-full ${getAvatarColor(userId)} flex items-center justify-center text-white text-xs font-medium`}>
+      <div className={`${avatarSize} rounded-full ${getAvatarColor(userId)} flex items-center justify-center text-white ${initialsSize} font-medium`}>
         {initials}
       </div>
       {showName && (
-        <span className="text-sm font-medium text-gray-900">{anonymousName}</span>
+        <div className="flex flex-col">
+          <span className={`${textSize} font-medium text-gray-900`}>{anonymousName}</span>
+          {showTime && timestamp && (
+            <span className="text-xs text-gray-500">
+              {formatDistanceToNow(new Date(timestamp), { addSuffix: true })}
+            </span>
+          )}
+        </div>
       )}
     </div>
   );

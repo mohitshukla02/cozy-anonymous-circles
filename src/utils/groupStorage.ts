@@ -224,8 +224,10 @@ export const createSampleGroups = () => {
 };
 
 export const joinGroup = async (userId: string, groupId: string): Promise<boolean> => {
+  console.log('Joining group:', { userId, groupId });
+  
   try {
-    // First check if user is already a member
+    // Check if user is already a member
     const { data: existingMembership } = await supabase
       .from('user_groups')
       .select('id')
@@ -234,13 +236,32 @@ export const joinGroup = async (userId: string, groupId: string): Promise<boolea
       .single();
 
     if (existingMembership) {
-      return true; // Already a member
+      console.log('User already a member');
+      return true;
     }
 
-    // Generate anonymous name for the user in this group
-    const anonymousName = generateAnonymousName();
+    // Get current group to check member limit
+    const { data: group, error: groupError } = await supabase
+      .from('groups')
+      .select('member_ids, member_limit')
+      .eq('id', groupId)
+      .single();
 
-    // Add user to user_groups table
+    if (groupError || !group) {
+      console.error('Error fetching group:', groupError);
+      return false;
+    }
+
+    // Check if group is at capacity
+    if (group.member_ids.length >= group.member_limit) {
+      console.log('Group is at capacity');
+      return false;
+    }
+
+    // Generate anonymous name for this user in this group
+    const anonymousName = generateAnonymousName(userId, groupId);
+
+    // Add to user_groups table
     const { error: userGroupError } = await supabase
       .from('user_groups')
       .insert({
@@ -251,37 +272,26 @@ export const joinGroup = async (userId: string, groupId: string): Promise<boolea
       });
 
     if (userGroupError) {
-      console.error('Error adding user to group:', userGroupError);
+      console.error('Error adding to user_groups:', userGroupError);
       return false;
     }
 
-    // Update the group's member_ids array
-    const { data: groupData, error: fetchError } = await supabase
-      .from('groups')
-      .select('member_ids')
-      .eq('id', groupId)
-      .single();
-
-    if (fetchError) {
-      console.error('Error fetching group:', fetchError);
-      return false;
-    }
-
-    const updatedMemberIds = [...(groupData.member_ids || []), userId];
-
+    // Update group's member_ids array
+    const updatedMemberIds = [...group.member_ids, userId];
     const { error: updateError } = await supabase
       .from('groups')
       .update({ member_ids: updatedMemberIds })
       .eq('id', groupId);
 
     if (updateError) {
-      console.error('Error updating group member list:', updateError);
+      console.error('Error updating group member_ids:', updateError);
       return false;
     }
 
+    console.log('Successfully joined group');
     return true;
   } catch (error) {
-    console.error('Error joining group:', error);
+    console.error('Error in joinGroup:', error);
     return false;
   }
 };
