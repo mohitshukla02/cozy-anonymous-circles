@@ -2,7 +2,7 @@
 import React from 'react';
 import { Heart, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
-import { trackUserInteraction } from '@/utils/supabaseHelpers';
+import { trackUserInteraction } from '@/utils/messaging';
 import { useToast } from '@/hooks/use-toast';
 
 interface InteractionTrackerProps {
