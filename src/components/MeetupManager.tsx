@@ -6,6 +6,8 @@ import MeetupEmptyState from './meetup/MeetupEmptyState';
 import MeetupList from './meetup/MeetupList';
 import PlanMeetupModal from './PlanMeetupModal';
 import { useToast } from '../hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
+import { createMeetup, rsvpToMeetup, checkInToMeetup } from '../utils/meetupHelpers';
 
 interface Meetup {
   id: string;
@@ -32,6 +34,8 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
   const [meetups, setMeetups] = useState<Meetup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showPlanModal, setShowPlanModal] = useState(false);
+  const [userRSVPs, setUserRSVPs] = useState<Record<string, string>>({});
+  const [userCheckIns, setUserCheckIns] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     loadMeetups();
@@ -40,12 +44,59 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
   const loadMeetups = async () => {
     setIsLoading(true);
     try {
-      // Simulate loading meetups from API
-      // In real implementation, this would fetch from Supabase
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      // Mock data for demonstration
-      setMeetups([]);
+      // Fetch meetups from Supabase
+      const { data: meetupsData, error: meetupsError } = await supabase
+        .from('meetups')
+        .select('*')
+        .eq('group_id', groupId)
+        .order('date_time', { ascending: true });
+
+      if (meetupsError) {
+        console.error('Error loading meetups:', meetupsError);
+        toast({
+          title: "Error",
+          description: "Failed to load meetups",
+          variant: "destructive"
+        });
+        return;
+      }
+
+      // Transform the data to match our interface
+      const transformedMeetups = meetupsData?.map(meetup => ({
+        id: meetup.id,
+        title: meetup.title,
+        description: meetup.description,
+        dateTime: meetup.date_time,
+        location: meetup.location,
+        purpose: meetup.purpose,
+        status: meetup.status as 'planned' | 'successful' | 'failed' | 'cancelled',
+        rsvpCount: meetup.rsvp_count,
+        checkinCount: meetup.checkin_count,
+        createdBy: meetup.created_by
+      })) || [];
+
+      setMeetups(transformedMeetups);
+
+      // Load user RSVPs
+      if (transformedMeetups.length > 0) {
+        const meetupIds = transformedMeetups.map(m => m.id);
+        const { data: rsvpData } = await supabase
+          .from('meetup_rsvps')
+          .select('meetup_id, status, checked_in')
+          .eq('user_id', currentUserId)
+          .in('meetup_id', meetupIds);
+
+        const rsvpMap: Record<string, string> = {};
+        const checkInMap: Record<string, boolean> = {};
+        
+        rsvpData?.forEach(rsvp => {
+          rsvpMap[rsvp.meetup_id] = rsvp.status;
+          checkInMap[rsvp.meetup_id] = rsvp.checked_in || false;
+        });
+
+        setUserRSVPs(rsvpMap);
+        setUserCheckIns(checkInMap);
+      }
     } catch (error) {
       console.error('Error loading meetups:', error);
       toast({
@@ -59,13 +110,67 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
   };
 
   const handleRsvp = async (meetupId: string, status: 'attending' | 'not_attending' | 'suggest_new_time') => {
-    console.log('RSVP to meetup:', meetupId, status);
-    // Update local state and sync with backend
+    try {
+      const rsvpStatus = status === 'attending' ? 'attending' : 
+                        status === 'not_attending' ? 'not_attending' : 
+                        'interested'; // Map suggest_new_time to interested for now
+
+      const success = await rsvpToMeetup(meetupId, currentUserId, rsvpStatus);
+      
+      if (success) {
+        setUserRSVPs(prev => ({ ...prev, [meetupId]: rsvpStatus }));
+        loadMeetups(); // Reload to get updated counts
+        
+        const statusText = status === 'attending' ? 'attending' : 
+                          status === 'not_attending' ? 'not attending' : 
+                          'suggesting new time';
+        toast({
+          title: "RSVP Updated",
+          description: `You're now marked as ${statusText}`
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update RSVP",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error updating RSVP:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update RSVP",
+        variant: "destructive"
+      });
+    }
   };
 
   const handleCheckIn = async (meetupId: string) => {
-    console.log('Check in to meetup:', meetupId);
-    // Update local state and sync with backend
+    try {
+      const success = await checkInToMeetup(meetupId, currentUserId);
+      
+      if (success) {
+        setUserCheckIns(prev => ({ ...prev, [meetupId]: true }));
+        loadMeetups(); // Reload to get updated counts and status
+        toast({
+          title: "Checked In!",
+          description: "You're now checked in to this meetup"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to check in",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error checking in:', error);
+      toast({
+        title: "Error",
+        description: "Failed to check in",
+        variant: "destructive"
+      });
+    }
   };
 
   const canCheckIn = (meetup: Meetup) => {
@@ -79,6 +184,46 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
 
   const handlePlanMeetup = () => {
     setShowPlanModal(true);
+  };
+
+  const handleMeetupCreated = async (meetupData: {
+    title: string;
+    description?: string;
+    dateTime: string;
+    location: string;
+    purpose: string;
+  }) => {
+    try {
+      const success = await createMeetup({
+        groupId,
+        title: meetupData.title,
+        description: meetupData.description,
+        dateTime: meetupData.dateTime,
+        location: meetupData.location,
+        createdBy: currentUserId
+      });
+
+      if (success) {
+        loadMeetups();
+        toast({
+          title: "Meetup Created!",
+          description: "Your group members will be notified"
+        });
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to create meetup",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error creating meetup:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create meetup",
+        variant: "destructive"
+      });
+    }
   };
 
   if (!isLocalGroup) {
@@ -105,6 +250,8 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
               onRsvp={handleRsvp}
               onCheckIn={handleCheckIn}
               canCheckIn={canCheckIn}
+              userRSVPs={userRSVPs}
+              userCheckIns={userCheckIns}
             />
           )}
         </CardContent>
@@ -116,13 +263,7 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
         onClose={() => setShowPlanModal(false)}
         groupId={groupId}
         groupName={groupName}
-        onMeetupCreated={() => {
-          loadMeetups();
-          toast({
-            title: "Meetup Created!",
-            description: "Your group members will be notified"
-          });
-        }}
+        onMeetupCreated={handleMeetupCreated}
       />
     </div>
   );

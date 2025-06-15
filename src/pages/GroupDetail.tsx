@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -140,6 +139,11 @@ const GroupDetail = () => {
     return comment?.likes.includes(user?.id || '') || false;
   };
 
+  const handleMeetupCreated = () => {
+    // The MeetupManager will handle the actual creation and show success toast
+    setShowPlanMeetupModal(false);
+  };
+
   if (!group) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 flex items-center justify-center">
@@ -223,13 +227,7 @@ const GroupDetail = () => {
           onClose={() => setShowPlanMeetupModal(false)}
           groupId={group.id}
           groupName={group.name}
-          onMeetupCreated={() => {
-            loadGroupData();
-            toast({
-              title: "Meetup Created!",
-              description: "Your group members will be notified"
-            });
-          }}
+          onMeetupCreated={handleMeetupCreated}
         />
       </div>
     </div>

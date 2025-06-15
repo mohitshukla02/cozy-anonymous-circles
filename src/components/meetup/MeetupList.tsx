@@ -21,9 +21,19 @@ interface MeetupListProps {
   onRsvp: (meetupId: string, status: 'attending' | 'not_attending' | 'suggest_new_time') => void;
   onCheckIn: (meetupId: string) => void;
   canCheckIn: (meetup: Meetup) => boolean;
+  userRSVPs: Record<string, string>;
+  userCheckIns: Record<string, boolean>;
 }
 
-const MeetupList = ({ meetups, currentUserId, onRsvp, onCheckIn, canCheckIn }: MeetupListProps) => {
+const MeetupList = ({ 
+  meetups, 
+  currentUserId, 
+  onRsvp, 
+  onCheckIn, 
+  canCheckIn,
+  userRSVPs,
+  userCheckIns
+}: MeetupListProps) => {
   return (
     <div className="space-y-4">
       {meetups.map(meetup => (
@@ -31,8 +41,8 @@ const MeetupList = ({ meetups, currentUserId, onRsvp, onCheckIn, canCheckIn }: M
           key={meetup.id}
           meetup={meetup}
           currentUserId={currentUserId}
-          userRsvpStatus={undefined} // Would come from backend
-          userCheckedIn={false} // Would come from backend
+          userRsvpStatus={userRSVPs[meetup.id] as 'attending' | 'not_attending' | 'suggest_new_time' | undefined}
+          userCheckedIn={userCheckIns[meetup.id] || false}
           onRsvp={(status) => onRsvp(meetup.id, status)}
           onCheckIn={() => onCheckIn(meetup.id)}
           canCheckIn={canCheckIn(meetup)}

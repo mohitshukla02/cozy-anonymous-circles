@@ -14,7 +14,13 @@ interface PlanMeetupModalProps {
   onClose: () => void;
   groupId: string;
   groupName: string;
-  onMeetupCreated: () => void;
+  onMeetupCreated: (meetupData: {
+    title: string;
+    description?: string;
+    dateTime: string;
+    location: string;
+    purpose: string;
+  }) => void;
 }
 
 const PURPOSE_OPTIONS = [
@@ -53,9 +59,8 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
       // Combine date and time
       const dateTime = new Date(`${formData.date}T${formData.time}`);
       
-      // Here we would create the meetup using our API
-      console.log('Creating meetup:', {
-        groupId,
+      // Call the parent handler with the meetup data
+      await onMeetupCreated({
         title: formData.title,
         description: formData.description,
         dateTime: dateTime.toISOString(),
@@ -63,15 +68,6 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
         purpose: formData.purpose
       });
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-
-      toast({
-        title: "Meetup Created!",
-        description: `Your meetup "${formData.title}" has been scheduled`
-      });
-
-      onMeetupCreated();
       onClose();
       
       // Reset form
