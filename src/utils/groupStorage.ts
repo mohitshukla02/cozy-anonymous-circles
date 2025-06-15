@@ -1,4 +1,4 @@
-
+import { supabase } from '@/integrations/supabase/client';
 import { Group, Post, Comment, UserGroup } from '../types/groups';
 
 const GROUPS_KEY = 'cozy_groups';
@@ -221,4 +221,112 @@ export const createSampleGroups = () => {
   ];
 
   saveGroups(sampleGroups);
+};
+
+export const joinGroup = async (userId: string, groupId: string): Promise<boolean> => {
+  try {
+    // First check if user is already a member
+    const { data: existingMembership } = await supabase
+      .from('user_groups')
+      .select('id')
+      .eq('user_id', userId)
+      .eq('group_id', groupId)
+      .single();
+
+    if (existingMembership) {
+      return true; // Already a member
+    }
+
+    // Generate anonymous name for the user in this group
+    const anonymousName = generateAnonymousName();
+
+    // Add user to user_groups table
+    const { error: userGroupError } = await supabase
+      .from('user_groups')
+      .insert({
+        user_id: userId,
+        group_id: groupId,
+        anonymous_name: anonymousName,
+        role: 'member'
+      });
+
+    if (userGroupError) {
+      console.error('Error adding user to group:', userGroupError);
+      return false;
+    }
+
+    // Update the group's member_ids array
+    const { data: groupData, error: fetchError } = await supabase
+      .from('groups')
+      .select('member_ids')
+      .eq('id', groupId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching group:', fetchError);
+      return false;
+    }
+
+    const updatedMemberIds = [...(groupData.member_ids || []), userId];
+
+    const { error: updateError } = await supabase
+      .from('groups')
+      .update({ member_ids: updatedMemberIds })
+      .eq('id', groupId);
+
+    if (updateError) {
+      console.error('Error updating group member list:', updateError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error joining group:', error);
+    return false;
+  }
+};
+
+export const leaveGroup = async (userId: string, groupId: string): Promise<boolean> => {
+  try {
+    // Remove user from user_groups table
+    const { error: userGroupError } = await supabase
+      .from('user_groups')
+      .delete()
+      .eq('user_id', userId)
+      .eq('group_id', groupId);
+
+    if (userGroupError) {
+      console.error('Error removing user from group:', userGroupError);
+      return false;
+    }
+
+    // Update the group's member_ids array
+    const { data: groupData, error: fetchError } = await supabase
+      .from('groups')
+      .select('member_ids')
+      .eq('id', groupId)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching group:', fetchError);
+      return false;
+    }
+
+    const updatedMemberIds = (groupData.member_ids || []).filter(id => id !== userId);
+
+    const { error: updateError } = await supabase
+      .from('groups')
+      .update({ member_ids: updatedMemberIds })
+      .eq('id', groupId);
+
+    if (updateError) {
+      console.error('Error updating group member list:', updateError);
+      return false;
+    }
+
+    return true;
+  } catch (error) {
+    console.error('Error leaving group:', error);
+    return false;
+  }
 };

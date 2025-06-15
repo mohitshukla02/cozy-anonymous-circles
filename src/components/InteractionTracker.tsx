@@ -1,9 +1,7 @@
 
 import React from 'react';
-import { Heart, MessageSquare } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { trackUserInteraction } from '@/utils/messaging';
-import { useToast } from '@/hooks/use-toast';
 
 interface InteractionTrackerProps {
   targetUserId: string;
@@ -21,35 +19,27 @@ const InteractionTracker: React.FC<InteractionTrackerProps> = ({
   interactionType
 }) => {
   const { user } = useAuth();
-  const { toast } = useToast();
 
-  const handleInteraction = async (e: React.MouseEvent) => {
+  const handleInteraction = async () => {
+    // Always call the original interaction first
+    onInteraction?.();
+
+    // Don't track self-interactions
     if (!user?.id || user.id === targetUserId) {
-      onInteraction?.();
       return;
     }
 
     try {
       // Track the interaction for messaging eligibility
       await trackUserInteraction(user.id, targetUserId, groupId, interactionType);
-      
-      // Check if this creates messaging eligibility
-      // This is a simplified check - in a real app you'd query the total interactions
-      toast({
-        title: "Interaction recorded",
-        description: "Keep interacting to unlock direct messaging!",
-        duration: 2000
-      });
-      
-      onInteraction?.();
+      console.log(`Tracked ${interactionType} interaction between ${user.id} and ${targetUserId} in group ${groupId}`);
     } catch (error) {
       console.error('Error tracking interaction:', error);
-      onInteraction?.();
     }
   };
 
   return (
-    <div onClick={handleInteraction} style={{ cursor: 'pointer' }}>
+    <div onClick={handleInteraction}>
       {children}
     </div>
   );

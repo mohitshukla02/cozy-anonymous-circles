@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -12,6 +13,7 @@ import MeetupManager from '../components/MeetupManager';
 import MeetupWarningBanner from '../components/MeetupWarningBanner';
 import PlanMeetupModal from '../components/PlanMeetupModal';
 import { useToast } from '../hooks/use-toast';
+import { supabase } from '@/integrations/supabase/client';
 
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -38,14 +40,40 @@ const GroupDetail = () => {
     if (!groupId || !user) return;
 
     try {
-      const foundGroup = await getGroupById(groupId);
-      
-      if (!foundGroup) {
+      // Get group data directly from Supabase with warning level
+      const { data: groupData, error: groupError } = await supabase
+        .from('groups')
+        .select('*')
+        .eq('id', groupId)
+        .single();
+
+      if (groupError || !groupData) {
         navigate('/groups');
         return;
       }
 
-      setGroup(foundGroup);
+      // Transform the group data to match our interface
+      const transformedGroup: Group = {
+        id: groupData.id,
+        name: groupData.name,
+        description: groupData.description,
+        image: groupData.avatar,
+        tags: groupData.tags,
+        memberIds: groupData.member_ids,
+        createdDate: groupData.created_date,
+        memberLimit: groupData.member_limit,
+        privacy: groupData.privacy as 'open' | 'invitation',
+        adminId: groupData.admin_id,
+        type: groupData.type as 'interest' | 'local-meetup',
+        locationCity: groupData.location_city,
+        locationRegion: groupData.location_region,
+        isArchived: groupData.status === 'archived',
+        meetupDeadline: groupData.next_meetup_deadline,
+        warning_level: groupData.warning_level as 'none' | 'week2' | 'week1' | 'final',
+        status: groupData.status
+      };
+
+      setGroup(transformedGroup);
       
       // Check if user is a member
       const userGroups = await getUserGroups(user.id);
@@ -140,7 +168,8 @@ const GroupDetail = () => {
   };
 
   const handleMeetupCreated = () => {
-    // The MeetupManager will handle the actual creation and show success toast
+    // Reload group data to get updated warning levels
+    loadGroupData();
     setShowPlanMeetupModal(false);
   };
 
