@@ -1,9 +1,11 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
 import { MapPin, Calendar, Users } from 'lucide-react';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useUser } from '@/contexts/UserContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 interface Meetup {
   id: string;
@@ -22,6 +24,7 @@ const MeetupMap = () => {
   const [selectedMeetup, setSelectedMeetup] = useState<Meetup | null>(null);
   const { profile } = useUserProfile();
   const { user } = useUser();
+  const { effectiveTheme } = useTheme();
 
   // Check for stored token on component mount
   useEffect(() => {
@@ -108,9 +111,14 @@ const MeetupMap = () => {
     // Initialize map
     mapboxgl.accessToken = mapboxToken;
     
+    // Choose map style based on theme
+    const mapStyle = effectiveTheme === 'dark' 
+      ? 'mapbox://styles/mapbox/dark-v11' 
+      : 'mapbox://styles/mapbox/light-v11';
+    
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
-      style: 'mapbox://styles/mapbox/light-v11',
+      style: mapStyle,
       center: userLocation.center,
       zoom: 12, // Closer zoom for city-level view
     });
@@ -128,8 +136,8 @@ const MeetupMap = () => {
       markerElement.style.cssText = `
         width: 32px;
         height: 32px;
-        background: #000;
-        border: 2px solid white;
+        background: ${effectiveTheme === 'dark' ? '#fafafa' : '#171717'};
+        border: 2px solid ${effectiveTheme === 'dark' ? '#171717' : '#fafafa'};
         border-radius: 50%;
         cursor: pointer;
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
@@ -157,7 +165,7 @@ const MeetupMap = () => {
     return () => {
       map.current?.remove();
     };
-  }, [mapboxToken, userLocation.center[0], userLocation.center[1]]);
+  }, [mapboxToken, userLocation.center[0], userLocation.center[1], effectiveTheme]);
 
   const handleTokenSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -172,13 +180,13 @@ const MeetupMap = () => {
 
   if (!mapboxToken) {
     return (
-      <div className="border border-gray-200 rounded-2xl p-8">
+      <div className="border border-neutral-200 dark:border-neutral-700 rounded-2xl p-8">
         <div className="text-center max-w-md mx-auto">
-          <MapPin className="mx-auto text-gray-400 mb-4" size={32} />
-          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+          <MapPin className="mx-auto text-neutral-400 dark:text-neutral-500 mb-4" size={32} />
+          <h3 className="text-xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
             Explore meetups in {userLocation.city}
           </h3>
-          <p className="text-gray-600 mb-6">
+          <p className="text-neutral-600 dark:text-neutral-400 mb-6">
             Enter your Mapbox token to see upcoming events on the map
           </p>
           <form onSubmit={handleTokenSubmit} className="space-y-4">
@@ -186,19 +194,19 @@ const MeetupMap = () => {
               type="text"
               name="token"
               placeholder="Mapbox public token"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-black focus:border-transparent text-sm"
+              className="w-full px-4 py-3 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-neutral-900 dark:focus:ring-neutral-100 focus:border-transparent text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100"
               required
             />
             <button 
               type="submit" 
-              className="w-full bg-black text-white px-4 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              className="w-full bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-4 py-3 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors"
             >
               Load map
             </button>
           </form>
-          <p className="text-xs text-gray-500 mt-3">
+          <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3">
             Get your token at{' '}
-            <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-black hover:underline">
+            <a href="https://mapbox.com/" target="_blank" rel="noopener noreferrer" className="text-neutral-900 dark:text-neutral-100 hover:underline">
               mapbox.com
             </a>
           </p>
@@ -210,37 +218,37 @@ const MeetupMap = () => {
   return (
     <div>
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
           Meetups in {userLocation.city}
         </h2>
-        <p className="text-gray-600">{upcomingMeetups.length} events happening this week</p>
+        <p className="text-neutral-600 dark:text-neutral-400">{upcomingMeetups.length} events happening this week</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Map */}
         <div className="lg:col-span-2">
-          <div className="relative h-96 rounded-xl overflow-hidden border border-gray-200">
+          <div className="relative h-96 rounded-xl overflow-hidden border border-neutral-200 dark:border-neutral-700">
             <div ref={mapContainer} className="absolute inset-0" />
           </div>
         </div>
         
         {/* Meetup List */}
         <div>
-          <h3 className="font-medium text-gray-900 mb-4">This week's events</h3>
+          <h3 className="font-medium text-neutral-900 dark:text-neutral-100 mb-4">This week's events</h3>
           <div className="space-y-3 max-h-80 overflow-y-auto">
             {upcomingMeetups.map((meetup) => (
               <div
                 key={meetup.id}
                 className={`p-4 rounded-lg border cursor-pointer transition-all ${
                   selectedMeetup?.id === meetup.id
-                    ? 'border-black bg-gray-50'
-                    : 'border-gray-200 hover:border-gray-300'
+                    ? 'border-neutral-900 dark:border-neutral-100 bg-neutral-50 dark:bg-neutral-700'
+                    : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
                 }`}
                 onClick={() => setSelectedMeetup(meetup)}
               >
-                <h4 className="font-medium text-gray-900 mb-1">{meetup.title}</h4>
-                <p className="text-sm text-gray-600 mb-3">{meetup.groupName}</p>
-                <div className="flex items-center justify-between text-xs text-gray-500">
+                <h4 className="font-medium text-neutral-900 dark:text-neutral-100 mb-1">{meetup.title}</h4>
+                <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-3">{meetup.groupName}</p>
+                <div className="flex items-center justify-between text-xs text-neutral-500 dark:text-neutral-400">
                   <div className="flex items-center gap-1">
                     <Calendar size={12} />
                     <span>{new Date(meetup.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })}</span>
@@ -258,12 +266,12 @@ const MeetupMap = () => {
 
       {/* Selected Meetup Details */}
       {selectedMeetup && (
-        <div className="mt-6 p-6 border border-gray-200 rounded-xl bg-gray-50">
+        <div className="mt-6 p-6 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-neutral-50 dark:bg-neutral-800">
           <div className="flex items-start justify-between">
             <div className="flex-1">
-              <h4 className="text-lg font-semibold text-gray-900 mb-1">{selectedMeetup.title}</h4>
-              <p className="text-gray-600 mb-4">{selectedMeetup.groupName}</p>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-gray-600">
+              <h4 className="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-1">{selectedMeetup.title}</h4>
+              <p className="text-neutral-600 dark:text-neutral-400 mb-4">{selectedMeetup.groupName}</p>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-neutral-600 dark:text-neutral-400">
                 <div className="flex items-center gap-2">
                   <Calendar size={16} />
                   <span>{new Date(selectedMeetup.date).toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
@@ -278,7 +286,7 @@ const MeetupMap = () => {
                 </div>
               </div>
             </div>
-            <button className="bg-black text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors">
+            <button className="bg-neutral-900 dark:bg-neutral-100 text-white dark:text-neutral-900 px-4 py-2 rounded-lg font-medium hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-colors">
               Join event
             </button>
           </div>

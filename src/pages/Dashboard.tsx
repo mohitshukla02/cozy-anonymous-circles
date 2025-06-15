@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import CreateGroupModal from '@/components/CreateGroupModal';
 import { useGroupsData } from '@/hooks/useGroupsData';
+import MeetupMap from '@/components/MeetupMap';
 
 const Dashboard = () => {
   const { user } = useAuth();
@@ -36,32 +37,7 @@ const Dashboard = () => {
 
   const username = profile?.username || user.user_metadata?.username || user.email?.split('@')[0] || 'User';
 
-  // Mock data for upcoming events
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: "Weekend Photography Walk",
-      group: "Local Photographers",
-      date: "Mon, Jun 16",
-      attendees: 9
-    },
-    {
-      id: 2,
-      title: "Saturday Morning Hike",
-      group: "Weekend Hikers", 
-      date: "Tue, Jun 17",
-      attendees: 18
-    },
-    {
-      id: 3,
-      title: "Coffee & Book Discussion",
-      group: "Book Club Enthusiasts",
-      date: "Wed, Jun 18",
-      attendees: 12
-    }
-  ];
-
-  // Mock data for featured groups
+  // Featured Groups
   const featuredGroups = [
     {
       id: 1,
@@ -94,80 +70,32 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50/30 to-gray-100/30 dark:bg-gradient-dark pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-50/30 to-neutral-100/30 dark:bg-gradient-dark pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="text-3xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
+          <h1 className="text-3xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
             Welcome back, {username}
           </h1>
-          <p className="text-gray-600 dark:text-gray-400">
+          <p className="text-neutral-600 dark:text-neutral-400">
             Discover groups and connect with people who share your interests
           </p>
         </div>
 
-        {/* Local Meetups Section */}
+        {/* Local Meetups Section with Map */}
         <div className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">
-                Meetups in {profile?.location_city || 'Hyderabad'}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-400">
-                {upcomingEvents.length} events happening this week
-              </p>
-            </div>
-          </div>
-
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Map Placeholder */}
-            <div className="relative bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700">
-              <div className="aspect-[4/3] bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-700 dark:to-gray-800 flex items-center justify-center">
-                <div className="text-center">
-                  <MapPin size={48} className="mx-auto text-gray-400 dark:text-gray-500 mb-4" />
-                  <p className="text-gray-500 dark:text-gray-400 font-medium">Interactive Map Coming Soon</p>
-                  <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">Discover meetups near you</p>
-                </div>
-              </div>
-            </div>
-
-            {/* Events List */}
-            <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-4">This week's events</h3>
-              <div className="space-y-4">
-                {upcomingEvents.map((event) => (
-                  <div key={event.id} className="flex items-center justify-between p-4 rounded-xl bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 transition-colors cursor-pointer">
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900 dark:text-gray-100">{event.title}</h4>
-                      <p className="text-sm text-gray-600 dark:text-gray-400">{event.group}</p>
-                      <div className="flex items-center space-x-4 mt-2">
-                        <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                          <Calendar size={12} className="mr-1" />
-                          {event.date}
-                        </div>
-                        <div className="flex items-center text-xs text-gray-500 dark:text-gray-400">
-                          <Users size={12} className="mr-1" />
-                          {event.attendees}
-                        </div>
-                      </div>
-                    </div>
-                    <ChevronRight size={16} className="text-gray-400 dark:text-gray-500" />
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+          <MeetupMap />
         </div>
 
         {/* Featured Groups */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
-              <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">Featured groups</h2>
-              <p className="text-gray-600 dark:text-gray-400">Popular communities in your area</p>
+              <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">Featured groups</h2>
+              <p className="text-neutral-600 dark:text-neutral-400">Popular communities in your area</p>
             </div>
             <Link to="/groups">
-              <Button variant="outline" className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+              <Button variant="outline" className="dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700">
                 Show all
                 <ChevronRight size={16} className="ml-1" />
               </Button>
@@ -176,7 +104,7 @@ const Dashboard = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
             {featuredGroups.map((group) => (
-              <div key={group.id} className="group bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-md dark:hover:shadow-xl transition-all duration-300 cursor-pointer">
+              <div key={group.id} className="group bg-white dark:bg-neutral-800 rounded-2xl overflow-hidden shadow-sm border border-neutral-200 dark:border-neutral-700 hover:shadow-md dark:hover:shadow-xl transition-all duration-300 cursor-pointer">
                 <div className="aspect-[4/3] overflow-hidden">
                   <img 
                     src={group.image} 
@@ -185,12 +113,12 @@ const Dashboard = () => {
                   />
                 </div>
                 <div className="p-4">
-                  <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{group.name}</h3>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400 mb-2">
+                  <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 mb-2">{group.name}</h3>
+                  <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400 mb-2">
                     <MapPin size={14} className="mr-1" />
                     {group.location}
                   </div>
-                  <div className="flex items-center text-sm text-gray-600 dark:text-gray-400">
+                  <div className="flex items-center text-sm text-neutral-600 dark:text-neutral-400">
                     <Users size={14} className="mr-1" />
                     {group.members} members
                   </div>
@@ -202,35 +130,35 @@ const Dashboard = () => {
 
         {/* Quick Actions */}
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Your Groups</h3>
-              <Badge variant="secondary" className="dark:bg-gray-700 dark:text-gray-300">
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Your Groups</h3>
+              <Badge variant="secondary" className="dark:bg-neutral-700 dark:text-neutral-300">
                 {userGroups.length}
               </Badge>
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-4">
               {userGroups.length > 0 ? 'Manage your communities and stay connected' : 'Join your first community to get started'}
             </p>
             <Link to="/groups">
-              <Button variant="outline" className="w-full dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
+              <Button variant="outline" className="w-full dark:border-neutral-700 dark:text-neutral-300 dark:hover:bg-neutral-700">
                 <Users size={16} className="mr-2" />
                 {userGroups.length > 0 ? 'View Groups' : 'Discover Groups'}
               </Button>
             </Link>
           </div>
 
-          <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700">
+          <div className="bg-white dark:bg-neutral-800 rounded-2xl p-6 shadow-sm border border-neutral-200 dark:border-neutral-700">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="font-semibold text-gray-900 dark:text-gray-100">Create Community</h3>
-              <Plus size={20} className="text-gray-400 dark:text-gray-500" />
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100">Create Community</h3>
+              <Plus size={20} className="text-neutral-400 dark:text-neutral-500" />
             </div>
-            <p className="text-gray-600 dark:text-gray-400 text-sm mb-4">
+            <p className="text-neutral-600 dark:text-neutral-400 text-sm mb-4">
               Start a new group and bring people together around shared interests
             </p>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="w-full bg-gray-900 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white"
+              className="w-full bg-neutral-900 hover:bg-neutral-800 dark:bg-neutral-600 dark:hover:bg-neutral-500 text-white"
             >
               <Plus size={16} className="mr-2" />
               Create Group
