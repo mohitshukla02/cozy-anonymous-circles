@@ -42,6 +42,18 @@ const getMeetupFrequency = (group: Group) => {
   return Math.floor(Math.random() * 8) + 4; // 4-12 times per month for online groups
 };
 
+// Mock function to get next meetup date
+const getNextMeetupDate = (group: Group) => {
+  if (group.type !== 'local-meetup') return null;
+  
+  // Generate a random upcoming date within the next 2 weeks
+  const now = new Date();
+  const randomDays = Math.floor(Math.random() * 14) + 1;
+  const nextMeetup = new Date(now.getTime() + randomDays * 24 * 60 * 60 * 1000);
+  
+  return nextMeetup;
+};
+
 const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJoined = false }: GroupDetailDialogProps) => {
   if (!group) return null;
 
@@ -55,6 +67,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
 
   const groupHealth = getGroupHealth(group);
   const meetupFrequency = getMeetupFrequency(group);
+  const nextMeetupDate = getNextMeetupDate(group);
 
   const handleJoinClick = () => {
     onJoin(group.id);
@@ -91,7 +104,7 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
           <div className="flex items-start justify-between">
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-2">
-                <DialogTitle className="text-2xl font-semibold text-gray-900">
+                <DialogTitle className="text-3xl font-semibold text-gray-900">
                   {group.name}
                 </DialogTitle>
                 {matchingTags.length > 0 && (
@@ -141,10 +154,21 @@ const GroupDetailDialog = ({ group, isOpen, onClose, onJoin, userTags = [], isJo
             </div>
             
             <div className="text-center p-3 bg-gray-50 rounded-xl">
-              <div className="text-xs text-gray-500 mb-1">Created</div>
-              <div className="font-semibold text-gray-900 text-sm">
-                {new Date(group.createdDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-              </div>
+              {group.type === 'local-meetup' && nextMeetupDate ? (
+                <>
+                  <div className="text-xs text-gray-500 mb-1">Next Meetup</div>
+                  <div className="font-semibold text-gray-900 text-sm">
+                    {nextMeetupDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </div>
+                </>
+              ) : (
+                <>
+                  <div className="text-xs text-gray-500 mb-1">Created</div>
+                  <div className="font-semibold text-gray-900 text-sm">
+                    {new Date(group.createdDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
+                  </div>
+                </>
+              )}
             </div>
           </div>
 
