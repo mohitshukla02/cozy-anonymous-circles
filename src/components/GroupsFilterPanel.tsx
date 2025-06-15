@@ -41,7 +41,7 @@ const GroupsFilterPanel = ({
         {/* Group Type Filter */}
         <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
           <Button
-            variant={groupType === 'all' ? 'default' : 'ghost'}
+            variant={groupType === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('all')}
             className="flex-1 text-xs dark:text-gray-300"
@@ -49,7 +49,7 @@ const GroupsFilterPanel = ({
             All
           </Button>
           <Button
-            variant={groupType === 'interest' ? 'default' : 'ghost'}
+            variant={groupType === 'interest' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('interest')}
             className="flex-1 text-xs dark:text-gray-300"
@@ -57,7 +57,7 @@ const GroupsFilterPanel = ({
             Global
           </Button>
           <Button
-            variant={groupType === 'local-meetup' ? 'default' : 'ghost'}
+            variant={groupType === 'local-meetup' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('local-meetup')}
             className="flex-1 text-xs dark:text-gray-300"
@@ -94,8 +94,8 @@ const GroupsFilterPanel = ({
             ))}
             {selectedTag && (
               <Badge
-                variant="ghost"
-                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                variant="outline"
+                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 border-gray-300 dark:border-gray-600"
                 onClick={() => setSelectedTag(null)}
               >
                 Clear

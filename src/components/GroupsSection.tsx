@@ -74,7 +74,7 @@ const GroupsSection = ({
             userTags={userTags}
             isJoined={userGroups.includes(group.id)}
             onJoin={onJoin}
-            onView={onViewGroup}
+            onViewGroup={onViewGroup}
           />
         ))}
       </div>
