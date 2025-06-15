@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Calendar, Plus } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import MeetupCard from './MeetupCard';
+import { Card, CardContent } from './ui/card';
+import MeetupHeader from './meetup/MeetupHeader';
+import MeetupEmptyState from './meetup/MeetupEmptyState';
+import MeetupList from './meetup/MeetupList';
 import PlanMeetupModal from './PlanMeetupModal';
 import { useToast } from '../hooks/use-toast';
 
@@ -77,6 +77,10 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
     return now >= twoHoursBefore && now <= sixHoursAfter;
   };
 
+  const handlePlanMeetup = () => {
+    setShowPlanModal(true);
+  };
+
   if (!isLocalGroup) {
     return null; // Only show for local meetup groups
   }
@@ -85,18 +89,7 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
     <div className="space-y-6">
       {/* Header with Plan Meetup button */}
       <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Calendar size={20} />
-              Meetups
-            </CardTitle>
-            <Button onClick={() => setShowPlanModal(true)} size="sm" className="rounded-xl">
-              <Plus size={14} className="mr-1" />
-              Plan Meetup
-            </Button>
-          </div>
-        </CardHeader>
+        <MeetupHeader onPlanMeetup={handlePlanMeetup} />
         
         <CardContent>
           {isLoading ? (
@@ -104,31 +97,15 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
               Loading meetups...
             </div>
           ) : meetups.length === 0 ? (
-            <div className="text-center py-8">
-              <Calendar size={48} className="mx-auto text-gray-400 mb-4" />
-              <h3 className="font-semibold text-gray-900 mb-2">No meetups planned</h3>
-              <p className="text-gray-600 text-sm mb-4">
-                Start building your community by planning the first meetup!
-              </p>
-              <Button onClick={() => setShowPlanModal(true)} size="sm">
-                Plan First Meetup
-              </Button>
-            </div>
+            <MeetupEmptyState onPlanMeetup={handlePlanMeetup} />
           ) : (
-            <div className="space-y-4">
-              {meetups.map(meetup => (
-                <MeetupCard
-                  key={meetup.id}
-                  meetup={meetup}
-                  currentUserId={currentUserId}
-                  userRsvpStatus={undefined} // Would come from backend
-                  userCheckedIn={false} // Would come from backend
-                  onRsvp={(status) => handleRsvp(meetup.id, status)}
-                  onCheckIn={() => handleCheckIn(meetup.id)}
-                  canCheckIn={canCheckIn(meetup)}
-                />
-              ))}
-            </div>
+            <MeetupList
+              meetups={meetups}
+              currentUserId={currentUserId}
+              onRsvp={handleRsvp}
+              onCheckIn={handleCheckIn}
+              canCheckIn={canCheckIn}
+            />
           )}
         </CardContent>
       </Card>
