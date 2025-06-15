@@ -12,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Moon, Sun } from 'lucide-react';
+import { Moon, Sun, MessageSquare } from 'lucide-react';
 import { Button } from './ui/button';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import NotificationBell from './meetup/NotificationBell';
@@ -23,7 +23,7 @@ const Header = () => {
   const { profile } = useUserProfile();
 
   return (
-    <header className="bg-white dark:bg-neutral-900 border-b dark:border-neutral-800 py-4">
+    <header className="sticky top-0 z-50 bg-white dark:bg-neutral-900 border-b dark:border-neutral-800 py-4">
       <div className="container mx-auto px-4 flex items-center justify-between">
         <Link to="/" className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100">
           ConnectSphere
@@ -35,9 +35,11 @@ const Header = () => {
           <Link to="/feed" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
             Feed
           </Link>
-          <Link to="/messages" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
-            Messages
-          </Link>
+          <Button variant="ghost" size="sm" asChild>
+            <Link to="/messages" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
+              <MessageSquare size={18} />
+            </Link>
+          </Button>
           
           {/* Add notification bell before user profile */}
           <NotificationBell />
@@ -61,6 +63,21 @@ const Header = () => {
                 <DropdownMenuItem asChild>
                   <Link to="/settings">Settings</Link>
                 </DropdownMenuItem>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
+                  {theme === "dark" ? (
+                    <>
+                      <Sun className="h-4 w-4 mr-2" />
+                      Light mode
+                    </>
+                  ) : (
+                    <>
+                      <Moon className="h-4 w-4 mr-2" />
+                      Dark mode
+                    </>
+                  )}
+                </DropdownMenuItem>
+                <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={() => signOut()}>Sign Out</DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
@@ -74,10 +91,6 @@ const Header = () => {
               </Link>
             </>
           )}
-          <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            {theme === "dark" ? <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 transition-all dark:-rotate-90" /> : <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 transition-all dark:rotate-0" />}
-            <span className="sr-only">Toggle theme</span>
-          </Button>
         </nav>
         <div className="md:hidden">
           <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
