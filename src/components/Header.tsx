@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
@@ -11,7 +12,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { MoonIcon, SunIcon } from '@radix-ui/react-icons';
+import { Moon, Sun } from 'lucide-react';
 import { Button } from './ui/button';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import NotificationBell from './meetup/NotificationBell';
@@ -46,8 +47,8 @@ const Header = () => {
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="h-8 w-8 p-0 rounded-full">
                   <Avatar className="h-8 w-8">
-                    <AvatarImage src={profile?.avatar_url} />
-                    <AvatarFallback>{profile?.full_name?.substring(0, 2).toUpperCase()}</AvatarFallback>
+                    <AvatarImage src={user?.user_metadata?.avatar_url} />
+                    <AvatarFallback>{profile?.username?.substring(0, 2).toUpperCase()}</AvatarFallback>
                   </Avatar>
                 </Button>
               </DropdownMenuTrigger>
@@ -74,13 +75,13 @@ const Header = () => {
             </>
           )}
           <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            {theme === "dark" ? <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 transition-all dark:-rotate-90" /> : <MoonIcon className="h-[1.2rem] w-[1.2rem] rotate-90 transition-all dark:rotate-0" />}
+            {theme === "dark" ? <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 transition-all dark:-rotate-90" /> : <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 transition-all dark:rotate-0" />}
             <span className="sr-only">Toggle theme</span>
           </Button>
         </nav>
         <div className="md:hidden">
           <Button variant="ghost" size="sm" onClick={() => setTheme(theme === "dark" ? "light" : "dark")}>
-            {theme === "dark" ? <SunIcon className="h-[1.2rem] w-[1.2rem] rotate-0 transition-all dark:-rotate-90" /> : <MoonIcon className="h-[1.2rem] w-[1.2rem] rotate-90 transition-all dark:rotate-0" />}
+            {theme === "dark" ? <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 transition-all dark:-rotate-90" /> : <Moon className="h-[1.2rem] w-[1.2rem] rotate-90 transition-all dark:rotate-0" />}
             <span className="sr-only">Toggle theme</span>
           </Button>
         </div>
