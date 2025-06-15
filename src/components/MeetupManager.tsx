@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from './ui/card';
 import MeetupHeader from './meetup/MeetupHeader';
@@ -111,14 +110,15 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
 
   const handleRsvp = async (meetupId: string, status: 'attending' | 'not_attending' | 'suggest_new_time') => {
     try {
+      // Map the new status to database values
       const rsvpStatus = status === 'attending' ? 'attending' : 
                         status === 'not_attending' ? 'not_attending' : 
-                        'interested'; // Map suggest_new_time to interested for now
+                        'interested'; // Map suggest_new_time to interested for database compatibility
 
       const success = await rsvpToMeetup(meetupId, currentUserId, rsvpStatus);
       
       if (success) {
-        setUserRSVPs(prev => ({ ...prev, [meetupId]: rsvpStatus }));
+        setUserRSVPs(prev => ({ ...prev, [meetupId]: status })); // Store the original status for UI
         loadMeetups(); // Reload to get updated counts
         
         const statusText = status === 'attending' ? 'attending' : 

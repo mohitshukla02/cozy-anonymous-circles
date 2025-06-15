@@ -1,6 +1,9 @@
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, Users, MapPin, Clock } from 'lucide-react';
+import RSVPActions from './RSVPActions';
+import MeetupRecapModal from './MeetupRecapModal';
+import { useNotifications } from '../../hooks/useNotifications';
 
 interface DatabaseMeetup {
   id: string;
@@ -34,6 +37,10 @@ const MeetupList = ({
   userRSVPs, 
   userCheckIns 
 }: MeetupListProps) => {
+  const { createNotification } = useNotifications();
+  const [showRecapModal, setShowRecapModal] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+
   const formatDate = (dateTime: string) => {
     return new Date(dateTime).toLocaleDateString('en-US', { 
       weekday: 'short', 
@@ -56,6 +63,57 @@ const MeetupList = ({
         return 'text-blue-600 bg-blue-50';
     }
   };
+
+  const handleRsvp = async (meetupId: string, status: 'attending' | 'not_attending' | 'suggest_new_time') => {
+    setIsLoading(true);
+    try {
+      await onRsvp(meetupId, status);
+      
+      // Create notification for meetup creator
+      const meetup = meetups.find(m => m.id === meetupId);
+      if (meetup && meetup.createdBy !== currentUserId) {
+        const statusText = status === 'attending' ? 'will attend' : 
+                          status === 'not_attending' ? 'can\'t attend' : 
+                          'suggested a new time for';
+        
+        await createNotification(
+          meetup.createdBy,
+          'rsvp_update',
+          'RSVP Update',
+          `Someone ${statusText} your meetup "${meetup.title}"`,
+          { meetupId, status }
+        );
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleCheckIn = async (meetupId: string) => {
+    setIsLoading(true);
+    try {
+      await onCheckIn(meetupId);
+      
+      // Check if this creates a successful meetup
+      const meetup = meetups.find(m => m.id === meetupId);
+      if (meetup && meetup.checkinCount + 1 >= 3) {
+        // Show recap modal after successful check-in
+        setTimeout(() => {
+          setShowRecapModal(meetupId);
+        }, 2000);
+      }
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleSubmitRecap = async (recap: string) => {
+    // This would integrate with the post creation system
+    // For now, we'll just close the modal
+    setShowRecapModal(null);
+  };
+
+  const selectedMeetup = meetups.find(m => m.id === showRecapModal);
 
   return (
     <div className="space-y-4">
@@ -84,10 +142,6 @@ const MeetupList = ({
                   <MapPin size={12} />
                   <span>{meetup.location}</span>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Users size={12} />
-                  <span>{meetup.rsvpCount} RSVPs</span>
-                </div>
               </div>
             </div>
             <span className={`px-2 py-1 rounded text-xs font-medium ${getStatusColor(meetup.status)}`}>
@@ -95,42 +149,30 @@ const MeetupList = ({
             </span>
           </div>
 
-          <div className="flex gap-2 flex-wrap">
-            {!userRSVPs[meetup.id] && (
-              <>
-                <button
-                  onClick={() => onRsvp(meetup.id, 'attending')}
-                  className="px-3 py-1 bg-green-600 text-white text-xs rounded hover:bg-green-700 transition-colors"
-                >
-                  Attending
-                </button>
-                <button
-                  onClick={() => onRsvp(meetup.id, 'not_attending')}
-                  className="px-3 py-1 bg-red-600 text-white text-xs rounded hover:bg-red-700 transition-colors"
-                >
-                  Can't make it
-                </button>
-              </>
-            )}
-
-            {userRSVPs[meetup.id] === 'attending' && !userCheckIns[meetup.id] && canCheckIn(meetup) && (
-              <button
-                onClick={() => onCheckIn(meetup.id)}
-                className="px-3 py-1 bg-blue-600 text-white text-xs rounded hover:bg-blue-700 transition-colors"
-              >
-                Check In
-              </button>
-            )}
-
-            {userRSVPs[meetup.id] && (
-              <span className="px-3 py-1 bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 text-xs rounded">
-                RSVP: {userRSVPs[meetup.id]}
-                {userCheckIns[meetup.id] && ' (Checked in)'}
-              </span>
-            )}
-          </div>
+          <RSVPActions
+            meetupId={meetup.id}
+            currentUserId={currentUserId}
+            userRsvpStatus={userRSVPs[meetup.id] as 'attending' | 'not_attending' | 'suggest_new_time'}
+            userCheckedIn={userCheckIns[meetup.id]}
+            rsvpCount={meetup.rsvpCount}
+            checkinCount={meetup.checkinCount}
+            canCheckIn={canCheckIn(meetup)}
+            isLoading={isLoading}
+            onRsvp={(status) => handleRsvp(meetup.id, status)}
+            onCheckIn={() => handleCheckIn(meetup.id)}
+          />
         </div>
       ))}
+
+      {/* Recap Modal */}
+      {showRecapModal && selectedMeetup && (
+        <MeetupRecapModal
+          isOpen={true}
+          onClose={() => setShowRecapModal(null)}
+          meetupTitle={selectedMeetup.title}
+          onSubmitRecap={handleSubmitRecap}
+        />
+      )}
     </div>
   );
 };
