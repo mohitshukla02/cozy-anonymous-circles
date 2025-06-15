@@ -1,14 +1,10 @@
 
 import React, { useState } from 'react';
-import { Calendar, Clock, Users, BookOpen, Gamepad2, Coffee } from 'lucide-react';
+import { Calendar } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
-import { Button } from './ui/button';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useToast } from '../hooks/use-toast';
-import GooglePlacesSelector from './GooglePlacesSelector';
+import MeetupFormFields from './meetup/MeetupFormFields';
+import MeetupFormActions from './meetup/MeetupFormActions';
 
 interface PlanMeetupModalProps {
   isOpen: boolean;
@@ -23,14 +19,6 @@ interface PlanMeetupModalProps {
     purpose: string;
   }) => void;
 }
-
-const PURPOSE_OPTIONS = [
-  { id: 'coffee', label: 'Coffee Chat', icon: Coffee },
-  { id: 'walk', label: 'Walk & Talk', icon: Users },
-  { id: 'workshop', label: 'Workshop', icon: BookOpen },
-  { id: 'games', label: 'Games Night', icon: Gamepad2 },
-  { id: 'social', label: 'Social Hangout', icon: Users }
-];
 
 const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated }: PlanMeetupModalProps) => {
   const { toast } = useToast();
@@ -122,89 +110,17 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <Label htmlFor="title">Meetup Title *</Label>
-            <Input
-              id="title"
-              value={formData.title}
-              onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-              placeholder="e.g., Coffee & Chat"
-              maxLength={100}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="description">Description</Label>
-            <Textarea
-              id="description"
-              value={formData.description}
-              onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-              placeholder="What will you do at this meetup?"
-              rows={3}
-              maxLength={300}
-            />
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <Label htmlFor="date">Date *</Label>
-              <Input
-                id="date"
-                type="date"
-                value={formData.date}
-                onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                min={new Date().toISOString().split('T')[0]}
-              />
-            </div>
-            <div>
-              <Label htmlFor="time">Time *</Label>
-              <Input
-                id="time"
-                type="time"
-                value={formData.time}
-                onChange={(e) => setFormData({ ...formData, time: e.target.value })}
-              />
-            </div>
-          </div>
-
-          <div>
-            <Label>Location *</Label>
-            <GooglePlacesSelector
-              onLocationSelect={handleLocationSelect}
-              selectedLocation={selectedPlace}
-            />
-          </div>
-
-          <div>
-            <Label htmlFor="purpose">Purpose</Label>
-            <Select value={formData.purpose} onValueChange={(value) => setFormData({ ...formData, purpose: value })}>
-              <SelectTrigger>
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {PURPOSE_OPTIONS.map((option) => {
-                  const Icon = option.icon;
-                  return (
-                    <SelectItem key={option.id} value={option.id}>
-                      <div className="flex items-center gap-2">
-                        <Icon size={14} />
-                        {option.label}
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-              </SelectContent>
-            </Select>
-          </div>
-
-          <div className="flex gap-3 pt-4">
-            <Button type="button" variant="outline" onClick={onClose} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={isLoading} className="flex-1">
-              {isLoading ? 'Creating...' : 'Create Meetup'}
-            </Button>
-          </div>
+          <MeetupFormFields
+            formData={formData}
+            onFormDataChange={setFormData}
+            selectedPlace={selectedPlace}
+            onLocationSelect={handleLocationSelect}
+          />
+          
+          <MeetupFormActions
+            onCancel={onClose}
+            isLoading={isLoading}
+          />
         </form>
       </DialogContent>
     </Dialog>
