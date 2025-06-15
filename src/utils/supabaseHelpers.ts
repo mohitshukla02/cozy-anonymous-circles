@@ -1,6 +1,6 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { generateAnonymousName } from './groupStorage';
+import { trackMessageSent } from './trackActivity';
 
 export interface Message {
   id: string;
@@ -144,6 +144,9 @@ export const sendMessage = async (
     console.error('Error sending message:', error);
     return false;
   }
+
+  // Log the action
+  await trackMessageSent(senderId);
 
   return true;
 };

@@ -54,6 +54,45 @@ export type Database = {
           },
         ]
       }
+      content_creations: {
+        Row: {
+          content_type: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          content_type: string
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          content_type?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      group_creations: {
+        Row: {
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       groups: {
         Row: {
           admin_id: string
@@ -231,6 +270,24 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      message_sends: {
+        Row: {
+          id: string
+          sent_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          sent_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          sent_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       messages: {
         Row: {

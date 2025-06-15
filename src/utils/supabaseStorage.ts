@@ -1,5 +1,6 @@
 import { supabase } from '@/integrations/supabase/client';
 import { Group, Post, Comment, UserGroup } from '@/types/groups';
+import { trackGroupCreated, trackContentCreated } from './trackActivity';
 
 // Group operations
 export const getGroups = async (): Promise<Group[]> => {
@@ -107,6 +108,9 @@ export const createGroup = async (group: Omit<Group, 'id' | 'createdDate' | 'mem
     .single();
 
   if (error) throw error;
+
+  // Log group creation
+  await trackGroupCreated(user.id);
 
   return {
     id: data.id,
@@ -228,6 +232,9 @@ export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' |
 
   if (error) throw error;
 
+  // Log post creation
+  await trackContentCreated(post.authorId, 'post');
+
   return {
     id: data.id,
     authorId: data.author_id,
@@ -276,6 +283,9 @@ export const createComment = async (comment: Omit<Comment, 'id' | 'createdAt' | 
     .single();
 
   if (error) throw error;
+
+  // Log comment creation
+  await trackContentCreated(comment.authorId, 'comment');
 
   return {
     id: data.id,
