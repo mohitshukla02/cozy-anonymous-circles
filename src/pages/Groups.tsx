@@ -1,9 +1,10 @@
+
 import React, { useState, useEffect } from 'react';
 import { Plus, MapPin, Globe } from 'lucide-react';
 import { Group } from '@/types/groups';
 import { getGroups, createGroup, getUserGroups, joinGroup } from '@/utils/supabaseStorage';
 import CreateGroupModal from '@/components/CreateGroupModal';
-import GroupsFilters from '@/components/GroupsFilters';
+import GroupsFilterPanel from '@/components/GroupsFilterPanel';
 import GroupsSection from '@/components/GroupsSection';
 import GroupDetailDialog from '@/components/GroupDetailDialog';
 import LocationFilter from '@/components/LocationFilter';
@@ -27,7 +28,6 @@ const Groups = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedTag, setSelectedTag] = useState('');
   const [groupType, setGroupType] = useState<'all' | 'interest' | 'local-meetup'>('all');
-  const [cityFilter, setCityFilter] = useState('');
   const [locationFilter, setLocationFilter] = useState('Hyderabad, India');
   
   const { profile, loading: profileLoading } = useUserProfile();
@@ -125,9 +125,6 @@ const Groups = () => {
 
   const handleLocationChange = (location: string) => {
     setLocationFilter(location);
-    // Also update the city filter to match the location
-    const city = location.split(',')[0].trim();
-    setCityFilter(city);
   };
 
   if (loading || profileLoading) {
@@ -148,8 +145,9 @@ const Groups = () => {
     );
   }
 
+  const cityFilter = locationFilter ? locationFilter.split(',')[0].trim() : '';
   const filteredGroups = filterGroups(groups, searchTerm, selectedTag, groupType, cityFilter);
-  const { allTags, allCities } = getUniqueTagsAndCities(groups);
+  const { allTags } = getUniqueTagsAndCities(groups);
   const { interestGroups, localGroups } = separateGroupsByType(filteredGroups);
 
   return (
@@ -182,26 +180,23 @@ const Groups = () => {
           </div>
         </div>
 
-        {/* Search and Filters */}
-        <GroupsFilters
+        {/* New Filter Panel */}
+        <GroupsFilterPanel
           searchTerm={searchTerm}
           setSearchTerm={setSearchTerm}
           groupType={groupType}
           setGroupType={setGroupType}
           selectedTag={selectedTag}
           setSelectedTag={setSelectedTag}
-          cityFilter={cityFilter}
-          setCityFilter={setCityFilter}
           allTags={allTags}
-          allCities={allCities}
         />
 
-        {/* Global Groups */}
+        {/* Trending Groups */}
         {(groupType === 'all' || groupType === 'interest') && (
           <GroupsSection
-            title="Global Communities"
-            subtitle="Online discussions around shared interests and hobbies"
-            groups={interestGroups}
+            title="Trending Now"
+            subtitle="Popular communities with active discussions"
+            groups={interestGroups.slice(0, 6)}
             userTags={profile?.selected_tags || []}
             userGroups={userGroups}
             onJoin={handleJoinGroup}
@@ -209,8 +204,24 @@ const Groups = () => {
             showViewAll={groupType === 'all'}
             onViewAll={() => setGroupType('interest')}
             emptyIcon={<Globe size={48} className="mx-auto text-gray-400 mb-4" />}
-            emptyMessage="No global groups found matching your criteria."
+            emptyMessage="No trending groups found matching your criteria."
             emptySubMessage="Try adjusting your filters or create a new community!"
+          />
+        )}
+
+        {/* Suggested Groups */}
+        {(groupType === 'all' || groupType === 'interest') && interestGroups.length > 6 && (
+          <GroupsSection
+            title="Based on Your Interests"
+            subtitle="Communities that match your selected interests and preferences"
+            groups={interestGroups.slice(6)}
+            userTags={profile?.selected_tags || []}
+            userGroups={userGroups}
+            onJoin={handleJoinGroup}
+            onViewGroup={handleViewGroup}
+            emptyIcon={<Globe size={48} className="mx-auto text-gray-400 mb-4" />}
+            emptyMessage="No suggested groups found."
+            emptySubMessage="Update your interests in your profile to get better recommendations!"
           />
         )}
 
