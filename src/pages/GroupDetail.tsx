@@ -1,18 +1,17 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Plus, TrendingUp, MessageCircle, Heart, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Group, Post, Comment } from '../types/groups';
 import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups } from '../utils/supabaseStorage';
-import PostCard from '../components/PostCard';
-import UserAvatarWithName from '../components/UserAvatarWithName';
+import GroupHeader from '../components/group-detail/GroupHeader';
+import GroupInfoCard from '../components/group-detail/GroupInfoCard';
+import CreatePostCard from '../components/group-detail/CreatePostCard';
+import PostsSection from '../components/group-detail/PostsSection';
+import NotMemberCard from '../components/group-detail/NotMemberCard';
 import MeetupManager from '../components/MeetupManager';
 import MeetupWarningBanner from '../components/MeetupWarningBanner';
 import PlanMeetupModal from '../components/PlanMeetupModal';
-import { Badge } from '../components/ui/badge';
-import { Button } from '../components/ui/button';
-import { Card, CardContent } from '../components/ui/card';
-import { TAG_CATEGORIES } from '../types/tags';
 import { useToast } from '../hooks/use-toast';
 
 const GroupDetail = () => {
@@ -23,17 +22,9 @@ const GroupDetail = () => {
   const [group, setGroup] = useState<Group | null>(null);
   const [posts, setPosts] = useState<Post[]>([]);
   const [comments, setComments] = useState<Comment[]>([]);
-  const [newPostContent, setNewPostContent] = useState('');
   const [sortBy, setSortBy] = useState<'recent' | 'liked' | 'discussed'>('recent');
   const [isJoined, setIsJoined] = useState(false);
   const [showPlanMeetupModal, setShowPlanMeetupModal] = useState(false);
-
-  const tagNames = new Map();
-  TAG_CATEGORIES.forEach(category => {
-    category.tags.forEach(tag => {
-      tagNames.set(tag.id, tag.name);
-    });
-  });
 
   useEffect(() => {
     if (!user || !groupId) {
@@ -80,19 +71,17 @@ const GroupDetail = () => {
     }
   };
 
-  const handleCreatePost = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user || !group || !newPostContent.trim()) return;
+  const handleCreatePost = async (content: string) => {
+    if (!user || !group) return;
 
     try {
       await createPost({
         groupId: group.id,
         authorId: user.id,
-        content: newPostContent.trim(),
+        content,
         editedAt: undefined
       });
 
-      setNewPostContent('');
       loadGroupData();
       
       toast({
@@ -146,24 +135,9 @@ const GroupDetail = () => {
     }
   };
 
-  const getSortedPosts = () => {
-    const sortedPosts = [...posts];
-    
-    switch (sortBy) {
-      case 'liked':
-        return sortedPosts.sort((a, b) => b.likes.length - a.likes.length);
-      case 'discussed':
-        return sortedPosts.sort((a, b) => {
-          const aComments = comments.filter(c => c.postId === a.id).length;
-          const bComments = comments.filter(c => c.postId === b.id).length;
-          return bComments - aComments;
-        });
-      case 'recent':
-      default:
-        return sortedPosts.sort((a, b) => 
-          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-    }
+  const getCommentLikeStatus = (commentId: string) => {
+    const comment = comments.find(c => c.id === commentId);
+    return comment?.likes.includes(user?.id || '') || false;
   };
 
   if (!group) {
@@ -180,41 +154,15 @@ const GroupDetail = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
       <div className="max-w-4xl mx-auto px-4 py-6">
         {/* Header */}
-        <div className="flex items-center gap-3 mb-6">
-          <button
-            onClick={() => navigate('/groups')}
-            className="p-3 rounded-2xl bg-white/80 backdrop-blur-sm border border-gray-200/50 text-gray-600 hover:text-gray-900 hover:bg-white transition-all duration-200 hover:shadow-md"
-          >
-            <ArrowLeft size={20} />
-          </button>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
-                {group.name}
-              </h1>
-              {isArchived && (
-                <Badge variant="secondary" className="bg-gray-100 text-gray-600">
-                  Archived
-                </Badge>
-              )}
-            </div>
-            <p className="text-sm text-gray-500 mt-1">
-              {group.memberIds.length} members • {getSortedPosts().length} posts
-            </p>
-          </div>
-          
-          {/* Quick Plan Meetup button for local groups */}
-          {isJoined && group.type === 'local-meetup' && !isArchived && (
-            <Button
-              onClick={() => setShowPlanMeetupModal(true)}
-              size="sm"
-              className="rounded-xl"
-            >
-              <Calendar size={14} className="mr-1" />
-              Plan Meetup
-            </Button>
-          )}
-        </div>
+        <GroupHeader
+          groupName={group.name}
+          isArchived={isArchived}
+          memberCount={group.memberIds.length}
+          postCount={posts.length}
+          isJoined={isJoined}
+          isLocalGroup={group.type === 'local-meetup'}
+          onPlanMeetup={() => setShowPlanMeetupModal(true)}
+        />
 
         {/* Meetup Warning Banner for local groups */}
         {isJoined && group.type === 'local-meetup' && group.meetupDeadline && (
@@ -227,48 +175,7 @@ const GroupDetail = () => {
         )}
 
         {/* Group Info Card */}
-        <Card className={`mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm ${isArchived ? 'opacity-75' : ''}`}>
-          {group.image && (
-            <div className="relative h-48 overflow-hidden rounded-t-2xl">
-              <img 
-                src={group.image} 
-                alt={group.name}
-                className="w-full h-full object-cover"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-              <Badge 
-                variant="outline"
-                className="absolute top-4 right-4 text-xs px-3 py-1.5 border-0 font-medium backdrop-blur-md bg-white/90 text-gray-700 shadow-sm rounded-full"
-              >
-                {group.type === 'local-meetup' ? 'Local' : 'Global'}
-              </Badge>
-            </div>
-          )}
-          <CardContent className="p-6">
-            <p className="text-gray-700 text-sm mb-4 leading-relaxed">{group.description}</p>
-            
-            <div className="flex items-center gap-4 mb-4 text-xs text-gray-500">
-              <div className="flex items-center gap-1.5">
-                <Users size={14} />
-                <span>{group.memberIds.length}/{group.memberLimit} members</span>
-              </div>
-              <div className="w-1 h-1 bg-gray-300 rounded-full" />
-              <span>Created {new Date(group.createdDate).toLocaleDateString()}</span>
-            </div>
-
-            <div className="flex flex-wrap gap-2">
-              {group.tags.map(tagId => (
-                <Badge 
-                  key={tagId} 
-                  variant="outline" 
-                  className="text-xs px-3 py-1 bg-gradient-to-r from-purple-50 to-pink-50 text-purple-700 border-0 font-medium rounded-full"
-                >
-                  {tagNames.get(tagId)}
-                </Badge>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+        <GroupInfoCard group={group} isArchived={isArchived} />
 
         {isJoined ? (
           <>
@@ -284,117 +191,30 @@ const GroupDetail = () => {
 
             {/* Create Post Card - disabled if archived */}
             {!isArchived && (
-              <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
-                <CardContent className="p-6">
-                  <form onSubmit={handleCreatePost}>
-                    <div className="flex items-start gap-4">
-                      <UserAvatarWithName userId={user.id} groupId={group.id} showName={false} />
-                      <div className="flex-1">
-                        <textarea
-                          value={newPostContent}
-                          onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
-                          placeholder="Share your thoughts with the group..."
-                          maxLength={500}
-                          rows={3}
-                          className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
-                        />
-                        <div className="flex justify-between items-center mt-3">
-                          <span className="text-xs text-gray-400">
-                            {newPostContent.length}/500
-                          </span>
-                          <Button
-                            type="submit"
-                            disabled={!newPostContent.trim()}
-                            size="sm"
-                            className="rounded-xl"
-                          >
-                            <Plus size={14} className="mr-1" />
-                            Post
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                  </form>
-                </CardContent>
-              </Card>
+              <CreatePostCard
+                userId={user.id}
+                groupId={group.id}
+                onCreatePost={handleCreatePost}
+              />
             )}
 
-            {/* Sort Options */}
-            <div className="flex gap-2 mb-6">
-              {[
-                { key: 'recent', label: 'Recent', icon: TrendingUp },
-                { key: 'liked', label: 'Liked', icon: Heart },
-                { key: 'discussed', label: 'Discussed', icon: MessageCircle }
-              ].map(({ key, label, icon: Icon }) => (
-                <Button
-                  key={key}
-                  variant={sortBy === key ? "default" : "outline"}
-                  size="sm"
-                  onClick={() => setSortBy(key as any)}
-                  className="rounded-xl"
-                >
-                  <Icon size={12} className="mr-1" />
-                  {label}
-                </Button>
-              ))}
-            </div>
-
-            {/* Posts */}
-            <div className="space-y-4">
-              {getSortedPosts().length === 0 ? (
-                <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
-                  <CardContent className="text-center py-12">
-                    <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                      <MessageCircle size={24} className="text-blue-600" />
-                    </div>
-                    <h3 className="font-semibold text-gray-900 mb-2 text-sm">
-                      No posts yet
-                    </h3>
-                    <p className="text-gray-600 text-xs">
-                      {isArchived ? 'This group has been archived.' : 'Be the first to start a conversation!'}
-                    </p>
-                  </CardContent>
-                </Card>
-              ) : (
-                getSortedPosts().map(post => (
-                  <PostCard
-                    key={post.id}
-                    post={post}
-                    authorName={''}
-                    comments={comments.filter(c => c.postId === post.id)}
-                    onLike={handleLikePost}
-                    onComment={handleComment}
-                    onLikeComment={handleLikeComment}
-                    currentUserId={user.id}
-                    getAuthorName={() => ''}
-                    groupId={group.id}
-                    isLiked={post.likes.includes(user.id)}
-                    getCommentLikeStatus={(commentId) => {
-                      const comment = comments.find(c => c.id === commentId);
-                      return comment?.likes.includes(user.id) || false;
-                    }}
-                  />
-                ))
-              )}
-            </div>
+            {/* Posts Section */}
+            <PostsSection
+              posts={posts}
+              comments={comments}
+              sortBy={sortBy}
+              onSortChange={setSortBy}
+              currentUserId={user.id}
+              groupId={group.id}
+              onLike={handleLikePost}
+              onComment={handleComment}
+              onLikeComment={handleLikeComment}
+              getCommentLikeStatus={getCommentLikeStatus}
+              isArchived={isArchived}
+            />
           </>
         ) : (
-          <Card className="rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
-            <CardContent className="text-center py-12">
-              <div className="w-16 h-16 bg-gradient-to-br from-blue-100 to-purple-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                <Users size={24} className="text-blue-600" />
-              </div>
-              <h3 className="font-semibold text-gray-900 mb-2 text-sm">
-                Join to participate
-              </h3>
-              <p className="text-gray-600 text-xs mb-4">
-                Become a member to view posts and join discussions.
-              </p>
-              <Button onClick={() => navigate('/groups')} className="rounded-xl">
-                Back to Groups
-              </Button>
-            </CardContent>
-          </Card>
+          <NotMemberCard />
         )}
 
         {/* Plan Meetup Modal */}
