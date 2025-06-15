@@ -14,13 +14,13 @@ const LandingHeader: React.FC = () => (
         </div>
         <div className="flex items-center space-x-4">
           <Link
-            to="/auth"
+            to="/auth?mode=signin"
             className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
           >
             Sign in
           </Link>
           <Link
-            to="/auth"
+            to="/auth?mode=signup"
             className="bg-gray-900 text-white px-4 py-2 rounded-lg font-medium hover:bg-gray-800 transition-colors"
           >
             Join now
