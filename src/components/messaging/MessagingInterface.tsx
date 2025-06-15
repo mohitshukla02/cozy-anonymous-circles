@@ -1,14 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Button } from '../ui/button';
-import { Input } from '../ui/input';
-import { Badge } from '../ui/badge';
-import { MessageSquare, Send, Users } from 'lucide-react';
 import { useAuth } from '../../contexts/AuthContext';
-import { getUserConversations, sendMessage, markMessageAsRead, canUsersMessage } from '../../utils/messaging';
+import { getUserConversations, sendMessage, canUsersMessage } from '../../utils/messaging';
 import { getUserProfile } from '../../utils/userProfileStorage';
 import { useToast } from '../../hooks/use-toast';
+import ConversationList from './ConversationList';
+import ChatWindow from './ChatWindow';
+import NewConversationCard from './NewConversationCard';
 
 interface Conversation {
   partnerId: string;
@@ -55,11 +53,6 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
       return profile;
     }
     return null;
-  };
-
-  const getDisplayName = (userId: string) => {
-    const profile = userProfiles[userId];
-    return profile?.username || 'Anonymous User';
   };
 
   const loadConversations = async () => {
@@ -113,7 +106,7 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
 
       if (success) {
         setNewMessage('');
-        loadConversations(); // Reload to show new message
+        loadConversations();
         toast({
           title: "Message sent",
           description: "Your message has been delivered"
@@ -166,172 +159,40 @@ const MessagingInterface = ({ selectedPartnerId, groupContextId }: MessagingInte
 
   if (isLoading) {
     return (
-      <Card>
-        <CardContent className="p-4">
-          <div className="text-center">Loading conversations...</div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center h-64">
+        <div className="text-center">Loading conversations...</div>
+      </div>
     );
   }
 
   // If we have a selected partner but no conversation yet
   if (selectedPartnerId && !activeConversation) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare size={20} />
-            Start Conversation
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {canMessage ? (
-            <>
-              <p className="text-sm text-gray-600">
-                You can now message this user! Start a conversation below.
-              </p>
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  onKeyPress={(e) => e.key === 'Enter' && newMessage.trim() && startNewConversation()}
-                />
-                <Button 
-                  onClick={startNewConversation}
-                  disabled={!newMessage.trim()}
-                  size="sm"
-                >
-                  <Send size={16} />
-                </Button>
-              </div>
-            </>
-          ) : (
-            <div className="text-center p-4">
-              <Users size={32} className="mx-auto text-gray-400 mb-2" />
-              <p className="text-sm text-gray-600 mb-2">
-                Interact more to unlock messaging
-              </p>
-              <p className="text-xs text-gray-500">
-                Like or comment on each other's posts 3+ times to start messaging
-              </p>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      <NewConversationCard
+        canMessage={canMessage}
+        newMessage={newMessage}
+        onMessageChange={setNewMessage}
+        onStartConversation={startNewConversation}
+      />
     );
   }
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-4 h-[600px]">
-      {/* Conversations List */}
-      <Card className="md:col-span-1">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <MessageSquare size={20} />
-            Messages
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="p-0">
-          <div className="space-y-1 max-h-[500px] overflow-y-auto">
-            {conversations.length === 0 ? (
-              <p className="text-center text-gray-500 p-4 text-sm">
-                No conversations yet
-              </p>
-            ) : (
-              conversations.map((conv) => (
-                <div
-                  key={`${conv.partnerId}-${conv.groupId}`}
-                  className={`p-3 cursor-pointer hover:bg-gray-50 border-b ${
-                    activeConversation?.partnerId === conv.partnerId ? 'bg-blue-50' : ''
-                  }`}
-                  onClick={() => setActiveConversation(conv)}
-                >
-                  <div className="flex justify-between items-start">
-                    <div className="flex-1 min-w-0">
-                      <p className="font-medium text-sm truncate">
-                        {getDisplayName(conv.partnerId)}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        in {conv.groupName}
-                      </p>
-                      <p className="text-xs text-gray-500 truncate">
-                        {conv.lastMessage?.content || 'Start conversation'}
-                      </p>
-                    </div>
-                    {conv.unreadCount > 0 && (
-                      <Badge variant="destructive" className="text-xs">
-                        {conv.unreadCount}
-                      </Badge>
-                    )}
-                  </div>
-                </div>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Active Conversation */}
-      <Card className="md:col-span-2">
-        {activeConversation ? (
-          <>
-            <CardHeader>
-              <CardTitle className="text-sm">
-                Conversation with {getDisplayName(activeConversation.partnerId)}
-              </CardTitle>
-              <p className="text-xs text-gray-500">in {activeConversation.groupName}</p>
-            </CardHeader>
-            <CardContent className="flex flex-col h-[500px]">
-              {/* Messages */}
-              <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-                {activeConversation.messages.reverse().map((message) => (
-                  <div
-                    key={message.id}
-                    className={`flex ${
-                      message.sender_id === user?.id ? 'justify-end' : 'justify-start'
-                    }`}
-                  >
-                    <div
-                      className={`max-w-[70%] p-2 rounded-lg text-sm ${
-                        message.sender_id === user?.id
-                          ? 'bg-blue-500 text-white'
-                          : 'bg-gray-100 text-gray-900'
-                      }`}
-                    >
-                      {message.content}
-                    </div>
-                  </div>
-                ))}
-              </div>
-
-              {/* Message Input */}
-              <div className="flex gap-2">
-                <Input
-                  value={newMessage}
-                  onChange={(e) => setNewMessage(e.target.value)}
-                  placeholder="Type your message..."
-                  onKeyPress={(e) => e.key === 'Enter' && newMessage.trim() && handleSendMessage()}
-                />
-                <Button 
-                  onClick={handleSendMessage}
-                  disabled={!newMessage.trim()}
-                  size="sm"
-                >
-                  <Send size={16} />
-                </Button>
-              </div>
-            </CardContent>
-          </>
-        ) : (
-          <CardContent className="flex items-center justify-center h-[500px]">
-            <div className="text-center text-gray-500">
-              <MessageSquare size={48} className="mx-auto mb-2" />
-              <p>Select a conversation to start messaging</p>
-            </div>
-          </CardContent>
-        )}
-      </Card>
+      <ConversationList
+        conversations={conversations}
+        activeConversation={activeConversation}
+        onSelectConversation={setActiveConversation}
+        userProfiles={userProfiles}
+      />
+      <ChatWindow
+        activeConversation={activeConversation}
+        newMessage={newMessage}
+        onMessageChange={setNewMessage}
+        onSendMessage={handleSendMessage}
+        currentUserId={user?.id || ''}
+        userProfiles={userProfiles}
+      />
     </div>
   );
 };
