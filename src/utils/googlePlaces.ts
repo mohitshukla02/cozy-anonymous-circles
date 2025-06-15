@@ -26,26 +26,27 @@ interface PlacePrediction {
 }
 
 export class GooglePlacesService {
-  private apiKey: string;
+  private supabaseClient: any;
 
-  constructor(apiKey: string) {
-    this.apiKey = apiKey;
+  constructor(supabaseClient: any) {
+    this.supabaseClient = supabaseClient;
   }
 
   async searchPlaces(query: string): Promise<PlacePrediction[]> {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
-          query
-        )}&types=(cities)&key=${this.apiKey}`
-      );
+      const { data, error } = await this.supabaseClient.functions.invoke('google-places', {
+        body: { 
+          action: 'autocomplete',
+          input: query 
+        }
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch places');
+      if (error) {
+        console.error('Error calling google-places function:', error);
+        return [];
       }
 
-      const data = await response.json();
-      return data.predictions || [];
+      return data?.predictions || [];
     } catch (error) {
       console.error('Error searching places:', error);
       return [];
@@ -54,16 +55,19 @@ export class GooglePlacesService {
 
   async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
     try {
-      const response = await fetch(
-        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,formatted_address,name,geometry,address_components&key=${this.apiKey}`
-      );
+      const { data, error } = await this.supabaseClient.functions.invoke('google-places', {
+        body: { 
+          action: 'details',
+          place_id: placeId 
+        }
+      });
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch place details');
+      if (error) {
+        console.error('Error calling google-places function:', error);
+        return null;
       }
 
-      const data = await response.json();
-      return data.result || null;
+      return data?.result || null;
     } catch (error) {
       console.error('Error fetching place details:', error);
       return null;

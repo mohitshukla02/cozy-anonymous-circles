@@ -16,24 +16,8 @@ export const useGooglePlaces = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const initializePlacesService = async () => {
-      try {
-        const { data } = await supabase.functions.invoke('get-secrets', {
-          body: { names: ['GOOGLE_PLACES_API_KEY'] }
-        });
-        
-        if (data?.GOOGLE_PLACES_API_KEY) {
-          setPlacesService(new GooglePlacesService(data.GOOGLE_PLACES_API_KEY));
-        } else {
-          setError('Google Places API key not found');
-        }
-      } catch (err) {
-        console.error('Error initializing Google Places service:', err);
-        setError('Failed to initialize Google Places service');
-      }
-    };
-
-    initializePlacesService();
+    // Initialize the service with the supabase client
+    setPlacesService(new GooglePlacesService(supabase));
   }, []);
 
   const searchPlaces = async (query: string): Promise<PlaceSuggestion[]> => {
