@@ -24,6 +24,7 @@ const GroupDetail = () => {
   const [comments, setComments] = useState<Comment[]>([]);
   const [sortBy, setSortBy] = useState<'recent' | 'liked' | 'discussed'>('recent');
   const [isJoined, setIsJoined] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false);
   const [showPlanMeetupModal, setShowPlanMeetupModal] = useState(false);
 
   useEffect(() => {
@@ -74,10 +75,14 @@ const GroupDetail = () => {
 
       setGroup(transformedGroup);
       
-      // Check if user is a member
+      // Check if user is a member and get their role
       const userGroups = await getUserGroups(user.id);
-      const isMember = userGroups.some(ug => ug.groupId === groupId);
+      const userGroup = userGroups.find(ug => ug.groupId === groupId);
+      const isMember = !!userGroup;
+      const isGroupAdmin = userGroup?.role === 'admin' || transformedGroup.adminId === user.id;
+      
       setIsJoined(isMember);
+      setIsAdmin(isGroupAdmin);
 
       if (isMember) {
         const allPosts = await getPostsByGroup(groupId);
@@ -194,6 +199,14 @@ const GroupDetail = () => {
     setShowPlanMeetupModal(false);
   };
 
+  const handleGroupDeleted = () => {
+    toast({
+      title: "Group Deleted",
+      description: "The group has been permanently deleted.",
+    });
+    navigate('/groups');
+  };
+
   if (!group) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 flex items-center justify-center">
@@ -215,7 +228,10 @@ const GroupDetail = () => {
           postCount={posts.length}
           isJoined={isJoined}
           isLocalGroup={group.type === 'local-meetup'}
+          isAdmin={isAdmin}
+          groupId={group.id}
           onPlanMeetup={() => setShowPlanMeetupModal(true)}
+          onGroupDeleted={handleGroupDeleted}
         />
 
         {/* Meetup Warning Banner for local groups */}
@@ -265,6 +281,7 @@ const GroupDetail = () => {
               onLikeComment={handleLikeComment}
               getCommentLikeStatus={getCommentLikeStatus}
               isArchived={isArchived}
+              isAdmin={isAdmin}
             />
           </>
         ) : (

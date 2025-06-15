@@ -1,3 +1,4 @@
+
 import { supabase } from '@/integrations/supabase/client';
 import { Group, Post, Comment, UserGroup } from '@/types/groups';
 import { trackGroupCreated, trackContentCreated } from './trackActivity';
@@ -295,6 +296,18 @@ export const createComment = async (comment: Omit<Comment, 'id' | 'createdAt' | 
     createdAt: data.created_at,
     likes: data.likes || []
   };
+};
+
+export const deleteComment = async (commentId: string): Promise<void> => {
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) throw new Error('User not authenticated');
+
+  const { error } = await supabase
+    .from('comments')
+    .delete()
+    .eq('id', commentId);
+
+  if (error) throw error;
 };
 
 export const likePost = async (postId: string): Promise<void> => {

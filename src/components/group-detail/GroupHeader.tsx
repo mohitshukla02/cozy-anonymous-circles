@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Calendar } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Button } from '../ui/button';
+import AdminGroupActions from '../AdminGroupActions';
 
 interface GroupHeaderProps {
   groupName: string;
@@ -12,7 +13,10 @@ interface GroupHeaderProps {
   postCount: number;
   isJoined: boolean;
   isLocalGroup: boolean;
+  isAdmin: boolean;
+  groupId: string;
   onPlanMeetup: () => void;
+  onGroupDeleted: () => void;
 }
 
 const GroupHeader = ({
@@ -22,7 +26,10 @@ const GroupHeader = ({
   postCount,
   isJoined,
   isLocalGroup,
-  onPlanMeetup
+  isAdmin,
+  groupId,
+  onPlanMeetup,
+  onGroupDeleted
 }: GroupHeaderProps) => {
   const navigate = useNavigate();
 
@@ -44,23 +51,38 @@ const GroupHeader = ({
               Archived
             </Badge>
           )}
+          {isAdmin && (
+            <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
+              Admin
+            </Badge>
+          )}
         </div>
         <p className="text-sm text-gray-500 mt-1">
           {memberCount} members • {postCount} posts
         </p>
       </div>
       
-      {/* Quick Plan Meetup button for local groups */}
-      {isJoined && isLocalGroup && !isArchived && (
-        <Button
-          onClick={onPlanMeetup}
-          size="sm"
-          className="rounded-xl"
-        >
-          <Calendar size={14} className="mr-1" />
-          Plan Meetup
-        </Button>
-      )}
+      <div className="flex items-center gap-2">
+        {/* Quick Plan Meetup button for local groups */}
+        {isJoined && isLocalGroup && !isArchived && (
+          <Button
+            onClick={onPlanMeetup}
+            size="sm"
+            className="rounded-xl"
+          >
+            <Calendar size={14} className="mr-1" />
+            Plan Meetup
+          </Button>
+        )}
+
+        {/* Admin Actions */}
+        <AdminGroupActions
+          groupId={groupId}
+          groupName={groupName}
+          isAdmin={isAdmin}
+          onGroupDeleted={onGroupDeleted}
+        />
+      </div>
     </div>
   );
 };
