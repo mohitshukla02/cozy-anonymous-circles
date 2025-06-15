@@ -3,6 +3,8 @@ import React, { useState } from 'react';
 import { MapPin, Loader, CheckCircle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
+import GooglePlacesSelector from './GooglePlacesSelector';
+import { useGooglePlaces } from '@/hooks/useGooglePlaces';
 
 interface LocationSelectorProps {
   onLocationSelect: (location: {
@@ -22,6 +24,14 @@ const LocationSelector = ({ onLocationSelect, selectedLocation }: LocationSelect
   const [manualCity, setManualCity] = useState('');
   const [manualRegion, setManualRegion] = useState('');
   const [error, setError] = useState('');
+  const [showManualEntry, setShowManualEntry] = useState(false);
+
+  const { isReady } = useGooglePlaces();
+
+  // If Google Places is available, use the enhanced selector
+  if (isReady) {
+    return <GooglePlacesSelector onLocationSelect={onLocationSelect} selectedLocation={selectedLocation} />;
+  }
 
   const detectLocation = async () => {
     setIsDetecting(true);
@@ -109,28 +119,48 @@ const LocationSelector = ({ onLocationSelect, selectedLocation }: LocationSelect
 
           <div className="text-center text-sm text-gray-500">or</div>
 
-          <div className="space-y-3">
-            <Input
-              value={manualCity}
-              onChange={(e) => setManualCity(e.target.value)}
-              placeholder="Enter your city"
-              className="text-sm"
-            />
-            <Input
-              value={manualRegion}
-              onChange={(e) => setManualRegion(e.target.value)}
-              placeholder="Enter your state/region"
-              className="text-sm"
-            />
-            <Button
-              onClick={handleManualSubmit}
-              disabled={!manualCity.trim() || !manualRegion.trim()}
-              variant="outline"
-              className="w-full"
-            >
-              Set Location
-            </Button>
-          </div>
+          {!showManualEntry ? (
+            <div className="text-center">
+              <Button
+                onClick={() => setShowManualEntry(true)}
+                variant="outline"
+                className="w-full"
+              >
+                Enter Location Manually
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <Input
+                value={manualCity}
+                onChange={(e) => setManualCity(e.target.value)}
+                placeholder="Enter your city"
+                className="text-sm"
+              />
+              <Input
+                value={manualRegion}
+                onChange={(e) => setManualRegion(e.target.value)}
+                placeholder="Enter your state/region"
+                className="text-sm"
+              />
+              <div className="flex gap-2">
+                <Button
+                  onClick={handleManualSubmit}
+                  disabled={!manualCity.trim() || !manualRegion.trim()}
+                  className="flex-1"
+                >
+                  Set Location
+                </Button>
+                <Button
+                  onClick={() => setShowManualEntry(false)}
+                  variant="outline"
+                  className="flex-1"
+                >
+                  Cancel
+                </Button>
+              </div>
+            </div>
+          )}
         </>
       )}
 

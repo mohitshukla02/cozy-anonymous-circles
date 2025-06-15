@@ -1,0 +1,110 @@
+
+interface PlaceDetails {
+  place_id: string;
+  formatted_address: string;
+  name: string;
+  geometry: {
+    location: {
+      lat: number;
+      lng: number;
+    };
+  };
+  address_components: Array<{
+    long_name: string;
+    short_name: string;
+    types: string[];
+  }>;
+}
+
+interface PlacePrediction {
+  place_id: string;
+  description: string;
+  structured_formatting: {
+    main_text: string;
+    secondary_text: string;
+  };
+}
+
+export class GooglePlacesService {
+  private apiKey: string;
+
+  constructor(apiKey: string) {
+    this.apiKey = apiKey;
+  }
+
+  async searchPlaces(query: string): Promise<PlacePrediction[]> {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${encodeURIComponent(
+          query
+        )}&types=(cities)&key=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch places');
+      }
+
+      const data = await response.json();
+      return data.predictions || [];
+    } catch (error) {
+      console.error('Error searching places:', error);
+      return [];
+    }
+  }
+
+  async getPlaceDetails(placeId: string): Promise<PlaceDetails | null> {
+    try {
+      const response = await fetch(
+        `https://maps.googleapis.com/maps/api/place/details/json?place_id=${placeId}&fields=place_id,formatted_address,name,geometry,address_components&key=${this.apiKey}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch place details');
+      }
+
+      const data = await response.json();
+      return data.result || null;
+    } catch (error) {
+      console.error('Error fetching place details:', error);
+      return null;
+    }
+  }
+
+  extractLocationFromPlace(place: PlaceDetails): {
+    city: string;
+    region: string;
+    coordinates: { lat: number; lng: number };
+  } {
+    let city = '';
+    let region = '';
+
+    // Extract city and region from address components
+    place.address_components.forEach(component => {
+      if (component.types.includes('locality')) {
+        city = component.long_name;
+      } else if (component.types.includes('administrative_area_level_1')) {
+        region = component.long_name;
+      } else if (component.types.includes('sublocality_level_1') && !city) {
+        city = component.long_name;
+      }
+    });
+
+    // Fallback to formatted address parsing if components don't provide clear city/region
+    if (!city || !region) {
+      const addressParts = place.formatted_address.split(', ');
+      if (addressParts.length >= 2) {
+        city = city || addressParts[0];
+        region = region || addressParts[addressParts.length - 2];
+      }
+    }
+
+    return {
+      city: city || 'Unknown City',
+      region: region || 'Unknown Region',
+      coordinates: {
+        lat: place.geometry.location.lat,
+        lng: place.geometry.location.lng
+      }
+    };
+  }
+}
