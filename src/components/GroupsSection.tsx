@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Globe, MapPin, ArrowRight } from 'lucide-react';
+import { ChevronRight } from 'lucide-react';
 import { Group } from '@/types/groups';
 import GroupCard from './GroupCard';
+import { Button } from './ui/button';
 
 interface GroupsSectionProps {
   title: string;
@@ -14,7 +15,7 @@ interface GroupsSectionProps {
   onViewGroup: (group: Group) => void;
   showViewAll?: boolean;
   onViewAll?: () => void;
-  emptyIcon?: React.ReactNode;
+  emptyIcon: React.ReactNode;
   emptyMessage: string;
   emptySubMessage: string;
 }
@@ -27,50 +28,56 @@ const GroupsSection = ({
   userGroups,
   onJoin,
   onViewGroup,
-  showViewAll = false,
+  showViewAll,
   onViewAll,
   emptyIcon,
   emptyMessage,
   emptySubMessage
 }: GroupsSectionProps) => {
+  if (groups.length === 0) {
+    return (
+      <div className="mb-12">
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{title}</h2>
+          <p className="text-gray-600 dark:text-gray-400">{subtitle}</p>
+        </div>
+        
+        <div className="text-center py-12 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl border border-gray-200 dark:border-gray-700">
+          {emptyIcon}
+          <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">{emptyMessage}</h3>
+          <p className="text-gray-600 dark:text-gray-400 text-sm">{emptySubMessage}</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="mb-12">
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h2 className="text-xl font-medium text-gray-900 mb-1">{title}</h2>
-          <p className="text-gray-600 text-sm">{subtitle}</p>
+          <h2 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 mb-2">{title}</h2>
+          <p className="text-gray-600 dark:text-gray-400">{subtitle}</p>
         </div>
         {showViewAll && onViewAll && (
-          <button
-            onClick={onViewAll}
-            className="text-gray-900 font-medium hover:underline flex items-center text-sm"
-          >
-            Show all
-            <ArrowRight className="ml-1" size={16} />
-          </button>
+          <Button variant="outline" onClick={onViewAll} className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+            View all
+            <ChevronRight size={16} className="ml-1" />
+          </Button>
         )}
       </div>
-      
-      {groups.length > 0 ? (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {groups.map(group => (
-            <GroupCard 
-              key={group.id} 
-              group={group} 
-              userTags={userTags}
-              onJoin={onJoin}
-              onViewGroup={onViewGroup}
-              isJoined={userGroups.includes(group.id)}
-            />
-          ))}
-        </div>
-      ) : (
-        <div className="text-center py-16 bg-gray-50 rounded-xl border border-gray-200">
-          {emptyIcon || <Globe size={48} className="mx-auto text-gray-400 mb-4" />}
-          <p className="text-gray-500 text-lg">{emptyMessage}</p>
-          <p className="text-gray-400 text-sm mt-2">{emptySubMessage}</p>
-        </div>
-      )}
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {groups.map((group) => (
+          <GroupCard
+            key={group.id}
+            group={group}
+            userTags={userTags}
+            isJoined={userGroups.includes(group.id)}
+            onJoin={onJoin}
+            onView={onViewGroup}
+          />
+        ))}
+      </div>
     </div>
   );
 };

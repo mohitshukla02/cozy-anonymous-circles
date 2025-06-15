@@ -40,7 +40,7 @@ const Groups = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:bg-gradient-dark pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50/30 to-gray-100/30 dark:bg-gradient-dark pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         <GroupsHeader onCreateGroup={() => setShowCreateModal(true)} />
 

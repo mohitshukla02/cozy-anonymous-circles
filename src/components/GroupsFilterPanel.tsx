@@ -1,22 +1,17 @@
 
-import React, { useState } from 'react';
-import { Filter, Search, X } from 'lucide-react';
+import React from 'react';
+import { Search, Filter } from 'lucide-react';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
-import { Tabs, TabsList, TabsTrigger, TabsContent } from './ui/tabs';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from './ui/popover';
+import { Badge } from './ui/badge';
 
 interface GroupsFilterPanelProps {
   searchTerm: string;
   setSearchTerm: (term: string) => void;
   groupType: 'all' | 'interest' | 'local-meetup';
   setGroupType: (type: 'all' | 'interest' | 'local-meetup') => void;
-  selectedTag: string;
-  setSelectedTag: (tag: string) => void;
+  selectedTag: string | null;
+  setSelectedTag: (tag: string | null) => void;
   allTags: string[];
 }
 
@@ -29,102 +24,86 @@ const GroupsFilterPanel = ({
   setSelectedTag,
   allTags
 }: GroupsFilterPanelProps) => {
-  const [isFilterOpen, setIsFilterOpen] = useState(false);
-
   return (
-    <div className="bg-gray-50 border border-gray-200 rounded-xl p-6 mb-12">
-      <div className="flex flex-col md:flex-row gap-4">
-        {/* Search Input */}
-        <div className="flex-1">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" size={18} />
-            <Input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search groups..."
-              className="pl-10 pr-3 py-3 border-gray-200 focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-            />
+    <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm rounded-2xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 mb-8">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+        {/* Search */}
+        <div className="md:col-span-2 relative">
+          <Search size={20} className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500" />
+          <Input
+            placeholder="Search groups..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="pl-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+          />
+        </div>
+
+        {/* Group Type Filter */}
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
+          <Button
+            variant={groupType === 'all' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setGroupType('all')}
+            className="flex-1 text-xs dark:text-gray-300"
+          >
+            All
+          </Button>
+          <Button
+            variant={groupType === 'interest' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setGroupType('interest')}
+            className="flex-1 text-xs dark:text-gray-300"
+          >
+            Global
+          </Button>
+          <Button
+            variant={groupType === 'local-meetup' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setGroupType('local-meetup')}
+            className="flex-1 text-xs dark:text-gray-300"
+          >
+            Local
+          </Button>
+        </div>
+
+        {/* Filters Button */}
+        <Button variant="outline" className="dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700">
+          <Filter size={16} className="mr-2" />
+          Filters
+        </Button>
+      </div>
+
+      {/* Tags Filter */}
+      {allTags.length > 0 && (
+        <div>
+          <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Filter by interests:</p>
+          <div className="flex flex-wrap gap-2">
+            {allTags.slice(0, 10).map(tag => (
+              <Badge
+                key={tag}
+                variant={selectedTag === tag ? "default" : "outline"}
+                className={`cursor-pointer transition-colors ${
+                  selectedTag === tag 
+                    ? "bg-primary text-primary-foreground" 
+                    : "border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                }`}
+                onClick={() => setSelectedTag(selectedTag === tag ? null : tag)}
+              >
+                {tag}
+              </Badge>
+            ))}
+            {selectedTag && (
+              <Badge
+                variant="ghost"
+                className="cursor-pointer text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300"
+                onClick={() => setSelectedTag(null)}
+              >
+                Clear
+              </Badge>
+            )}
           </div>
         </div>
-
-        {/* Group Type Toggle */}
-        <div className="flex-shrink-0">
-          <Tabs value={groupType} onValueChange={(value) => setGroupType(value as 'all' | 'interest' | 'local-meetup')}>
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="all" className="text-sm">All</TabsTrigger>
-              <TabsTrigger value="interest" className="text-sm">Global</TabsTrigger>
-              <TabsTrigger value="local-meetup" className="text-sm">Local</TabsTrigger>
-            </TabsList>
-          </Tabs>
-        </div>
-
-        {/* Filter Button */}
-        <Popover open={isFilterOpen} onOpenChange={setIsFilterOpen}>
-          <PopoverTrigger asChild>
-            <Button
-              variant="outline"
-              className="flex items-center gap-2 px-4 py-3 h-auto"
-            >
-              <Filter size={18} />
-              <span>Filters</span>
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent className="w-80 p-0" align="end">
-            <div className="p-4 space-y-4">
-              <div className="flex items-center justify-between">
-                <h3 className="font-medium text-gray-900">Filter Options</h3>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setIsFilterOpen(false)}
-                >
-                  <X size={16} />
-                </Button>
-              </div>
-
-              <div className="space-y-3">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Interest Tags
-                  </label>
-                  <select
-                    value={selectedTag}
-                    onChange={(e) => setSelectedTag(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-gray-900 focus:border-transparent"
-                  >
-                    <option value="">All Tags</option>
-                    {allTags.map(tag => (
-                      <option key={tag} value={tag}>{tag}</option>
-                    ))}
-                  </select>
-                </div>
-              </div>
-
-              <div className="flex gap-2 pt-3 border-t">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    setSelectedTag('');
-                    setIsFilterOpen(false);
-                  }}
-                  className="flex-1"
-                >
-                  Clear All
-                </Button>
-                <Button
-                  onClick={() => setIsFilterOpen(false)}
-                  size="sm"
-                  className="flex-1"
-                >
-                  Apply
-                </Button>
-              </div>
-            </div>
-          </PopoverContent>
-        </Popover>
-      </div>
+      )}
     </div>
   );
 };
