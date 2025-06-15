@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, MapPin, Globe } from 'lucide-react';
 import { Group } from '@/types/groups';
@@ -7,6 +6,7 @@ import CreateGroupModal from '@/components/CreateGroupModal';
 import GroupsFilters from '@/components/GroupsFilters';
 import GroupsSection from '@/components/GroupsSection';
 import GroupDetailDialog from '@/components/GroupDetailDialog';
+import LocationFilter from '@/components/LocationFilter';
 import { useUserProfile } from '@/hooks/useUserProfile';
 import { useAuth } from '@/contexts/AuthContext';
 import { generateRandomUsername } from '@/utils/usernameGenerator';
@@ -28,6 +28,7 @@ const Groups = () => {
   const [selectedTag, setSelectedTag] = useState('');
   const [groupType, setGroupType] = useState<'all' | 'interest' | 'local-meetup'>('all');
   const [cityFilter, setCityFilter] = useState('');
+  const [locationFilter, setLocationFilter] = useState('Hyderabad, India');
   
   const { profile, loading: profileLoading } = useUserProfile();
   const { user } = useAuth();
@@ -122,6 +123,13 @@ const Groups = () => {
     setSelectedGroup(null);
   };
 
+  const handleLocationChange = (location: string) => {
+    setLocationFilter(location);
+    // Also update the city filter to match the location
+    const city = location.split(',')[0].trim();
+    setCityFilter(city);
+  };
+
   if (loading || profileLoading) {
     return (
       <div className="min-h-screen bg-white pt-20">
@@ -163,6 +171,14 @@ const Groups = () => {
               <Plus className="mr-2" size={20} />
               Create Group
             </button>
+          </div>
+
+          {/* Location Filter */}
+          <div className="mb-6">
+            <LocationFilter
+              selectedLocation={locationFilter}
+              onLocationChange={handleLocationChange}
+            />
           </div>
         </div>
 
