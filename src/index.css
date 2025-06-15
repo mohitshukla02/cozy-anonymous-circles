@@ -48,45 +48,45 @@
   }
 
   .dark {
-    /* Main backgrounds - grey focused like Lovable */
-    --background: 0 0% 9%;
+    /* Main backgrounds - pure grey focused like Lovable */
+    --background: 0 0% 7%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 11%;
+    --card: 0 0% 9%;
     --card-foreground: 0 0% 95%;
 
-    --popover: 0 0% 11%;
+    --popover: 0 0% 9%;
     --popover-foreground: 0 0% 95%;
     
-    /* Primary colors - subtle grey-blue */
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
+    /* Primary colors - light grey for contrast */
+    --primary: 0 0% 95%;
+    --primary-foreground: 0 0% 7%;
 
-    /* Secondary backgrounds */
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 98%;
+    /* Secondary backgrounds - slightly lighter grey */
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 0 0% 95%;
 
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 63%;
+    --muted: 0 0% 12%;
+    --muted-foreground: 0 0% 65%;
 
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 98%;
+    --accent: 0 0% 12%;
+    --accent-foreground: 0 0% 95%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
 
-    --border: 0 0% 17%;
-    --input: 0 0% 17%;
+    --border: 0 0% 15%;
+    --input: 0 0% 15%;
     --ring: 0 0% 83.1%;
 
     /* Sidebar colors */
-    --sidebar-background: 0 0% 8%;
+    --sidebar-background: 0 0% 6%;
     --sidebar-foreground: 0 0% 85%;
-    --sidebar-primary: 0 0% 98%;
-    --sidebar-primary-foreground: 0 0% 9%;
-    --sidebar-accent: 0 0% 13%;
+    --sidebar-primary: 0 0% 95%;
+    --sidebar-primary-foreground: 0 0% 7%;
+    --sidebar-accent: 0 0% 11%;
     --sidebar-accent-foreground: 0 0% 85%;
-    --sidebar-border: 0 0% 17%;
+    --sidebar-border: 0 0% 15%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -105,7 +105,7 @@
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-heading;
+    @apply font-heading text-foreground;
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   }
 
@@ -134,9 +134,14 @@
     overflow: hidden;
   }
   
-  /* Dark mode gradient backgrounds - more grey focused */
+  /* Dark mode gradient backgrounds - pure grey focused */
   .bg-gradient-dark {
-    background: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 11%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 7%) 0%, hsl(0 0% 6%) 50%, hsl(0 0% 9%) 100%);
+  }
+  
+  /* Light mode gradients */
+  .bg-gradient-light {
+    background: linear-gradient(135deg, hsl(0 0% 98%) 0%, hsl(220 14% 96%) 50%, hsl(210 20% 98%) 100%);
   }
   
   /* Improved glass morphism for dark mode */
@@ -150,6 +155,6 @@
   }
   
   .bg-glass-dark {
-    background: rgba(23, 23, 23, 0.8);
+    background: rgba(18, 18, 18, 0.8);
   }
 }

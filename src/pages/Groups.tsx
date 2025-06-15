@@ -129,14 +129,14 @@ const Groups = () => {
 
   if (loading || profileLoading) {
     return (
-      <div className="min-h-screen bg-white pt-20">
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 pt-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
           <div className="animate-pulse space-y-6">
-            <div className="h-16 bg-gray-100 rounded-xl"></div>
-            <div className="h-32 bg-gray-100 rounded-xl"></div>
+            <div className="h-16 bg-gray-100 dark:bg-gray-800 rounded-xl"></div>
+            <div className="h-32 bg-gray-100 dark:bg-gray-800 rounded-xl"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="bg-gray-100 h-64 rounded-xl"></div>
+                <div key={i} className="bg-gray-100 dark:bg-gray-800 h-64 rounded-xl"></div>
               ))}
             </div>
           </div>
@@ -151,20 +151,20 @@ const Groups = () => {
   const { interestGroups, localGroups } = separateGroupsByType(filteredGroups);
 
   return (
-    <div className="min-h-screen bg-white pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:bg-gradient-dark pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Header */}
         <div className="mb-12">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
             <div>
-              <h1 className="text-3xl font-medium text-gray-900 mb-2">
+              <h1 className="text-3xl font-medium text-gray-900 dark:text-gray-100 mb-2">
                 Discover Groups
               </h1>
-              <p className="text-gray-600">Find your community and connect with like-minded people</p>
+              <p className="text-gray-600 dark:text-gray-400">Find your community and connect with like-minded people</p>
             </div>
             <button
               onClick={() => setShowCreateModal(true)}
-              className="mt-6 sm:mt-0 inline-flex items-center px-6 py-3 bg-gray-900 text-white rounded-lg font-medium hover:bg-gray-800 transition-colors"
+              className="mt-6 sm:mt-0 inline-flex items-center px-6 py-3 bg-gray-900 dark:bg-gray-100 text-white dark:text-gray-900 rounded-lg font-medium hover:bg-gray-800 dark:hover:bg-gray-200 transition-colors"
             >
               <Plus className="mr-2" size={20} />
               Create Group
