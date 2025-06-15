@@ -1,17 +1,20 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { LogOut, User, Home, Users, Rss, Bell, MessageCircle } from 'lucide-react';
+import { LogOut, User, Home, Users, Rss, Bell, MessageCircle, UserPlus } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 import UserAvatar from '@/components/UserAvatar';
+import InviteUserModal from '@/components/InviteUserModal';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useInvitations } from '@/hooks/useInvitations';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Badge } from '@/components/ui/badge';
 
 const Header = () => {
   const { user, signOut } = useAuth();
   const { profile } = useUserProfile();
+  const { remainingInvites } = useInvitations();
   const location = useLocation();
   const isMobile = useIsMobile();
 
@@ -116,6 +119,19 @@ const Header = () => {
           <User size={16} />
           <span>View Profile</span>
         </Link>
+        
+        <InviteUserModal 
+          remainingInvites={remainingInvites}
+          trigger={
+            <button className="flex items-center space-x-2 p-2 rounded-lg text-sm text-gray-600 hover:bg-gray-50 transition-colors w-full">
+              <UserPlus size={16} />
+              <span>Invite Friends</span>
+              <Badge variant="secondary" className="ml-auto text-xs">
+                {remainingInvites}
+              </Badge>
+            </button>
+          }
+        />
         
         <button onClick={handleLogout} className="flex items-center space-x-2 p-2 rounded-lg text-sm text-red-600 hover:bg-red-50 transition-colors w-full">
           <LogOut size={16} />

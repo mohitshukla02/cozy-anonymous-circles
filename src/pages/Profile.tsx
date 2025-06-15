@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { User, Calendar, Settings, Shield, Trash2, Tag, Edit3, Users, MessageCircle, UserPlus, Key, Bell, Globe, Moon, Eye, EyeOff, Lock, MapPin, Clock } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
@@ -10,11 +9,14 @@ import { Separator } from '../components/ui/separator';
 import { Switch } from '../components/ui/switch';
 import { Textarea } from '../components/ui/textarea';
 import UserAvatar from '../components/UserAvatar';
+import InviteUserModal from '../components/InviteUserModal';
 import { useUserProfile } from '@/hooks/useUserProfile';
+import { useInvitations } from '@/hooks/useInvitations';
 
 const Profile = () => {
   const { user, signOut } = useAuth();
   const { profile, loading, updateProfile } = useUserProfile();
+  const { invitations, remainingInvites, refreshInvitations } = useInvitations();
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [editingBio, setEditingBio] = useState(false);
@@ -28,12 +30,10 @@ const Profile = () => {
 
   const userBio = profile?.bio || '';
 
-  // Move useEffect BEFORE the early return to ensure hooks are called consistently
   React.useEffect(() => {
     setBioText(userBio);
   }, [userBio]);
 
-  // Move the early return AFTER all hooks
   if (!user) {
     return (
       <div className="min-h-screen pt-20">
@@ -168,6 +168,59 @@ const Profile = () => {
         </div>
 
         <div className="space-y-8">
+          {/* Invite Friends Section */}
+          <div>
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-lg font-medium text-gray-900">Invite Friends</h2>
+              <div className="flex items-center space-x-2 text-sm text-gray-600">
+                <span>{remainingInvites} / 5 left this month</span>
+              </div>
+            </div>
+
+            <div className="bg-white rounded-lg border border-gray-200 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="font-medium text-gray-900">Share Circles with friends</h3>
+                  <p className="text-sm text-gray-600 mt-1">Help grow our community by inviting people you think would enjoy meaningful connections.</p>
+                </div>
+                <InviteUserModal 
+                  remainingInvites={remainingInvites}
+                  onInviteSent={refreshInvitations}
+                />
+              </div>
+
+              {invitations.length > 0 && (
+                <div className="mt-6 border-t border-gray-200 pt-6">
+                  <h4 className="font-medium text-gray-900 mb-3">Recent Invitations</h4>
+                  <div className="space-y-2">
+                    {invitations.slice(0, 5).map((invitation) => (
+                      <div key={invitation.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div>
+                          <p className="text-sm font-medium text-gray-900">{invitation.invitee_email}</p>
+                          <p className="text-xs text-gray-500">
+                            Sent {new Date(invitation.created_at).toLocaleDateString()}
+                          </p>
+                        </div>
+                        <Badge 
+                          variant={
+                            invitation.status === 'accepted' ? 'default' : 
+                            invitation.status === 'expired' ? 'destructive' : 
+                            'secondary'
+                          }
+                          className="text-xs"
+                        >
+                          {invitation.status}
+                        </Badge>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <Separator />
+
           {/* Interests Section */}
           <div>
             <div className="flex items-center justify-between mb-4">
