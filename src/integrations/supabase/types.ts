@@ -101,6 +101,7 @@ export type Database = {
           description: string
           id: string
           last_activity: string | null
+          last_successful_meetup: string | null
           location_city: string | null
           location_lat: number | null
           location_lng: number | null
@@ -109,11 +110,13 @@ export type Database = {
           member_ids: string[]
           member_limit: number
           name: string
+          next_meetup_deadline: string | null
           pinned_post_id: string | null
           privacy: string
           status: string | null
           tags: string[]
           type: string
+          warning_level: string | null
         }
         Insert: {
           admin_id: string
@@ -122,6 +125,7 @@ export type Database = {
           description: string
           id?: string
           last_activity?: string | null
+          last_successful_meetup?: string | null
           location_city?: string | null
           location_lat?: number | null
           location_lng?: number | null
@@ -130,11 +134,13 @@ export type Database = {
           member_ids?: string[]
           member_limit?: number
           name: string
+          next_meetup_deadline?: string | null
           pinned_post_id?: string | null
           privacy?: string
           status?: string | null
           tags?: string[]
           type: string
+          warning_level?: string | null
         }
         Update: {
           admin_id?: string
@@ -143,6 +149,7 @@ export type Database = {
           description?: string
           id?: string
           last_activity?: string | null
+          last_successful_meetup?: string | null
           location_city?: string | null
           location_lat?: number | null
           location_lng?: number | null
@@ -151,11 +158,13 @@ export type Database = {
           member_ids?: string[]
           member_limit?: number
           name?: string
+          next_meetup_deadline?: string | null
           pinned_post_id?: string | null
           privacy?: string
           status?: string | null
           tags?: string[]
           type?: string
+          warning_level?: string | null
         }
         Relationships: []
       }
@@ -191,6 +200,38 @@ export type Database = {
           status?: string
         }
         Relationships: []
+      }
+      meetup_recaps: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          meetup_id: string
+          user_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          meetup_id: string
+          user_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          meetup_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meetup_recaps_meetup_id_fkey"
+            columns: ["meetup_id"]
+            isOneToOne: false
+            referencedRelation: "meetups"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       meetup_rsvps: {
         Row: {
@@ -229,6 +270,7 @@ export type Database = {
       }
       meetups: {
         Row: {
+          checkin_count: number
           created_at: string
           created_by: string
           date_time: string
@@ -236,10 +278,14 @@ export type Database = {
           group_id: string
           id: string
           location: string
+          purpose: string
+          rsvp_count: number
           status: string
           title: string
+          updated_at: string
         }
         Insert: {
+          checkin_count?: number
           created_at?: string
           created_by: string
           date_time: string
@@ -247,10 +293,14 @@ export type Database = {
           group_id: string
           id?: string
           location: string
+          purpose?: string
+          rsvp_count?: number
           status?: string
           title: string
+          updated_at?: string
         }
         Update: {
+          checkin_count?: number
           created_at?: string
           created_by?: string
           date_time?: string
@@ -258,8 +308,11 @@ export type Database = {
           group_id?: string
           id?: string
           location?: string
+          purpose?: string
+          rsvp_count?: number
           status?: string
           title?: string
+          updated_at?: string
         }
         Relationships: [
           {
@@ -326,6 +379,75 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      notification_preferences: {
+        Row: {
+          created_at: string
+          id: string
+          meetup_notifications: string
+          recap_notifications: string
+          rsvp_notifications: string
+          updated_at: string
+          user_id: string
+          warning_notifications: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          meetup_notifications?: string
+          recap_notifications?: string
+          rsvp_notifications?: string
+          updated_at?: string
+          user_id: string
+          warning_notifications?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          meetup_notifications?: string
+          recap_notifications?: string
+          rsvp_notifications?: string
+          updated_at?: string
+          user_id?: string
+          warning_notifications?: string
+        }
+        Relationships: []
+      }
+      notifications: {
+        Row: {
+          channel: string
+          created_at: string
+          id: string
+          message: string
+          payload: Json | null
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          channel?: string
+          created_at?: string
+          id?: string
+          message: string
+          payload?: Json | null
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          channel?: string
+          created_at?: string
+          id?: string
+          message?: string
+          payload?: Json | null
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       posts: {
         Row: {
@@ -483,6 +605,10 @@ export type Database = {
       get_remaining_invites_for_user: {
         Args: { user_id: string }
         Returns: number
+      }
+      update_group_warning_levels: {
+        Args: Record<PropertyKey, never>
+        Returns: undefined
       }
     }
     Enums: {

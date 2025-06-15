@@ -1,12 +1,14 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { ArrowLeft, Users, Plus, TrendingUp, MessageCircle, Heart } from 'lucide-react';
+import { ArrowLeft, Users, Plus, TrendingUp, MessageCircle, Heart, Calendar } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { Group, Post, Comment } from '../types/groups';
 import { getGroupById, getPostsByGroup, createPost, getCommentsByPost, createComment, likePost, likeComment, getUserGroups } from '../utils/supabaseStorage';
 import PostCard from '../components/PostCard';
 import UserAvatarWithName from '../components/UserAvatarWithName';
+import MeetupManager from '../components/MeetupManager';
+import MeetupWarningBanner from '../components/MeetupWarningBanner';
+import PlanMeetupModal from '../components/PlanMeetupModal';
 import { Badge } from '../components/ui/badge';
 import { Button } from '../components/ui/button';
 import { Card, CardContent } from '../components/ui/card';
@@ -24,6 +26,7 @@ const GroupDetail = () => {
   const [newPostContent, setNewPostContent] = useState('');
   const [sortBy, setSortBy] = useState<'recent' | 'liked' | 'discussed'>('recent');
   const [isJoined, setIsJoined] = useState(false);
+  const [showPlanMeetupModal, setShowPlanMeetupModal] = useState(false);
 
   const tagNames = new Map();
   TAG_CATEGORIES.forEach(category => {
@@ -171,6 +174,8 @@ const GroupDetail = () => {
     );
   }
 
+  const isArchived = group.isArchived || group.status === 'archived';
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30">
       <div className="max-w-4xl mx-auto px-4 py-6">
@@ -183,17 +188,46 @@ const GroupDetail = () => {
             <ArrowLeft size={20} />
           </button>
           <div className="flex-1">
-            <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
-              {group.name}
-            </h1>
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold text-gray-900 leading-tight">
+                {group.name}
+              </h1>
+              {isArchived && (
+                <Badge variant="secondary" className="bg-gray-100 text-gray-600">
+                  Archived
+                </Badge>
+              )}
+            </div>
             <p className="text-sm text-gray-500 mt-1">
               {group.memberIds.length} members • {getSortedPosts().length} posts
             </p>
           </div>
+          
+          {/* Quick Plan Meetup button for local groups */}
+          {isJoined && group.type === 'local-meetup' && !isArchived && (
+            <Button
+              onClick={() => setShowPlanMeetupModal(true)}
+              size="sm"
+              className="rounded-xl"
+            >
+              <Calendar size={14} className="mr-1" />
+              Plan Meetup
+            </Button>
+          )}
         </div>
 
+        {/* Meetup Warning Banner for local groups */}
+        {isJoined && group.type === 'local-meetup' && group.meetupDeadline && (
+          <MeetupWarningBanner
+            warningLevel={group.warning_level || 'none'}
+            nextDeadline={group.meetupDeadline}
+            onPlanMeetup={() => setShowPlanMeetupModal(true)}
+            isArchived={isArchived}
+          />
+        )}
+
         {/* Group Info Card */}
-        <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
+        <Card className={`mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm ${isArchived ? 'opacity-75' : ''}`}>
           {group.image && (
             <div className="relative h-48 overflow-hidden rounded-t-2xl">
               <img 
@@ -238,40 +272,52 @@ const GroupDetail = () => {
 
         {isJoined ? (
           <>
-            {/* Create Post Card */}
-            <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
-              <CardContent className="p-6">
-                <form onSubmit={handleCreatePost}>
-                  <div className="flex items-start gap-4">
-                    <UserAvatarWithName userId={user.id} groupId={group.id} showName={false} />
-                    <div className="flex-1">
-                      <textarea
-                        value={newPostContent}
-                        onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
-                        placeholder="Share your thoughts with the group..."
-                        maxLength={500}
-                        rows={3}
-                        className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
-                      />
-                      <div className="flex justify-between items-center mt-3">
-                        <span className="text-xs text-gray-400">
-                          {newPostContent.length}/500
-                        </span>
-                        <Button
-                          type="submit"
-                          disabled={!newPostContent.trim()}
-                          size="sm"
-                          className="rounded-xl"
-                        >
-                          <Plus size={14} className="mr-1" />
-                          Post
-                        </Button>
+            {/* Meetup Manager for local groups */}
+            {group.type === 'local-meetup' && (
+              <MeetupManager
+                groupId={group.id}
+                groupName={group.name}
+                currentUserId={user.id}
+                isLocalGroup={true}
+              />
+            )}
+
+            {/* Create Post Card - disabled if archived */}
+            {!isArchived && (
+              <Card className="mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <form onSubmit={handleCreatePost}>
+                    <div className="flex items-start gap-4">
+                      <UserAvatarWithName userId={user.id} groupId={group.id} showName={false} />
+                      <div className="flex-1">
+                        <textarea
+                          value={newPostContent}
+                          onChange={(e) => setNewPostContent(e.target.value.slice(0, 500))}
+                          placeholder="Share your thoughts with the group..."
+                          maxLength={500}
+                          rows={3}
+                          className="w-full px-4 py-3 bg-gray-50/50 border border-gray-200/50 rounded-2xl text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-300 transition-all"
+                        />
+                        <div className="flex justify-between items-center mt-3">
+                          <span className="text-xs text-gray-400">
+                            {newPostContent.length}/500
+                          </span>
+                          <Button
+                            type="submit"
+                            disabled={!newPostContent.trim()}
+                            size="sm"
+                            className="rounded-xl"
+                          >
+                            <Plus size={14} className="mr-1" />
+                            Post
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </form>
-              </CardContent>
-            </Card>
+                  </form>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Sort Options */}
             <div className="flex gap-2 mb-6">
@@ -305,7 +351,7 @@ const GroupDetail = () => {
                       No posts yet
                     </h3>
                     <p className="text-gray-600 text-xs">
-                      Be the first to start a conversation!
+                      {isArchived ? 'This group has been archived.' : 'Be the first to start a conversation!'}
                     </p>
                   </CardContent>
                 </Card>
@@ -314,13 +360,13 @@ const GroupDetail = () => {
                   <PostCard
                     key={post.id}
                     post={post}
-                    authorName={''} // We'll use the UserAvatarWithName component instead
+                    authorName={''}
                     comments={comments.filter(c => c.postId === post.id)}
                     onLike={handleLikePost}
                     onComment={handleComment}
                     onLikeComment={handleLikeComment}
                     currentUserId={user.id}
-                    getAuthorName={() => ''} // We'll use the UserAvatarWithName component instead
+                    getAuthorName={() => ''}
                     groupId={group.id}
                     isLiked={post.likes.includes(user.id)}
                     getCommentLikeStatus={(commentId) => {
@@ -350,6 +396,21 @@ const GroupDetail = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Plan Meetup Modal */}
+        <PlanMeetupModal
+          isOpen={showPlanMeetupModal}
+          onClose={() => setShowPlanMeetupModal(false)}
+          groupId={group.id}
+          groupName={group.name}
+          onMeetupCreated={() => {
+            loadGroupData();
+            toast({
+              title: "Meetup Created!",
+              description: "Your group members will be notified"
+            });
+          }}
+        />
       </div>
     </div>
   );
