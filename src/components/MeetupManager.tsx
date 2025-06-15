@@ -9,7 +9,7 @@ import { useToast } from '../hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { createMeetup, rsvpToMeetup, checkInToMeetup } from '../utils/meetupHelpers';
 
-interface Meetup {
+interface DatabaseMeetup {
   id: string;
   title: string;
   description?: string;
@@ -31,7 +31,7 @@ interface MeetupManagerProps {
 
 const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: MeetupManagerProps) => {
   const { toast } = useToast();
-  const [meetups, setMeetups] = useState<Meetup[]>([]);
+  const [meetups, setMeetups] = useState<DatabaseMeetup[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [showPlanModal, setShowPlanModal] = useState(false);
   const [userRSVPs, setUserRSVPs] = useState<Record<string, string>>({});
@@ -173,7 +173,7 @@ const MeetupManager = ({ groupId, groupName, currentUserId, isLocalGroup }: Meet
     }
   };
 
-  const canCheckIn = (meetup: Meetup) => {
+  const canCheckIn = (meetup: DatabaseMeetup) => {
     const meetupDate = new Date(meetup.dateTime);
     const now = new Date();
     const twoHoursBefore = new Date(meetupDate.getTime() - 2 * 60 * 60 * 1000);
