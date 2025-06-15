@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Calendar, Clock, MapPin, Coffee, Users, BookOpen, Gamepad2 } from 'lucide-react';
+import { Calendar, Clock, Users, BookOpen, Gamepad2, Coffee } from 'lucide-react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from './ui/dialog';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -8,6 +8,7 @@ import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
 import { useToast } from '../hooks/use-toast';
+import GooglePlacesSelector from './GooglePlacesSelector';
 
 interface PlanMeetupModalProps {
   isOpen: boolean;
@@ -42,6 +43,24 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
     location: '',
     purpose: 'coffee'
   });
+  const [selectedPlace, setSelectedPlace] = useState<{
+    city: string;
+    region: string;
+    coordinates?: { lat: number; lng: number };
+  } | undefined>();
+
+  const handleLocationSelect = (location: {
+    city: string;
+    region: string;
+    coordinates?: { lat: number; lng: number };
+  }) => {
+    setSelectedPlace(location);
+    // Use the full description as the location for the meetup
+    setFormData(prev => ({ 
+      ...prev, 
+      location: `${location.city}, ${location.region}` 
+    }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -79,6 +98,7 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
         location: '',
         purpose: 'coffee'
       });
+      setSelectedPlace(undefined);
     } catch (error) {
       console.error('Error creating meetup:', error);
       toast({
@@ -148,18 +168,11 @@ const PlanMeetupModal = ({ isOpen, onClose, groupId, groupName, onMeetupCreated 
           </div>
 
           <div>
-            <Label htmlFor="location">Location *</Label>
-            <div className="relative">
-              <MapPin size={16} className="absolute left-3 top-3 text-gray-400" />
-              <Input
-                id="location"
-                value={formData.location}
-                onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-                placeholder="e.g., Central Park Cafe, 123 Main St"
-                className="pl-10"
-                maxLength={200}
-              />
-            </div>
+            <Label>Location *</Label>
+            <GooglePlacesSelector
+              onLocationSelect={handleLocationSelect}
+              selectedLocation={selectedPlace}
+            />
           </div>
 
           <div>
