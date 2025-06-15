@@ -1,4 +1,3 @@
-
 import { supabase } from '@/integrations/supabase/client';
 import { Group, Post, Comment, UserGroup } from '@/types/groups';
 
@@ -186,13 +185,22 @@ export const getPostsByGroup = async (groupId: string): Promise<Post[]> => {
   return postsWithCommentCount;
 };
 
+function sanitizeInput(content: string): string {
+  // Basic sanitize: remove script tags and limit to 500 chars
+  let clean = content.replace(/<script[\s\S]*?>[\s\S]*?<\/script>/gi, "");
+  clean = clean.replace(/on\w+=".*?"/gi, ""); // remove inline JS
+  return clean.substring(0, 500);
+}
+
 export const createPost = async (post: Omit<Post, 'id' | 'createdAt' | 'likes' | 'commentCount'>): Promise<Post> => {
+  const sanitizedContent = sanitizeInput(post.content);
+
   const { data, error } = await supabase
     .from('posts')
     .insert([{
       author_id: post.authorId,
       group_id: post.groupId,
-      content: post.content,
+      content: sanitizedContent,
       likes: []
     }])
     .select()
@@ -233,12 +241,14 @@ export const getCommentsByPost = async (postId: string): Promise<Comment[]> => {
 };
 
 export const createComment = async (comment: Omit<Comment, 'id' | 'createdAt' | 'likes'>): Promise<Comment> => {
+  const sanitizedContent = sanitizeInput(comment.content);
+
   const { data, error } = await supabase
     .from('comments')
     .insert([{
       post_id: comment.postId,
       author_id: comment.authorId,
-      content: comment.content,
+      content: sanitizedContent,
       likes: []
     }])
     .select()

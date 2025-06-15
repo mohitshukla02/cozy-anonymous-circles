@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
@@ -28,11 +27,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
-        
-        // If user just signed in with Reddit, fetch their subreddits
+
+        // If user just signed in with Reddit, trigger backend sync
         if (event === 'SIGNED_IN' && session?.user?.app_metadata?.provider === 'reddit') {
           setTimeout(() => {
-            fetchRedditData(session.user);
+            syncRedditBackend(session.user);
           }, 0);
         }
       }
@@ -48,72 +47,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const fetchRedditData = async (user: User) => {
+  // Replace frontend Reddit API with edge function
+  const syncRedditBackend = async (user: User) => {
     try {
-      // Extract Reddit access token from user metadata
       const redditToken = user.user_metadata?.provider_token;
       if (!redditToken) return;
-
-      // Fetch user's subreddits
-      const subredditsResponse = await fetch('https://oauth.reddit.com/subreddits/mine/subscriber', {
-        headers: {
-          'Authorization': `Bearer ${redditToken}`,
-          'User-Agent': 'CozyCircles/1.0'
-        }
-      });
-
-      if (subredditsResponse.ok) {
-        const subredditsData = await subredditsResponse.json();
-        
-        // Extract subreddit names and convert to tags
-        const subredditTags = subredditsData.data?.children?.map((sub: any) => 
-          sub.data.display_name.toLowerCase()
-        ).slice(0, 20) || []; // Limit to first 20 subreddits
-
-        // Fetch user info for karma
-        const userResponse = await fetch('https://oauth.reddit.com/api/v1/me', {
-          headers: {
-            'Authorization': `Bearer ${redditToken}`,
-            'User-Agent': 'CozyCircles/1.0'
-          }
-        });
-
-        let karma = 0;
-        if (userResponse.ok) {
-          const userData = await userResponse.json();
-          karma = (userData.link_karma || 0) + (userData.comment_karma || 0);
-        }
-
-        // Update user profile with Reddit data
-        const { data: existingProfile } = await supabase
-          .from('user_profiles')
-          .select('*')
-          .eq('user_id', user.id)
-          .single();
-
-        const profileData = {
+      // Call secure edge function
+      const response = await fetch('https://sbvcdbbdstnlzycbkjxh.supabase.co/functions/v1/sync-reddit-data', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           user_id: user.id,
-          username: user.user_metadata?.user_name || user.user_metadata?.name || 'RedditUser',
-          selected_tags: subredditTags,
-          reddit_karma: karma,
-          updated_at: new Date().toISOString()
-        };
-
-        if (existingProfile) {
-          await supabase
-            .from('user_profiles')
-            .update(profileData)
-            .eq('user_id', user.id);
-        } else {
-          await supabase
-            .from('user_profiles')
-            .insert([profileData]);
-        }
-
-        console.log('Reddit data synced:', { subredditTags, karma });
-      }
-    } catch (error) {
-      console.error('Error fetching Reddit data:', error);
+          reddit_token: redditToken,
+          user_metadata: user.user_metadata
+        }),
+      });
+      if (!response.ok) throw new Error('Failed to sync Reddit data');
+      const data = await response.json();
+      console.log('Reddit data synced via edge:', data);
+    } catch (err: any) {
+      console.error('syncReddit error', err);
     }
   };
 
