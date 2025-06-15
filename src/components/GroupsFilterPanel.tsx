@@ -34,7 +34,7 @@ const GroupsFilterPanel = ({
             placeholder="Search groups..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-gray-900 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
+            className="pl-10 bg-white dark:bg-gray-700 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
           />
         </div>
 
@@ -44,7 +44,7 @@ const GroupsFilterPanel = ({
             variant={groupType === 'all' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('all')}
-            className="flex-1 text-xs dark:text-gray-300"
+            className="flex-1 text-xs dark:text-gray-300 dark:border-gray-600"
           >
             All
           </Button>
@@ -52,7 +52,7 @@ const GroupsFilterPanel = ({
             variant={groupType === 'interest' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('interest')}
-            className="flex-1 text-xs dark:text-gray-300"
+            className="flex-1 text-xs dark:text-gray-300 dark:border-gray-600"
           >
             Global
           </Button>
@@ -60,7 +60,7 @@ const GroupsFilterPanel = ({
             variant={groupType === 'local-meetup' ? 'default' : 'outline'}
             size="sm"
             onClick={() => setGroupType('local-meetup')}
-            className="flex-1 text-xs dark:text-gray-300"
+            className="flex-1 text-xs dark:text-gray-300 dark:border-gray-600"
           >
             Local
           </Button>

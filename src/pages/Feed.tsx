@@ -33,7 +33,7 @@ const Feed = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50/30 to-gray-100/30 dark:from-gray-900 dark:via-gray-800/30 dark:to-gray-700/30">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50/30 to-gray-100/30 dark:bg-gradient-dark">
       <div className="max-w-6xl mx-auto px-4 py-6">
         <FeedHeader
           onToggleLocationFilter={() => setShowLocationFilter(!showLocationFilter)}

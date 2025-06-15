@@ -94,7 +94,7 @@ const Dashboard = () => {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-gray-50/30 to-gray-100/30 dark:bg-gradient-dark pt-20">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-gray-50/30 to-gray-100/30 dark:bg-gradient-dark pt-20">
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
         {/* Welcome Header */}
         <div className="mb-8">
@@ -167,7 +167,7 @@ const Dashboard = () => {
               <p className="text-gray-600 dark:text-gray-400">Popular communities in your area</p>
             </div>
             <Link to="/groups">
-              <Button variant="outline" className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-800">
+              <Button variant="outline" className="dark:border-gray-700 dark:text-gray-300 dark:hover:bg-gray-700">
                 Show all
                 <ChevronRight size={16} className="ml-1" />
               </Button>
@@ -230,7 +230,7 @@ const Dashboard = () => {
             </p>
             <Button 
               onClick={() => setShowCreateModal(true)}
-              className="w-full"
+              className="w-full bg-gray-900 hover:bg-gray-800 dark:bg-gray-600 dark:hover:bg-gray-500 text-white"
             >
               <Plus size={16} className="mr-2" />
               Create Group
