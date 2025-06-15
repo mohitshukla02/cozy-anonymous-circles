@@ -98,16 +98,14 @@ const PostsSection = ({
             <PostCard
               key={post.id}
               post={post}
-              authorName={''}
               comments={comments.filter(c => c.postId === post.id)}
               onLike={onLike}
               onComment={onComment}
               onLikeComment={onLikeComment}
               currentUserId={currentUserId}
-              getAuthorName={() => ''}
               groupId={groupId}
-              isLiked={post.likes.includes(currentUserId)}
               getCommentLikeStatus={getCommentLikeStatus}
+              isArchived={isArchived}
             />
           ))
         )}

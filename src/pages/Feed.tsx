@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Plus, Filter, Search, MapPin, Users, TrendingUp } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
@@ -364,13 +363,11 @@ const Feed = () => {
                   <div className="p-4">
                     <PostCard
                       post={post}
-                      authorName={authorName}
                       comments={postComments}
                       onLike={handleLikePost}
                       onComment={handleComment}
                       onLikeComment={handleLikeComment}
                       currentUserId={user.id}
-                      getAuthorName={getUserName}
                       groupId={post.groupId}
                       isLiked={isLiked}
                       getCommentLikeStatus={(commentId) => {
