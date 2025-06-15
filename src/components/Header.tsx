@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { LogOut, User, Home, Users, Rss, Bell, MessageCircle, UserPlus } from 'lucide-react';
@@ -147,9 +148,9 @@ const Header = () => {
           <div className="flex items-center space-x-8">
             <Link to="/dashboard" className="flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-colors">
               <div className="w-6 h-6 rounded-full flex items-center justify-center">
-                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-6 h-6" />
+                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Convene Logo" className="w-6 h-6" />
               </div>
-              <span className="font-medium text-xl">Circles</span>
+              <span className="font-medium text-xl">Convene</span>
             </Link>
             
             <nav className="hidden md:flex space-x-1">

@@ -18,6 +18,10 @@ import Feed from "./pages/Feed";
 import Messages from "./pages/Messages";
 import NotFound from "./pages/NotFound";
 import TagOnboarding from "./pages/TagOnboarding";
+import HelpCenter from "./pages/HelpCenter";
+import About from "./pages/About";
+import CommunityGuidelines from "./pages/CommunityGuidelines";
+import Contact from "./pages/Contact";
 
 const queryClient = new QueryClient();
 
@@ -101,6 +105,26 @@ const AppContent = () => {
             <Route path="/tag-onboarding" element={
               <ProtectedRoute>
                 <TagOnboarding />
+              </ProtectedRoute>
+            } />
+            <Route path="/help" element={
+              <ProtectedRoute>
+                <HelpCenter />
+              </ProtectedRoute>
+            } />
+            <Route path="/about" element={
+              <ProtectedRoute>
+                <About />
+              </ProtectedRoute>
+            } />
+            <Route path="/guidelines" element={
+              <ProtectedRoute>
+                <CommunityGuidelines />
+              </ProtectedRoute>
+            } />
+            <Route path="/contact" element={
+              <ProtectedRoute>
+                <Contact />
               </ProtectedRoute>
             } />
             <Route path="*" element={<NotFound />} />

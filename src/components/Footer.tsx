@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Link } from 'react-router-dom';
 
@@ -9,9 +10,9 @@ const Footer = () => {
           <div>
             <div className="flex items-center space-x-2 mb-4">
               <div className="w-5 h-5 flex items-center justify-center">
-                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Circles Logo" className="w-5 h-5" />
+                <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Convene Logo" className="w-5 h-5" />
               </div>
-              <span className="font-medium text-gray-800">Cozy Circles</span>
+              <span className="font-medium text-gray-800">Convene</span>
             </div>
             <p className="text-sm text-gray-600">
               Building authentic connections through anonymous interaction.
@@ -39,7 +40,7 @@ const Footer = () => {
         
         <div className="border-t border-gray-200 mt-8 pt-6 text-center">
           <p className="text-sm text-gray-500">
-            © 2024 Cozy Circles. Made with care for authentic connections.
+            © 2025 Convene. Made with care for authentic connections.
           </p>
         </div>
       </div>
