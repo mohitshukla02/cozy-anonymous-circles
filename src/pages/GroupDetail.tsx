@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -138,7 +137,7 @@ const GroupDetail = () => {
       });
 
       if (result) {
-        loadGroupData();
+        await loadGroupData();
         
         toast({
           title: "Success",
@@ -160,7 +159,7 @@ const GroupDetail = () => {
 
     try {
       await likePost(postId);
-      loadGroupData();
+      await loadGroupData();
     } catch (error) {
       console.error('Error liking post:', error);
     }
@@ -175,7 +174,7 @@ const GroupDetail = () => {
         authorId: user.id,
         content
       });
-      loadGroupData();
+      await loadGroupData();
     } catch (error) {
       console.error('Error creating comment:', error);
     }
@@ -186,7 +185,7 @@ const GroupDetail = () => {
 
     try {
       await likeComment(commentId);
-      loadGroupData();
+      await loadGroupData();
     } catch (error) {
       console.error('Error liking comment:', error);
     }

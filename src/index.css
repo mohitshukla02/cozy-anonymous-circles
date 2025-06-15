@@ -48,41 +48,45 @@
   }
 
   .dark {
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
+    /* Main backgrounds - grey focused like Lovable */
+    --background: 0 0% 9%;
+    --foreground: 0 0% 95%;
 
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
+    --popover: 0 0% 11%;
+    --popover-foreground: 0 0% 95%;
+    
+    /* Primary colors - subtle grey-blue */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
 
-    --primary: 210 20% 98%;
-    --primary-foreground: 220.9 39.3% 11%;
+    /* Secondary backgrounds */
+    --secondary: 0 0% 14%;
+    --secondary-foreground: 0 0% 98%;
 
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
+    --muted: 0 0% 14%;
+    --muted-foreground: 0 0% 63%;
 
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
+    --accent: 0 0% 14%;
+    --accent-foreground: 0 0% 98%;
 
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
+    --border: 0 0% 17%;
+    --input: 0 0% 17%;
+    --ring: 0 0% 83.1%;
 
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 216 12.2% 83.9%;
-
-    --sidebar-background: 220 13% 6%;
-    --sidebar-foreground: 220 9% 85%;
-    --sidebar-primary: 224 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 220 13% 13%;
-    --sidebar-accent-foreground: 220 9% 85%;
-    --sidebar-border: 220 13% 13%;
+    /* Sidebar colors */
+    --sidebar-background: 0 0% 8%;
+    --sidebar-foreground: 0 0% 85%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 0 0% 9%;
+    --sidebar-accent: 0 0% 13%;
+    --sidebar-accent-foreground: 0 0% 85%;
+    --sidebar-border: 0 0% 17%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -130,9 +134,9 @@
     overflow: hidden;
   }
   
-  /* Dark mode gradient backgrounds */
+  /* Dark mode gradient backgrounds - more grey focused */
   .bg-gradient-dark {
-    background: linear-gradient(135deg, hsl(224 71.4% 4.1%) 0%, hsl(220 13% 6%) 50%, hsl(224 71.4% 4.1%) 100%);
+    background: linear-gradient(135deg, hsl(0 0% 9%) 0%, hsl(0 0% 8%) 50%, hsl(0 0% 11%) 100%);
   }
   
   /* Improved glass morphism for dark mode */
@@ -146,6 +150,6 @@
   }
   
   .bg-glass-dark {
-    background: rgba(15, 23, 42, 0.8);
+    background: rgba(23, 23, 23, 0.8);
   }
 }
