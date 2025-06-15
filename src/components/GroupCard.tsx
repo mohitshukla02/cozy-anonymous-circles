@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Users, Heart, ArrowRight, MapPin } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -47,7 +48,7 @@ const GroupCard = ({
       onViewGroup(group);
     }
   };
-  return <div className={`group relative overflow-hidden rounded-xl border bg-white hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer`} onClick={handleCardClick}>
+  return <div className={`group relative overflow-hidden rounded-xl border bg-white dark:bg-neutral-800 hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer border-neutral-200 dark:border-neutral-700`} onClick={handleCardClick}>
       {/* Group Image */}
       {group.image && <div className="relative h-48 overflow-hidden">
           <img src={group.image} alt={group.name} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
@@ -58,11 +59,11 @@ const GroupCard = ({
           </Badge>
         </div>}
 
-      <div className="p-6 space-y-4 flex flex-col bg-neutral-800 rounded-sm">
+      <div className="p-6 space-y-4 flex flex-col">
         <div className="flex justify-between items-start">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-3">
-              <h3 className="font-semibold text-gray-900 text-lg leading-tight">
+              <h3 className="font-semibold text-neutral-900 dark:text-neutral-100 text-lg leading-tight">
                 {group.name}
               </h3>
               {matchingTags.length > 0 && <div className="flex items-center gap-1 text-pink-500">
@@ -72,27 +73,27 @@ const GroupCard = ({
             </div>
             
             {/* Location for local groups */}
-            {group.type === 'local-meetup' && group.locationCity && <div className="flex items-center gap-1 mb-3 text-sm text-gray-600">
+            {group.type === 'local-meetup' && group.locationCity && <div className="flex items-center gap-1 mb-3 text-sm text-neutral-600 dark:text-neutral-400">
                 <MapPin size={14} />
                 <span>{group.locationCity}, {group.locationRegion}</span>
               </div>}
           </div>
-          {isJoined && <ArrowRight size={16} className="text-gray-400 group-hover:text-gray-600 transition-colors ml-3 flex-shrink-0" />}
+          {isJoined && <ArrowRight size={16} className="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 transition-colors ml-3 flex-shrink-0" />}
         </div>
 
         {/* Description - Fixed 2 lines */}
         <div className="h-10 flex items-start">
-          <p className="text-gray-600 text-sm leading-5 line-clamp-2">
+          <p className="text-neutral-600 dark:text-neutral-400 text-sm leading-5 line-clamp-2">
             {group.description}
           </p>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-500">
+        <div className="flex items-center gap-4 text-sm text-neutral-500 dark:text-neutral-400">
           <div className="flex items-center gap-1">
             <Users size={14} />
             <span>{group.memberIds.length}/{group.memberLimit}</span>
           </div>
-          <div className="w-1 h-1 bg-gray-300 rounded-full" />
+          <div className="w-1 h-1 bg-neutral-300 dark:bg-neutral-600 rounded-full" />
           <span>Created {new Date(group.createdDate).toLocaleDateString('en-US', {
             month: 'short',
             day: 'numeric'
@@ -102,14 +103,14 @@ const GroupCard = ({
         {/* Tags - Fixed 2 lines */}
         <div className="h-16 flex flex-col justify-start">
           <div className="flex flex-wrap gap-2">
-            {group.tags.slice(0, 3).map(tagId => <Badge key={tagId} variant="outline" className={`text-sm px-3 py-1 border-0 font-medium ${userTags.includes(tagId) ? 'bg-purple-100 text-purple-700' : 'bg-gray-100 text-gray-600'}`}>
+            {group.tags.slice(0, 3).map(tagId => <Badge key={tagId} variant="outline" className={`text-sm px-3 py-1 border-0 font-medium ${userTags.includes(tagId) ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300' : 'bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400'}`}>
                 {tagNames.get(tagId) || capitalizeWords(tagId)}
               </Badge>)}
-            {group.tags.length > 3 && <span className="text-sm text-gray-400 px-3 py-1">+{group.tags.length - 3}</span>}
+            {group.tags.length > 3 && <span className="text-sm text-neutral-400 dark:text-neutral-500 px-3 py-1">+{group.tags.length - 3}</span>}
           </div>
         </div>
 
-        <button onClick={handleViewClick} className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 bg-gray-900 text-white hover:bg-gray-800 shadow-md hover:shadow-lg mt-auto">
+        <button onClick={handleViewClick} className="w-full py-3 px-4 rounded-xl text-sm font-medium transition-all duration-200 bg-neutral-900 text-white hover:bg-neutral-800 dark:bg-neutral-700 dark:hover:bg-neutral-600 shadow-md hover:shadow-lg mt-auto">
           View Group
         </button>
       </div>
