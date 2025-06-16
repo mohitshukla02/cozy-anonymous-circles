@@ -22,7 +22,7 @@ const GroupInfoCard = ({ group, isArchived }: GroupInfoCardProps) => {
   return (
     <Card className={`mb-6 rounded-2xl border-0 shadow-sm bg-white/90 backdrop-blur-sm ${isArchived ? 'opacity-75' : ''}`}>
       {group.image && (
-        <div className="relative h-48 overflow-hidden rounded-t-2xl">
+        <div className="relative h-64 overflow-hidden rounded-t-2xl">
           <img 
             src={group.image} 
             alt={group.name}

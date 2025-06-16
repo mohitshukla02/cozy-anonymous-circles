@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Calendar, Trash2, AlertTriangle } from 'lucide-react';
+import { Calendar, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { useToast } from '../hooks/use-toast';

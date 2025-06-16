@@ -1,22 +1,34 @@
 
 import React, { useState } from 'react';
-import { Trash2, Settings, Calendar, AlertTriangle } from 'lucide-react';
+import { Settings, Trash2, Image, AlertTriangle } from 'lucide-react';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger, DropdownMenuSeparator } from './ui/dropdown-menu';
 import { useToast } from '../hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import GroupImageSelector from './GroupImageSelector';
 
 interface AdminGroupActionsProps {
   groupId: string;
   groupName: string;
   isAdmin: boolean;
+  currentImage?: string;
   onGroupDeleted: () => void;
+  onImageUpdated?: () => void;
 }
 
-const AdminGroupActions = ({ groupId, groupName, isAdmin, onGroupDeleted }: AdminGroupActionsProps) => {
+const AdminGroupActions = ({ 
+  groupId, 
+  groupName, 
+  isAdmin, 
+  currentImage,
+  onGroupDeleted,
+  onImageUpdated
+}: AdminGroupActionsProps) => {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-  const [showSettingsDialog, setShowSettingsDialog] = useState(false);
+  const [showImageSelector, setShowImageSelector] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isUpdatingImage, setIsUpdatingImage] = useState(false);
   const { toast } = useToast();
 
   if (!isAdmin) return null;
@@ -51,29 +63,72 @@ const AdminGroupActions = ({ groupId, groupName, isAdmin, onGroupDeleted }: Admi
     }
   };
 
+  const handleImageSelected = async (imageUrl: string) => {
+    setIsUpdatingImage(true);
+    try {
+      const { error } = await supabase
+        .from('groups')
+        .update({ avatar: imageUrl })
+        .eq('id', groupId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Success",
+        description: "Group image has been updated",
+      });
+
+      if (onImageUpdated) {
+        onImageUpdated();
+      }
+    } catch (error) {
+      console.error('Error updating group image:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update group image",
+        variant: "destructive",
+      });
+    } finally {
+      setIsUpdatingImage(false);
+    }
+  };
+
   return (
     <>
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => setShowSettingsDialog(true)}
-          className="flex items-center gap-1"
-        >
-          <Settings size={14} />
-          Settings
-        </Button>
-        
-        <Button
-          variant="destructive"
-          size="sm"
-          onClick={() => setShowDeleteDialog(true)}
-          className="flex items-center gap-1"
-        >
-          <Trash2 size={14} />
-          Delete Group
-        </Button>
-      </div>
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1"
+          >
+            <Settings size={14} />
+            Settings
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuItem onClick={() => setShowImageSelector(true)}>
+            <Image size={14} className="mr-2" />
+            Change Cover Image
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem 
+            onClick={() => setShowDeleteDialog(true)}
+            className="text-red-600 hover:text-red-700"
+          >
+            <Trash2 size={14} className="mr-2" />
+            Delete Group
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+
+      {/* Image Selector Dialog */}
+      <GroupImageSelector
+        isOpen={showImageSelector}
+        onClose={() => setShowImageSelector(false)}
+        onImageSelected={handleImageSelected}
+        currentImage={currentImage}
+      />
 
       {/* Delete Group Dialog */}
       <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
@@ -103,28 +158,6 @@ const AdminGroupActions = ({ groupId, groupName, isAdmin, onGroupDeleted }: Admi
               className="flex-1"
             >
               {isDeleting ? 'Deleting...' : 'Delete Group'}
-            </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
-
-      {/* Settings Dialog - Placeholder for future settings */}
-      <Dialog open={showSettingsDialog} onOpenChange={setShowSettingsDialog}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Group Settings</DialogTitle>
-            <DialogDescription>
-              Manage group settings and preferences.
-            </DialogDescription>
-          </DialogHeader>
-          
-          <div className="space-y-4">
-            <p className="text-sm text-gray-500">More group settings will be available here in future updates.</p>
-          </div>
-          
-          <div className="flex justify-end pt-4">
-            <Button onClick={() => setShowSettingsDialog(false)}>
-              Close
             </Button>
           </div>
         </DialogContent>

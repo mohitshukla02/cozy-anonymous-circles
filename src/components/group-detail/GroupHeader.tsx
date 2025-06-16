@@ -15,8 +15,10 @@ interface GroupHeaderProps {
   isLocalGroup: boolean;
   isAdmin: boolean;
   groupId: string;
+  currentImage?: string;
   onPlanMeetup: () => void;
   onGroupDeleted: () => void;
+  onImageUpdated?: () => void;
 }
 
 const GroupHeader = ({
@@ -28,8 +30,10 @@ const GroupHeader = ({
   isLocalGroup,
   isAdmin,
   groupId,
+  currentImage,
   onPlanMeetup,
-  onGroupDeleted
+  onGroupDeleted,
+  onImageUpdated
 }: GroupHeaderProps) => {
   const navigate = useNavigate();
 
@@ -80,7 +84,9 @@ const GroupHeader = ({
           groupId={groupId}
           groupName={groupName}
           isAdmin={isAdmin}
+          currentImage={currentImage}
           onGroupDeleted={onGroupDeleted}
+          onImageUpdated={onImageUpdated}
         />
       </div>
     </div>

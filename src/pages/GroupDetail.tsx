@@ -207,6 +207,11 @@ const GroupDetail = () => {
     navigate('/groups');
   };
 
+  const handleImageUpdated = () => {
+    // Reload group data to get updated image
+    loadGroupData();
+  };
+
   if (!group) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 flex items-center justify-center">
@@ -230,8 +235,10 @@ const GroupDetail = () => {
           isLocalGroup={group.type === 'local-meetup'}
           isAdmin={isAdmin}
           groupId={group.id}
+          currentImage={group.image}
           onPlanMeetup={() => setShowPlanMeetupModal(true)}
           onGroupDeleted={handleGroupDeleted}
+          onImageUpdated={handleImageUpdated}
         />
 
         {/* Meetup Warning Banner for local groups */}
