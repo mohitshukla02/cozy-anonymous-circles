@@ -40,16 +40,17 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
     
     setLoading(true);
     try {
-      // Using Unsplash API directly - you'll need to add UNSPLASH_ACCESS_KEY to your secrets
-      const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchTerm)}&per_page=20&client_id=YOUR_UNSPLASH_ACCESS_KEY`
-      );
-      
-      if (!response.ok) {
-        throw new Error('Failed to search images');
+      const { data, error } = await supabase.functions.invoke('search-unsplash', {
+        body: { 
+          query: searchTerm,
+          per_page: 20
+        }
+      });
+
+      if (error) {
+        throw error;
       }
       
-      const data = await response.json();
       setUnsplashImages(data.results || []);
     } catch (error) {
       console.error('Error searching Unsplash:', error);
