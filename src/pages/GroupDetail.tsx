@@ -13,6 +13,9 @@ import MeetupWarningBanner from '../components/MeetupWarningBanner';
 import PlanMeetupModal from '../components/PlanMeetupModal';
 import { useToast } from '../hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { ArrowLeft, Calendar, Badge, Button } from 'lucide-react';
+import AdminGroupActions from '../components/AdminGroupActions';
+import GroupMembersModal from '../components/GroupMembersModal';
 
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
@@ -26,6 +29,7 @@ const GroupDetail = () => {
   const [isJoined, setIsJoined] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
   const [showPlanMeetupModal, setShowPlanMeetupModal] = useState(false);
+  const [showMembersModal, setShowMembersModal] = useState(false);
 
   useEffect(() => {
     if (!user || !groupId) {
@@ -214,8 +218,8 @@ const GroupDetail = () => {
 
   if (!group) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30 flex items-center justify-center">
-        <div className="animate-pulse dark:text-gray-300">Loading...</div>
+      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+        <div className="animate-pulse text-gray-600 dark:text-gray-300">Loading...</div>
       </div>
     );
   }
@@ -223,23 +227,68 @@ const GroupDetail = () => {
   const isArchived = group.isArchived || group.status === 'archived';
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-purple-50/30 dark:from-slate-900 dark:via-slate-800/30 dark:to-slate-900/30">
+    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       <div className="max-w-4xl mx-auto px-4 py-6">
-        {/* Header */}
-        <GroupHeader
-          groupName={group.name}
-          isArchived={isArchived}
-          memberCount={group.memberIds.length}
-          postCount={posts.length}
-          isJoined={isJoined}
-          isLocalGroup={group.type === 'local-meetup'}
-          isAdmin={isAdmin}
-          groupId={group.id}
-          currentImage={group.image}
-          onPlanMeetup={() => setShowPlanMeetupModal(true)}
-          onGroupDeleted={handleGroupDeleted}
-          onImageUpdated={handleImageUpdated}
-        />
+        {/* Header with member view button for admins */}
+        <div className="flex items-center gap-3 mb-6">
+          <button
+            onClick={() => navigate('/groups')}
+            className="p-3 rounded-2xl bg-white dark:bg-gray-800 backdrop-blur-sm border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 hover:shadow-md"
+          >
+            <ArrowLeft size={20} />
+          </button>
+          <div className="flex-1">
+            <div className="flex items-center gap-2">
+              <h1 className="text-2xl font-semibold text-gray-900 dark:text-gray-100 leading-tight">
+                {group.name}
+              </h1>
+              {isArchived && (
+                <Badge variant="secondary" className="bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300">
+                  Archived
+                </Badge>
+              )}
+              {isAdmin && (
+                <Badge variant="outline" className="bg-blue-50 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 border-blue-200 dark:border-blue-700">
+                  Admin
+                </Badge>
+              )}
+            </div>
+            <div className="flex items-center gap-4 text-sm text-gray-500 dark:text-gray-400 mt-1">
+              <button
+                onClick={() => setShowMembersModal(true)}
+                className="hover:text-gray-700 dark:hover:text-gray-300 transition-colors"
+              >
+                {group.memberIds.length} members
+              </button>
+              <span>•</span>
+              <span>{posts.length} posts</span>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-2">
+            {/* Plan Meetup button for local groups */}
+            {isJoined && group.type === 'local-meetup' && !isArchived && (
+              <Button
+                onClick={() => setShowPlanMeetupModal(true)}
+                size="sm"
+                className="rounded-xl bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white"
+              >
+                <Calendar size={14} className="mr-1" />
+                Plan Meetup
+              </Button>
+            )}
+
+            {/* Admin Actions */}
+            <AdminGroupActions
+              groupId={group.id}
+              groupName={group.name}
+              isAdmin={isAdmin}
+              currentImage={group.image}
+              onGroupDeleted={handleGroupDeleted}
+              onImageUpdated={handleImageUpdated}
+            />
+          </div>
+        </div>
 
         {/* Meetup Warning Banner for local groups */}
         {isJoined && group.type === 'local-meetup' && group.meetupDeadline && (
@@ -294,6 +343,15 @@ const GroupDetail = () => {
         ) : (
           <NotMemberCard onJoin={handleJoinGroup} />
         )}
+
+        {/* Group Members Modal */}
+        <GroupMembersModal
+          isOpen={showMembersModal}
+          onClose={() => setShowMembersModal(false)}
+          groupId={group.id}
+          groupName={group.name}
+          isAdmin={isAdmin}
+        />
 
         {/* Plan Meetup Modal */}
         <PlanMeetupModal

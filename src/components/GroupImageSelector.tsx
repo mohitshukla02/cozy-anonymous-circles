@@ -40,16 +40,14 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
     
     setLoading(true);
     try {
-      // Using Unsplash API directly - you'll need to add UNSPLASH_ACCESS_KEY to your secrets
-      const response = await fetch(
-        `https://api.unsplash.com/search/photos?query=${encodeURIComponent(searchTerm)}&per_page=20&client_id=Lxo65hsZnHGmffpAO8adYUqjMn5uunC4BjYGW96psDU`
-      );
+      const { data, error } = await supabase.functions.invoke('search-unsplash', {
+        body: { query: searchTerm, per_page: 20 }
+      });
       
-      if (!response.ok) {
-        throw new Error('Failed to search images');
+      if (error) {
+        throw new Error(error.message || 'Failed to search images');
       }
       
-      const data = await response.json();
       setUnsplashImages(data.results || []);
     } catch (error) {
       console.error('Error searching Unsplash:', error);
@@ -135,17 +133,17 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+      <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-700">
         <DialogHeader>
-          <DialogTitle>Select Group Image</DialogTitle>
+          <DialogTitle className="text-gray-900 dark:text-gray-100">Select Group Image</DialogTitle>
         </DialogHeader>
         
         <div className="space-y-6">
           {/* File Upload */}
-          <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-            <Upload className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Upload Custom Image</h3>
-            <p className="text-sm text-gray-500 mb-4">Choose a file from your computer (max 5MB)</p>
+          <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-6 text-center bg-gray-50 dark:bg-gray-800">
+            <Upload className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500 mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Upload Custom Image</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">Choose a file from your computer (max 5MB)</p>
             <input
               type="file"
               accept="image/*"
@@ -158,6 +156,7 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
               onClick={() => document.getElementById('file-upload')?.click()}
               disabled={uploading}
               variant="outline"
+              className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
             >
               {uploading ? 'Uploading...' : 'Choose File'}
             </Button>
@@ -165,23 +164,28 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
 
           {/* Unsplash Search */}
           <div>
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Search Unsplash</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Search Unsplash</h3>
             <div className="flex gap-2 mb-4">
               <Input
                 placeholder="Search for images..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 onKeyPress={(e) => e.key === 'Enter' && searchUnsplash()}
+                className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-gray-100"
               />
-              <Button onClick={searchUnsplash} disabled={loading}>
+              <Button 
+                onClick={searchUnsplash} 
+                disabled={loading}
+                className="bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white"
+              >
                 <Search size={16} />
               </Button>
             </div>
             
             {loading && (
               <div className="text-center py-8">
-                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-                <p className="text-sm text-gray-500 mt-2">Searching images...</p>
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-600 dark:border-gray-400 mx-auto"></div>
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-2">Searching images...</p>
               </div>
             )}
             
@@ -192,8 +196,8 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
                     key={image.id}
                     className={`relative cursor-pointer rounded-lg overflow-hidden border-2 transition-all ${
                       selectedImage === image.urls.regular
-                        ? 'border-blue-500 ring-2 ring-blue-200'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-gray-900 dark:border-gray-300 ring-2 ring-gray-200 dark:ring-gray-600'
+                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                     }`}
                     onClick={() => handleImageSelect(image.urls.regular)}
                   >
@@ -203,8 +207,8 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
                       className="w-full h-32 object-cover"
                     />
                     {selectedImage === image.urls.regular && (
-                      <div className="absolute inset-0 bg-blue-500 bg-opacity-20 flex items-center justify-center">
-                        <Check className="h-8 w-8 text-blue-600" />
+                      <div className="absolute inset-0 bg-gray-900 dark:bg-gray-100 bg-opacity-20 dark:bg-opacity-20 flex items-center justify-center">
+                        <Check className="h-8 w-8 text-gray-900 dark:text-gray-100" />
                       </div>
                     )}
                     <div className="absolute bottom-0 left-0 right-0 bg-black bg-opacity-50 text-white text-xs p-2">
@@ -218,8 +222,8 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
 
           {/* Current Image Preview */}
           {selectedImage && (
-            <div className="border rounded-lg p-4">
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Selected Image</h3>
+            <div className="border rounded-lg p-4 bg-gray-50 dark:bg-gray-800 border-gray-200 dark:border-gray-700">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Selected Image</h3>
               <img
                 src={selectedImage}
                 alt="Selected"
@@ -229,13 +233,18 @@ const GroupImageSelector = ({ isOpen, onClose, onImageSelected, currentImage }: 
           )}
         </div>
 
-        <div className="flex justify-end gap-2 pt-4 border-t">
-          <Button variant="outline" onClick={onClose}>
+        <div className="flex justify-end gap-2 pt-4 border-t border-gray-200 dark:border-gray-700">
+          <Button 
+            variant="outline" 
+            onClick={onClose}
+            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          >
             Cancel
           </Button>
           <Button 
             onClick={handleConfirm} 
             disabled={!selectedImage}
+            className="bg-gray-900 dark:bg-gray-700 hover:bg-gray-800 dark:hover:bg-gray-600 text-white disabled:opacity-50"
           >
             Use This Image
           </Button>
