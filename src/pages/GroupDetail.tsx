@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
@@ -13,9 +14,11 @@ import MeetupWarningBanner from '../components/MeetupWarningBanner';
 import PlanMeetupModal from '../components/PlanMeetupModal';
 import { useToast } from '../hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { ArrowLeft, Calendar, Badge, Button } from 'lucide-react';
+import { ArrowLeft, Calendar } from 'lucide-react';
+import { Badge } from '../components/ui/badge';
+import { Button } from '../components/ui/button';
 import AdminGroupActions from '../components/AdminGroupActions';
-import GroupMembersModal from '../components/GroupMembersModal';
+import GroupMembersModal from '../components/group-detail/GroupMembersModal';
 
 const GroupDetail = () => {
   const { groupId } = useParams<{ groupId: string }>();
