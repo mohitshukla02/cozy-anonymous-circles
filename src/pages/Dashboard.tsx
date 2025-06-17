@@ -72,7 +72,7 @@ const Dashboard = () => {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 py-0">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="mb-2 font-normal text-xl text-neutral-900">
+          <h1 className="mb-2 font-normal text-xl text-inherit">
             Welcome back, {username}
           </h1>
           <p className="text-neutral-500">
