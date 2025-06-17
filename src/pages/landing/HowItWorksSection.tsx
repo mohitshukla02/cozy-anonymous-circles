@@ -1,10 +1,7 @@
-
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Users } from 'lucide-react';
-
-const HowItWorksSection: React.FC = () => (
-  <section className="py-20">
+const HowItWorksSection: React.FC = () => <section className="py-20">
     <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
       <div className="text-center mb-16">
         <h2 className="text-3xl font-semibold text-gray-900 mb-4">
@@ -30,9 +27,7 @@ const HowItWorksSection: React.FC = () => (
             </div>
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">Plan Together</h4>
-              <p className="text-gray-600">
-                Chat anonymously, then schedule a public meetup with ease.
-              </p>
+              <p className="text-gray-600">Chat anonymously, then schedule a public meetup with ease.</p>
             </div>
           </div>
           <div className="flex items-start space-x-4">
@@ -54,10 +49,7 @@ const HowItWorksSection: React.FC = () => (
             </div>
             <h4 className="text-xl font-semibold text-gray-900 mb-4">Ready to Connect?</h4>
             <p className="text-gray-600 mb-6">Your next friendship is just three steps away.</p>
-            <Link
-              to="/auth"
-              className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors inline-flex items-center space-x-2"
-            >
+            <Link to="/auth" className="bg-gray-900 text-white px-6 py-3 rounded-lg font-medium hover:bg-gray-800 transition-colors inline-flex items-center space-x-2">
               <span>Get Started</span>
               <ArrowRight size={16} />
             </Link>
@@ -65,7 +57,5 @@ const HowItWorksSection: React.FC = () => (
         </div>
       </div>
     </div>
-  </section>
-);
-
+  </section>;
 export default HowItWorksSection;
