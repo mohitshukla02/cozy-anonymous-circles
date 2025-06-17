@@ -1,4 +1,3 @@
-
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 import 'mapbox-gl/dist/mapbox-gl.css';
@@ -9,13 +8,14 @@ import { Meetup } from '@/types/meetup';
 import MapboxTokenForm from '@/components/meetup/MapboxTokenForm';
 import MapMeetupList from '@/components/meetup/MapMeetupList';
 import SelectedMeetupDetails from '@/components/meetup/SelectedMeetupDetails';
-
 const MeetupMap = () => {
   const mapContainer = useRef<HTMLDivElement>(null);
   const map = useRef<mapboxgl.Map | null>(null);
   const [mapboxToken, setMapboxToken] = useState('');
   const [selectedMeetup, setSelectedMeetup] = useState<Meetup | null>(null);
-  const { effectiveTheme } = useTheme();
+  const {
+    effectiveTheme
+  } = useTheme();
   const userLocation = useUserLocation();
 
   // Check for stored token on component mount
@@ -25,45 +25,32 @@ const MeetupMap = () => {
       setMapboxToken(storedToken);
     }
   }, []);
-
-  const upcomingMeetups = generateLocalMeetups(
-    userLocation.center[0], 
-    userLocation.center[1], 
-    userLocation.city
-  );
-
+  const upcomingMeetups = generateLocalMeetups(userLocation.center[0], userLocation.center[1], userLocation.city);
   const handleTokenSubmit = (token: string) => {
     setMapboxToken(token);
     // Store token in localStorage for persistence
     localStorage.setItem('mapboxToken', token);
   };
-
   useEffect(() => {
     if (!mapContainer.current || !mapboxToken) return;
 
     // Initialize map
     mapboxgl.accessToken = mapboxToken;
-    
+
     // Choose map style based on theme
-    const mapStyle = effectiveTheme === 'dark' 
-      ? 'mapbox://styles/mapbox/dark-v11' 
-      : 'mapbox://styles/mapbox/light-v11';
-    
+    const mapStyle = effectiveTheme === 'dark' ? 'mapbox://styles/mapbox/dark-v11' : 'mapbox://styles/mapbox/light-v11';
     map.current = new mapboxgl.Map({
       container: mapContainer.current,
       style: mapStyle,
       center: userLocation.center,
-      zoom: 12, // Closer zoom for city-level view
+      zoom: 12 // Closer zoom for city-level view
     });
 
     // Add navigation controls
-    map.current.addControl(
-      new mapboxgl.NavigationControl(),
-      'top-right'
-    );
+    map.current.addControl(new mapboxgl.NavigationControl(), 'top-right');
 
     // Add meetup markers
-    upcomingMeetups.forEach((meetup) => {
+    upcomingMeetups.forEach(meetup => {
       const markerElement = document.createElement('div');
       markerElement.className = 'meetup-marker';
       markerElement.style.cssText = `
@@ -78,15 +65,11 @@ const MeetupMap = () => {
         align-items: center;
         justify-content: center;
       `;
-      
       const icon = document.createElement('div');
       icon.innerHTML = '📍';
       icon.style.fontSize = '14px';
       markerElement.appendChild(icon);
-
-      const marker = new mapboxgl.Marker(markerElement)
-        .setLngLat(meetup.coordinates)
-        .addTo(map.current!);
+      const marker = new mapboxgl.Marker(markerElement).setLngLat(meetup.coordinates).addTo(map.current!);
 
       // Add click event to marker
       markerElement.addEventListener('click', () => {
@@ -99,18 +82,15 @@ const MeetupMap = () => {
       map.current?.remove();
     };
   }, [mapboxToken, userLocation.center[0], userLocation.center[1], effectiveTheme]);
-
   if (!mapboxToken) {
     return <MapboxTokenForm userLocationCity={userLocation.city} onTokenSubmit={handleTokenSubmit} />;
   }
-
-  return (
-    <div>
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+  return <div>
+      <div className="mb-6 py-0 my-[32px]">
+        <h2 className="text-2xl mb-2 font-normal text-neutral-900">
           Meetups in {userLocation.city}
         </h2>
-        <p className="text-neutral-600 dark:text-neutral-400">{upcomingMeetups.length} events happening this week</p>
+        <p className="text-neutral-500">{upcomingMeetups.length} events happening this week</p>
       </div>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -122,17 +102,11 @@ const MeetupMap = () => {
         </div>
         
         {/* Meetup List */}
-        <MapMeetupList 
-          meetups={upcomingMeetups}
-          selectedMeetup={selectedMeetup}
-          onMeetupSelect={setSelectedMeetup}
-        />
+        <MapMeetupList meetups={upcomingMeetups} selectedMeetup={selectedMeetup} onMeetupSelect={setSelectedMeetup} />
       </div>
 
       {/* Selected Meetup Details */}
       {selectedMeetup && <SelectedMeetupDetails meetup={selectedMeetup} />}
-    </div>
-  );
+    </div>;
 };
-
 export default MeetupMap;
