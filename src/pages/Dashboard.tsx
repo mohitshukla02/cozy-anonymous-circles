@@ -68,11 +68,11 @@ const Dashboard = () => {
     members: 142,
     location: "Hyderabad, Telangana"
   }];
-  return <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-50/30 to-neutral-100/30 dark:bg-gradient-dark pt-20 py-0 bg-white">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12">
+  return <div className="min-h-screen bg-gradient-to-br from-neutral-50 via-neutral-50/30 to-neutral-100/30 dark:bg-gradient-dark pt-20 bg-white py-[32px]">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-12 py-0">
         {/* Welcome Header */}
         <div className="mb-8">
-          <h1 className="mb-2 text-neutral-900 text-3xl font-normal">
+          <h1 className="mb-2 font-normal text-xl text-neutral-900">
             Welcome back, {username}
           </h1>
           <p className="text-neutral-500">

@@ -87,7 +87,7 @@ const MeetupMap = () => {
   }
   return <div>
       <div className="mb-6 py-0 my-[32px]">
-        <h2 className="text-2xl mb-2 font-normal text-neutral-900">
+        <h2 className="text-2xl mb-2 text-neutral-900 font-semibold">
           Meetups in {userLocation.city}
         </h2>
         <p className="text-neutral-500">{upcomingMeetups.length} events happening this week</p>
