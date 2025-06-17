@@ -26,7 +26,7 @@ const Header = () => {
           <div className="w-8 h-8 flex items-center justify-center">
             <img src="/lovable-uploads/ef93a52d-7a19-46ab-9703-c60bf1cfdcd7.png" alt="Convene Logo" className="w-6 h-6 object-scale-down" />
           </div>
-          <span className="text-neutral-900 text-lg font-semibold">Convene</span>
+          <span className="text-lg font-semibold text-inherit">Convene</span>
         </Link>
         <nav className="hidden md:flex items-center space-x-6">
           <Link to="/groups" className="text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-neutral-100 transition-colors">
