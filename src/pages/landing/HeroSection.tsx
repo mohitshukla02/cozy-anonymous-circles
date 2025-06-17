@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
-const HeroSection: React.FC = () => <section className="min-h-screen flex flex-col justify-center pt-32 pb-20 px-4 sm:px-6 lg:px-8">
+const HeroSection: React.FC = () => <section className="min-h-screen flex flex-col justify-center pt-32 pb-20 px-4 sm:px-6 lg:px-8 bg-neutral-50">
     <div className="max-w-6xl mx-auto text-center flex flex-col flex-1 justify-center">
       <h1 className="text-5xl text-gray-900 mb-6 leading-tight md:text-7xl font-semibold mx-0">
         Real Connections.<br />
