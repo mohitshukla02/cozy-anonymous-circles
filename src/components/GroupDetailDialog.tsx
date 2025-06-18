@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { Users, Heart, MapPin, Activity, Calendar, ArrowLeft } from 'lucide-react';
 import { Group } from '@/types/groups';
@@ -6,7 +5,6 @@ import { Badge } from './ui/badge';
 import { Button } from './ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from './ui/dialog';
 import { TAG_CATEGORIES } from '@/types/tags';
-
 interface GroupDetailDialogProps {
   group: Group | null;
   isOpen: boolean;
@@ -61,7 +59,6 @@ const getNextMeetupDate = (group: Group) => {
   const nextMeetup = new Date(now.getTime() + randomDays * 24 * 60 * 60 * 1000);
   return nextMeetup;
 };
-
 const GroupDetailDialog = ({
   group,
   isOpen,
@@ -71,7 +68,6 @@ const GroupDetailDialog = ({
   isJoined = false
 }: GroupDetailDialogProps) => {
   if (!group) return null;
-
   const matchingTags = group.tags.filter(tag => userTags.includes(tag));
   const tagNames = new Map();
   TAG_CATEGORIES.forEach(category => {
@@ -79,54 +75,36 @@ const GroupDetailDialog = ({
       tagNames.set(tag.id, capitalizeWords(tag.name));
     });
   });
-
   const groupHealth = getGroupHealth(group);
   const meetupFrequency = getMeetupFrequency(group);
   const nextMeetupDate = getNextMeetupDate(group);
-  
+
   // Check if this is a featured/mock group
   const isFeaturedGroup = group.id.startsWith('featured-');
-
   const handleJoinClick = () => {
     if (!isFeaturedGroup) {
       onJoin(group.id);
     }
     onClose();
   };
-
-  return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-neutral-900">
+  return <Dialog open={isOpen} onOpenChange={onClose}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto border border-gray-200 dark:border-gray-700 rounded-3xl bg-inherit">
         <DialogDescription className="sr-only">
           Group details for {group.name}
         </DialogDescription>
         
         {/* Group Image */}
-        {group.image && (
-          <div className="relative h-48 -m-6 mb-0 overflow-hidden rounded-t-xl">
+        {group.image && <div className="relative h-48 -m-6 mb-0 overflow-hidden rounded-t-xl">
             <img src={group.image} alt={group.name} className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
             {/* Group Type Badge */}
-            <Badge 
-              variant="outline" 
-              className={`absolute top-4 right-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md ${
-                group.type === 'local-meetup' 
-                  ? 'bg-green-500/90 text-white shadow-lg' 
-                  : 'bg-blue-500/90 text-white shadow-lg'
-              }`}
-            >
+            <Badge variant="outline" className={`absolute top-4 right-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md ${group.type === 'local-meetup' ? 'bg-green-500/90 text-white shadow-lg' : 'bg-blue-500/90 text-white shadow-lg'}`}>
               {group.type === 'local-meetup' ? 'Local' : 'Global'}
             </Badge>
-            {isFeaturedGroup && (
-              <Badge 
-                variant="outline" 
-                className="absolute top-4 left-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md bg-orange-500/90 text-white shadow-lg"
-              >
+            {isFeaturedGroup && <Badge variant="outline" className="absolute top-4 left-4 text-xs px-3 py-1 border-0 font-medium backdrop-blur-md bg-orange-500/90 text-white shadow-lg">
                 Demo Group
-              </Badge>
-            )}
-          </div>
-        )}
+              </Badge>}
+          </div>}
 
         <DialogHeader className="space-y-4">
           <div className="flex items-start justify-between">
@@ -135,21 +113,17 @@ const GroupDetailDialog = ({
                 <DialogTitle className="text-3xl font-semibold text-gray-900 dark:text-gray-100">
                   {group.name}
                 </DialogTitle>
-                {matchingTags.length > 0 && (
-                  <div className="flex items-center gap-1 text-pink-500">
+                {matchingTags.length > 0 && <div className="flex items-center gap-1 text-pink-500">
                     <Heart size={16} fill="currentColor" />
                     <span className="text-sm font-medium">{matchingTags.length}</span>
-                  </div>
-                )}
+                  </div>}
               </div>
               
               {/* Location for local groups */}
-              {group.type === 'local-meetup' && group.locationCity && (
-                <div className="flex items-center gap-1 mb-3 text-sm text-gray-600 dark:text-gray-400">
+              {group.type === 'local-meetup' && group.locationCity && <div className="flex items-center gap-1 mb-3 text-sm text-gray-600 dark:text-gray-400">
                   <MapPin size={14} />
                   <span>{group.locationCity}, {group.locationRegion}</span>
-                </div>
-              )}
+                </div>}
             </div>
           </div>
         </DialogHeader>
@@ -182,27 +156,23 @@ const GroupDetailDialog = ({
             </div>
             
             <div className="text-center p-3 bg-gray-50 dark:bg-gray-700 rounded-xl">
-              {group.type === 'local-meetup' && nextMeetupDate ? (
-                <>
+              {group.type === 'local-meetup' && nextMeetupDate ? <>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Next Meetup</div>
                   <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
                     {nextMeetupDate.toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                  month: 'short',
+                  day: 'numeric'
+                })}
                   </div>
-                </>
-              ) : (
-                <>
+                </> : <>
                   <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">Created</div>
                   <div className="font-semibold text-gray-900 dark:text-gray-100 text-sm">
                     {new Date(group.createdDate).toLocaleDateString('en-US', {
-                      month: 'short',
-                      day: 'numeric'
-                    })}
+                  month: 'short',
+                  day: 'numeric'
+                })}
                   </div>
-                </>
-              )}
+                </>}
             </div>
           </div>
 
@@ -210,30 +180,18 @@ const GroupDetailDialog = ({
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-2">About this group</h3>
             <p className="text-gray-600 dark:text-gray-400 leading-relaxed">{group.description}</p>
-            {isFeaturedGroup && (
-              <p className="text-orange-600 dark:text-orange-400 text-sm mt-2 font-medium">
+            {isFeaturedGroup && <p className="text-orange-600 dark:text-orange-400 text-sm mt-2 font-medium">
                 This is a demo group to showcase the platform. You cannot join or interact with demo groups.
-              </p>
-            )}
+              </p>}
           </div>
 
           {/* Tags */}
           <div>
             <h3 className="font-semibold text-gray-900 dark:text-gray-100 mb-3">Interests</h3>
             <div className="flex flex-wrap gap-2">
-              {group.tags.map(tagId => (
-                <Badge 
-                  key={tagId} 
-                  variant="outline" 
-                  className={`text-sm px-3 py-1 border-0 font-medium ${
-                    userTags.includes(tagId) 
-                      ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' 
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'
-                  }`}
-                >
+              {group.tags.map(tagId => <Badge key={tagId} variant="outline" className={`text-sm px-3 py-1 border-0 font-medium ${userTags.includes(tagId) ? 'bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-400'}`}>
                   {tagNames.get(tagId) || capitalizeWords(tagId)}
-                </Badge>
-              ))}
+                </Badge>)}
             </div>
           </div>
 
@@ -244,32 +202,20 @@ const GroupDetailDialog = ({
               Go Back
             </Button>
             
-            {!isJoined && !isFeaturedGroup && (
-              <Button 
-                onClick={handleJoinClick} 
-                disabled={group.memberIds.length >= group.memberLimit} 
-                className="flex-1"
-              >
+            {!isJoined && !isFeaturedGroup && <Button onClick={handleJoinClick} disabled={group.memberIds.length >= group.memberLimit} className="flex-1">
                 {group.memberIds.length >= group.memberLimit ? 'Group Full' : 'Request to Join'}
-              </Button>
-            )}
+              </Button>}
             
-            {isJoined && !isFeaturedGroup && (
-              <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
+            {isJoined && !isFeaturedGroup && <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
                 Already Joined
-              </Button>
-            )}
+              </Button>}
 
-            {isFeaturedGroup && (
-              <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
+            {isFeaturedGroup && <Button variant="secondary" className="flex-1 dark:bg-gray-700 dark:text-gray-300" disabled>
                 Demo Group Only
-              </Button>
-            )}
+              </Button>}
           </div>
         </div>
       </DialogContent>
-    </Dialog>
-  );
+    </Dialog>;
 };
-
 export default GroupDetailDialog;
